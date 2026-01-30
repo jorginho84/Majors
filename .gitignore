@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+
+# Stata
+*.log
+*.smcl
+
+# Data files (keep on server only)
+*.dta
+*.csv
+
+# Temporary files
+*~
+*.tmp
