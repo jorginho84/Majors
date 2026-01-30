@@ -56,6 +56,12 @@ set scheme s2color
 * capture log close
 * log using "$logs/`c(current_date)'.log", replace
 
+*-------------------------------------------------------------------------------
+* Add project ado files to search path
+*-------------------------------------------------------------------------------
+
+adopath + "$code/ado"
+
 di "Configuration loaded successfully"
 di "Root: $root"
 di "Data: $data"
