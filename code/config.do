@@ -5,17 +5,38 @@
 
                         This file sets up paths and globals for the project.
                         Run this at the start of every do-file.
+
+                        MULTI-USER SETUP:
+                        Each coauthor should create their own config_user.do file
+                        (copy from config_user_template.do) with their local paths.
+                        This file is gitignored so it won't affect others.
 ------------------------------------------------------------------------------*/
 
 clear all
 set more off
 
 *-------------------------------------------------------------------------------
-* Project paths
+* Project paths - User-specific override
 *-------------------------------------------------------------------------------
 
-* Server paths (where data lives and code runs)
-global root     "/home/jrodriguezo/majors"
+* Default root path (server - jrodriguezo)
+global root "/home/jrodriguezo/majors"
+
+* Check for user-specific config file and load it
+* This allows each coauthor to override the root path
+local config_user_paths `" "config_user.do" "../code/config_user.do" "'
+foreach p of local config_user_paths {
+    capture confirm file `p'
+    if _rc == 0 {
+        quietly do `p'
+        continue, break
+    }
+}
+
+*-------------------------------------------------------------------------------
+* Derived paths (based on root)
+*-------------------------------------------------------------------------------
+
 global code     "$root/code"
 global data     "$root/data"
 global raw      "$data"

@@ -5,6 +5,9 @@
 *.log
 *.smcl
 
+# User-specific config (each coauthor has their own)
+code/config_user.do
+
 # Data files (keep on server only)
 *.dta
 *.csv

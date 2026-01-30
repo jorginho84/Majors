@@ -88,6 +88,33 @@
 
 ---
 
+## Multi-User Setup
+
+Each coauthor may have data in different locations. To accommodate this:
+
+1. **Copy the template:**
+   ```
+   cp code/config_user_template.do code/config_user.do
+   ```
+
+2. **Edit `config_user.do`** with your paths:
+   ```stata
+   global root "/your/path/to/majors"
+   ```
+
+3. **`config_user.do` is gitignored** — your paths won't affect others
+
+**Example paths by user:**
+| User | Root Path |
+|------|-----------|
+| jrodriguezo (server) | `/home/jrodriguezo/majors` |
+| Local Mac | `/Users/yourname/Research/Majors` |
+| Local Windows | `C:/Users/yourname/Research/Majors` |
+
+The default in `config.do` is the server path. If no `config_user.do` exists, it uses the default.
+
+---
+
 ## Folder Structure
 
 **Local Repository**
@@ -130,26 +157,28 @@ majors/
 - [x] Define folder structure following best practices for empirical research
 - [x] Create folder structure on server
 - [x] Set up `config.do` with path globals
-- [ ] Create `00_master.do` to run everything in order
+- [x] Create `00_master.do` to run everything in order
+- [x] Set up multi-user configuration (`config_user_template.do`)
 
 ### 2. Data Cleaning (`01_clean/`)
 Scripts to clean each raw data source:
 
 | Script | Input | Output | Status |
 |--------|-------|--------|--------|
-| `01_clean_psu.do` | PSU_scores/*.csv | `psu_scores.dta` | [ ] |
-| `02_clean_applications.do` | MINEDUC/Applications/*.csv | `applications.dta` | [ ] |
-| `03_clean_enrollment.do` | MINEDUC/Matricula.../*.csv | `enrollment.dta` | [ ] |
+| `01_clean_psu.do` | PSU_scores/*.csv | `psu_scores.dta` | [x] |
+| `02_clean_applications.do` | MINEDUC/Applications/*.csv | `applications.dta` | [x] |
+| `03_clean_enrollment.do` | MINEDUC/Matricula.../*.csv | `enrollment.dta` | [x] |
+| `04_clean_weights.do` | weights_2004_2016.csv | `weights.dta` | [x] |
 
 ### 3. Data Construction (`02_build/`)
 Scripts to build analysis datasets:
 
 | Script | Description | Output | Status |
 |--------|-------------|--------|--------|
-| `01_build_cutoffs.do` | Compute cutoffs from admitted applicants | `cutoffs.dta` | [ ] |
-| `02_build_running_var.do` | Merge scores + applications, compute score_rd | `applications_rd.dta` | [ ] |
-| `03_build_outcomes.do` | Merge enrollment outcomes | `analysis_sample.dta` | [ ] |
-| `04_build_waiting_list.do` | Identify program-years with waiting lists | `waiting_list.dta` | [ ] |
+| `01_build_cutoffs.do` | Compute cutoffs from admitted applicants | `cutoffs.dta` | [x] |
+| `02_build_running_var.do` | Merge scores + applications, compute score_rd | `applications_rd.dta` | [x] |
+| `03_build_outcomes.do` | Merge enrollment outcomes | `analysis_sample.dta` | [x] |
+| `04_build_waiting_list.do` | Identify program-years with waiting lists | `waiting_list.dta` | [x] |
 
 ### 4. Descriptive Statistics (`03_descriptive/`)
 | Script | Description | Status |
@@ -161,9 +190,14 @@ Scripts to build analysis datasets:
 ### 5. RDD Estimation (`04_rdd/`)
 | Script | Description | Status |
 |--------|-------------|--------|
-| `01_rdd_enrollment.do` | Main RDD estimates for enrollment | [ ] |
-| `02_rdd_figures.do` | RD plots | [ ] |
+| `01_rdd_enrollment.do` | Main RDD estimates for enrollment | [x] |
+| `02_rdd_figures.do` | RD plots | [x] |
 | `03_rdd_robustness.do` | Bandwidth sensitivity, polynomial order | [ ] |
+
+### 6. Custom Commands (`code/ado/`)
+| File | Description | Status |
+|------|-------------|--------|
+| `rd_plot.ado` | Reusable RD plot command | [x] |
 
 ---
 
@@ -183,9 +217,12 @@ Scripts to build analysis datasets:
 
 1. ~~**Explore server data** — Check exact file names and variable names in CSVs~~
 2. ~~**Create `config.do`** — Set up paths for server execution~~
-3. **Start with `02_clean_applications.do`** — Core data source for cutoffs
-4. **Create `01_clean_psu.do`** — PSU scores for application scores
-5. **Create `01_build_cutoffs.do`** — Compute cutoffs from admitted applicants
+3. ~~**Data cleaning scripts** — PSU, applications, enrollment, weights~~
+4. ~~**Data construction scripts** — cutoffs, running variable, outcomes~~
+5. ~~**RDD estimation and figures** — enrollment outcomes~~
+6. **Run pipeline on server** — Test full pipeline with actual data
+7. **Descriptive statistics** — Summary stats, McCrary test, balance
+8. **Robustness checks** — Bandwidth sensitivity, polynomial order
 
 ---
 
