@@ -17,7 +17,7 @@
                     Output: $processed/analysis_sample.dta
 ------------------------------------------------------------------------------*/
 
-do "$code/config.do"
+do "code/config.do"
 
 *-------------------------------------------------------------------------------
 * Load applications with running variable

@@ -11,7 +11,7 @@
                     Output: $processed/psu_scores.dta
 ------------------------------------------------------------------------------*/
 
-do "$code/config.do"
+do "code/config.do"
 
 *-------------------------------------------------------------------------------
 * Import and append PSU scores across years
@@ -25,6 +25,14 @@ import delimited "$psu_raw/A_INSCRITOS_PUNTAJES_PSU_`y'_PRIV_MRUN.csv", ///
 * Standardize variable names to lowercase
 rename *, lower
 
+* Fix encoding issues with año (ñ gets garbled in CSV headers)
+* Standardize to ao_proceso (without ñ) to avoid encoding issues
+capture rename año_proceso ao_proceso
+capture rename ano_proceso ao_proceso
+capture rename a_o_proceso ao_proceso
+capture rename aæo_proceso ao_proceso
+capture rename v3 ao_proceso
+
 tempfile psu_scores
 save `psu_scores'
 
@@ -35,6 +43,13 @@ forvalues y = `=$year_start + 1'/$year_end {
         delimiter(";") varnames(1) clear encoding(utf-8)
 
     rename *, lower
+
+    * Fix encoding issues with año (standardize to ao_proceso)
+    capture rename año_proceso ao_proceso
+    capture rename ano_proceso ao_proceso
+    capture rename a_o_proceso ao_proceso
+    capture rename aæo_proceso ao_proceso
+    capture rename v3 ao_proceso
 
     append using `psu_scores', force
     save `psu_scores', replace
@@ -50,7 +65,7 @@ forvalues y = `=$year_start + 1'/$year_end {
 * Average scores: promlm (language + math average)
 * BEA: scholarship indicator
 
-local keep_vars mrun año_proceso ///
+local keep_vars mrun ao_proceso ///
     ptje_nem ptje_ranking ///
     lyc_actual mate_actual hycs_actual ciencias_actual promlm_actual ///
     lyc_anterior mate_anterior hycs_anterior ciencias_anterior promlm_anterior ///
@@ -72,7 +87,7 @@ keep `keep_vars'
 * (Following legacy code from 03_returns.do)
 *-------------------------------------------------------------------------------
 
-bysort mrun: egen first_year = min(año_proceso)
+bysort mrun: egen first_year = min(ao_proceso)
 label variable first_year "First year student applied"
 
 *-------------------------------------------------------------------------------
@@ -81,19 +96,19 @@ label variable first_year "First year student applied"
 *-------------------------------------------------------------------------------
 
 * Check for duplicates before dropping
-duplicates tag mrun año_proceso, gen(dup)
+duplicates tag mrun ao_proceso, gen(dup)
 tab dup
 drop dup
 
 * Drop duplicates (keep first occurrence)
-duplicates drop mrun año_proceso, force
+duplicates drop mrun ao_proceso, force
 
 *-------------------------------------------------------------------------------
 * Label variables
 *-------------------------------------------------------------------------------
 
 label variable mrun "Student ID"
-label variable año_proceso "Application year"
+label variable ao_proceso "Application year"
 label variable ptje_nem "GPA score (NEM)"
 label variable ptje_ranking "Class ranking score"
 
@@ -116,8 +131,8 @@ capture label variable bea "BEA scholarship indicator"
 *-------------------------------------------------------------------------------
 
 * Check year range
-tab año_proceso
-assert año_proceso >= $year_start & año_proceso <= $year_end
+tab ao_proceso
+assert ao_proceso >= $year_start & ao_proceso <= $year_end
 
 * Check score ranges (valid PSU scores are 150-850)
 foreach var in lyc_actual mate_actual hycs_actual ciencias_actual {

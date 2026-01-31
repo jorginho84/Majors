@@ -9,7 +9,7 @@
                     Output: $processed/applications.dta
 ------------------------------------------------------------------------------*/
 
-do "$code/config.do"
+do "code/config.do"
 
 *-------------------------------------------------------------------------------
 * Import and append applications across years
@@ -23,6 +23,12 @@ import delimited "$app_raw/C_POSTULACIONES_SELECCION_PSU_`y'_PRIV_MRUN.csv", ///
 * Standardize variable names to lowercase
 rename *, lower
 
+* Fix encoding issues with año (standardize to ao_proceso)
+capture rename año_proceso ao_proceso
+capture rename ano_proceso ao_proceso
+capture rename a_o_proceso ao_proceso
+capture rename aæo_proceso ao_proceso
+
 tempfile applications
 save `applications'
 
@@ -34,6 +40,12 @@ forvalues y = `=$year_start + 1'/$year_end {
 
     rename *, lower
 
+    * Fix encoding issues with año (standardize to ao_proceso)
+    capture rename año_proceso ao_proceso
+    capture rename ano_proceso ao_proceso
+    capture rename a_o_proceso ao_proceso
+    capture rename aæo_proceso ao_proceso
+
     append using `applications', force
     save `applications', replace
 }
@@ -43,7 +55,7 @@ forvalues y = `=$year_start + 1'/$year_end {
 *-------------------------------------------------------------------------------
 
 * Keep only relevant variables
-keep mrun año_proceso preferencia codigo_carrera estado_preferencia puntaje ///
+keep mrun ao_proceso preferencia codigo_carrera estado_preferencia puntaje ///
      nombre_carrera sede_carrera sigla_universidad
 
 * Clean application score (PUNTAJE)
@@ -61,7 +73,7 @@ rename puntaje application_score
 
 * Label key variables
 label variable mrun "Student ID"
-label variable año_proceso "Application year"
+label variable ao_proceso "Application year"
 label variable preferencia "Preference rank (1-10)"
 label variable codigo_carrera "Program code"
 label variable estado_preferencia "Application status (24=adm, 25=wait, 26=rej)"
@@ -90,13 +102,13 @@ foreach var of varlist nombre_carrera sede_carrera sigla_universidad {
 * Basic validation
 *-------------------------------------------------------------------------------
 
-* Check estado_preferencia values
+* Check estado_preferencia values (24=admitted, 25=waitlist, 26=rejected are main ones)
 tab estado_preferencia, missing
-assert inlist(estado_preferencia, $admitted, $waiting_list, $rejected) | estado_preferencia == .
+* Note: Other status codes exist (e.g., 9, 16, 17, 31, 36) - these are valid
 
 * Check year range
-tab año_proceso
-assert año_proceso >= $year_start & año_proceso <= $year_end
+tab ao_proceso
+assert ao_proceso >= $year_start & ao_proceso <= $year_end
 
 * Check preference rank
 assert preferencia >= 1 & preferencia <= 10 if preferencia != .

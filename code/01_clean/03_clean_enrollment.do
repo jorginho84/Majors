@@ -11,7 +11,7 @@
                     Output: $processed/enrollment.dta
 ------------------------------------------------------------------------------*/
 
-do "$code/config.do"
+do "code/config.do"
 
 *-------------------------------------------------------------------------------
 * Import and process enrollment data year by year
