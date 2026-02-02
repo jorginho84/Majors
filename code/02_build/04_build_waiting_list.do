@@ -31,13 +31,13 @@ use "$processed/applications.dta", clear
 gen on_waiting_list = (estado_preferencia == $waiting_list)
 
 * Count waiting list applicants per program-year
-bysort codigo_carrera año_proceso: egen wl_count = total(on_waiting_list)
+bysort codigo_carrera ao_proceso: egen wl_count = total(on_waiting_list)
 
 * Keep only program-years with at least one person on waiting list
 keep if wl_count > 0 & wl_count != .
 
 * Collapse to program-year level
-collapse (first) wl_count, by(codigo_carrera año_proceso)
+collapse (first) wl_count, by(codigo_carrera ao_proceso)
 
 * Rename to match legacy code convention
 rename codigo_carrera t_codigo_carrera
@@ -47,7 +47,7 @@ rename wl_count waiting_list_size
 gen has_waiting_list = 1
 
 label variable t_codigo_carrera "Program code"
-label variable año_proceso "Application year"
+label variable ao_proceso "Application year"
 label variable waiting_list_size "Number of applicants on waiting list"
 label variable has_waiting_list "Program-year has waiting list"
 
@@ -59,7 +59,7 @@ di _n "=== Waiting List Summary ==="
 count
 di "Program-years with waiting lists: " r(N)
 
-tab año_proceso
+tab ao_proceso
 
 summarize waiting_list_size, detail
 

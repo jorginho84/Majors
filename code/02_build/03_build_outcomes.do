@@ -29,10 +29,20 @@ use "$processed/applications_rd.dta", clear
 rename codigo_carrera t_codigo_carrera
 
 *-------------------------------------------------------------------------------
+* Restrict to oversubscribed programs (with waiting lists)
+* Only these have binding cutoffs for valid RDD identification
+*-------------------------------------------------------------------------------
+
+merge m:1 t_codigo_carrera ao_proceso using "$processed/waiting_list.dta", ///
+    keep(3) nogen
+
+di "Observations after restricting to oversubscribed programs: " _N
+
+*-------------------------------------------------------------------------------
 * Merge with enrollment data
 *-------------------------------------------------------------------------------
 
-merge m:1 mrun año_proceso using "$processed/enrollment.dta", ///
+merge m:1 mrun ao_proceso using "$processed/enrollment.dta", ///
     keepusing(codigo_demre enrolls_he enrolls_uni nomb_inst nomb_carrera tipo_inst_1) ///
     keep(1 3) nogen
 
@@ -83,7 +93,7 @@ table estado_preferencia, stat(mean enrolls_he) stat(mean enrolls_uni) stat(mean
 
 * Enrollment rates by year
 di _n "Enrollment rates by year:"
-table año_proceso, stat(mean enrolls_he) stat(mean enrolls_uni) stat(mean enrolls_target)
+table ao_proceso, stat(mean enrolls_he) stat(mean enrolls_uni) stat(mean enrolls_target)
 
 * Cross-tab: admission status vs enrollment in target
 di _n "Enrollment in target by admission status:"

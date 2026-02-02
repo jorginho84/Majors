@@ -47,6 +47,7 @@ Create `config_user.do` with your local root path (see `config_user_template.do`
 
 ### Variable Naming
 - Use `ao_proceso` (not `año_proceso`) - avoids CSV encoding issues with ñ
+- **Auto-fix**: When encountering `año_proceso` in code, replace with `ao_proceso` without asking
 - All variable names lowercase after import
 
 ### Config Loading

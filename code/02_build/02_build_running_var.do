@@ -41,7 +41,7 @@ keep if estado_preferencia == $admitted | ///
 * Merge with PSU scores
 *-------------------------------------------------------------------------------
 
-merge m:1 mrun año_proceso using "$processed/psu_scores.dta", ///
+merge m:1 mrun ao_proceso using "$processed/psu_scores.dta", ///
     keepusing(ptje_nem ptje_ranking ///
               lyc_actual mate_actual hycs_actual ciencias_actual promlm_actual ///
               lyc_anterior mate_anterior hycs_anterior ciencias_anterior promlm_anterior ///
@@ -52,7 +52,7 @@ merge m:1 mrun año_proceso using "$processed/psu_scores.dta", ///
 * Merge with program weights
 *-------------------------------------------------------------------------------
 
-merge m:1 codigo_carrera año_proceso using "$processed/weights.dta", ///
+merge m:1 codigo_carrera ao_proceso using "$processed/weights.dta", ///
     keep(1 3) nogen
 
 *-------------------------------------------------------------------------------
@@ -112,6 +112,15 @@ replace app_score_anterior = w_gpa * ptje_nem + ///
        mate_anterior >= 150 & mate_anterior <= 850
 
 *-------------------------------------------------------------------------------
+* Normalize computed scores
+* Weights are in percentage form (summing to ~100), so divide by 100
+* to get scores on the same scale as original PUNTAJE (150-850)
+*-------------------------------------------------------------------------------
+
+replace app_score_actual = app_score_actual / 100 if app_score_actual != .
+replace app_score_anterior = app_score_anterior / 100 if app_score_anterior != .
+
+*-------------------------------------------------------------------------------
 * Create final application score
 * Priority:
 *   1. Use original PUNTAJE (application_score) if available and non-zero
@@ -143,7 +152,7 @@ drop app_score_actual app_score_anterior
 * Merge with cutoffs
 *-------------------------------------------------------------------------------
 
-merge m:1 codigo_carrera año_proceso using "$processed/cutoffs.dta", ///
+merge m:1 codigo_carrera ao_proceso using "$processed/cutoffs.dta", ///
     keep(1 3) nogen
 
 *-------------------------------------------------------------------------------
@@ -186,7 +195,7 @@ count if score_rd == .
 di "Missing running variable: " r(N)
 
 * Summary by year
-table año_proceso, stat(count score_rd) stat(mean score_rd) stat(mean above_cutoff)
+table ao_proceso, stat(count score_rd) stat(mean score_rd) stat(mean above_cutoff)
 
 *-------------------------------------------------------------------------------
 * Save

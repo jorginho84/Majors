@@ -40,7 +40,7 @@ count
 di "Observations within bandwidth: " r(N)
 
 * Generate year dummies for display
-tab año_proceso, gen(yr_)
+tab ao_proceso, gen(yr_)
 
 *-------------------------------------------------------------------------------
 * Summary statistics before estimation
@@ -50,7 +50,7 @@ di _n "=== Pre-estimation Summary ==="
 
 * Sample composition
 tab above_cutoff, missing
-tab año_proceso above_cutoff
+tab ao_proceso above_cutoff
 
 * Outcome means by treatment status
 di _n "Mean outcomes by treatment status:"
@@ -68,8 +68,8 @@ summarize score_rd, detail
 estimates clear
 
 * Local for fixed effects
-local fe "i.año_proceso#i.t_codigo_carrera"
-local cluster_var "año_proceso#t_codigo_carrera"
+local fe "i.ao_proceso#i.t_codigo_carrera"
+local cluster_var "ao_proceso#t_codigo_carrera"
 
 *--- Outcome 1: Enrolls in any higher education ---
 

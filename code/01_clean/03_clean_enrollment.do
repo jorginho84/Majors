@@ -75,7 +75,7 @@ drop has_demre any_demre N
 duplicates drop mrun, force
 
 * Add year variable
-gen año_proceso = `y'
+gen ao_proceso = `y'
 
 tempfile enrollment
 save `enrollment'
@@ -121,7 +121,7 @@ forvalues y = `=$year_start + 1'/$year_end {
 
     duplicates drop mrun, force
 
-    gen año_proceso = `y'
+    gen ao_proceso = `y'
 
     append using `enrollment', force
     save `enrollment', replace
@@ -132,7 +132,7 @@ forvalues y = `=$year_start + 1'/$year_end {
 *-------------------------------------------------------------------------------
 
 * Keep relevant variables
-keep mrun año_proceso codigo_demre cod_inst nomb_inst nomb_carrera tipo_inst_1 ///
+keep mrun ao_proceso codigo_demre cod_inst nomb_inst nomb_carrera tipo_inst_1 ///
      nivel_global
 
 * Clean text variables (remove accents, lowercase)
@@ -175,7 +175,7 @@ label variable enrolls_uni "Enrolled in university"
 *-------------------------------------------------------------------------------
 
 label variable mrun "Student ID"
-label variable año_proceso "Enrollment year"
+label variable ao_proceso "Enrollment year"
 label variable codigo_demre "DEMRE program code"
 label variable cod_inst "Institution code"
 label variable nomb_inst "Institution name"
@@ -187,7 +187,7 @@ label variable tipo_inst_1 "Institution type"
 *-------------------------------------------------------------------------------
 
 * Check year range
-tab año_proceso
+tab ao_proceso
 
 * Check enrollment indicators
 tab enrolls_uni
@@ -200,7 +200,7 @@ di "Total observations: " r(N)
 distinct mrun
 di "Unique students: " r(ndistinct)
 
-tab año_proceso enrolls_uni
+tab ao_proceso enrolls_uni
 
 *-------------------------------------------------------------------------------
 * Save

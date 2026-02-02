@@ -25,7 +25,7 @@ rename *, lower
 
 * Rename variables if needed (check legacy code naming)
 capture rename program_code codigo_carrera
-capture rename application_year año_proceso
+capture rename application_year ao_proceso
 
 *-------------------------------------------------------------------------------
 * Clean variables
@@ -59,7 +59,7 @@ drop weight_sum
 *-------------------------------------------------------------------------------
 
 label variable codigo_carrera "Program code"
-label variable año_proceso "Application year"
+label variable ao_proceso "Application year"
 
 capture label variable w_gpa "Weight: GPA (NEM)"
 capture label variable w_rank "Weight: Class ranking"
@@ -76,17 +76,17 @@ capture label variable min_reading_math "Minimum language-math average required"
 *-------------------------------------------------------------------------------
 
 * Check for duplicates (should be unique by program-year)
-duplicates tag codigo_carrera año_proceso, gen(dup)
+duplicates tag codigo_carrera ao_proceso, gen(dup)
 tab dup
 if r(N) > 0 {
     di as text "Warning: Duplicate program-years found"
-    list codigo_carrera año_proceso if dup > 0
+    list codigo_carrera ao_proceso if dup > 0
 }
 drop dup
 
 * Summary statistics
 di _n "=== Weights Summary ==="
-tab año_proceso
+tab ao_proceso
 
 distinct codigo_carrera
 di "Unique programs: " r(ndistinct)

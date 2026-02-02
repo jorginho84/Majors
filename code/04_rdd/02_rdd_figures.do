@@ -49,8 +49,8 @@ rd_plot enrolls_he, ///
     bandwidth($bandwidth) ///
     binwidth(5) ///
     degree(1) ///
-    absorb(año_proceso t_codigo_carrera) ///
-    cluster(año_proceso#t_codigo_carrera) ///
+    absorb(ao_proceso t_codigo_carrera) ///
+    cluster(ao_proceso#t_codigo_carrera) ///
     saving("$output/figures/rd_enrolls_he") ///
     title("Effect on Higher Education Enrollment") ///
     yrange(0 1)
@@ -67,8 +67,8 @@ rd_plot enrolls_uni, ///
     bandwidth($bandwidth) ///
     binwidth(5) ///
     degree(1) ///
-    absorb(año_proceso t_codigo_carrera) ///
-    cluster(año_proceso#t_codigo_carrera) ///
+    absorb(ao_proceso t_codigo_carrera) ///
+    cluster(ao_proceso#t_codigo_carrera) ///
     saving("$output/figures/rd_enrolls_uni") ///
     title("Effect on University Enrollment") ///
     yrange(0 1)
@@ -85,8 +85,8 @@ rd_plot enrolls_target, ///
     bandwidth($bandwidth) ///
     binwidth(5) ///
     degree(1) ///
-    absorb(año_proceso t_codigo_carrera) ///
-    cluster(año_proceso#t_codigo_carrera) ///
+    absorb(ao_proceso t_codigo_carrera) ///
+    cluster(ao_proceso#t_codigo_carrera) ///
     saving("$output/figures/rd_enrolls_target") ///
     title("Effect on Target Program Enrollment") ///
     yrange(0 1)
