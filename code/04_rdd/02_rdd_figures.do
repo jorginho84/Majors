@@ -38,6 +38,30 @@ label variable score_rd "Distance to Admission Cutoff"
 label variable above_cutoff "Above Cutoff"
 
 *-------------------------------------------------------------------------------
+* Figure 0: Histogram of running variable
+*-------------------------------------------------------------------------------
+
+di _n "=== Creating Histogram of Running Variable ==="
+
+* Full sample histogram (within display range)
+preserve
+keep if abs(score_rd) <= 50
+
+twoway (histogram score_rd, width(2) fcolor(gs12) lcolor(gs10) lwidth(vthin)), ///
+    xline(0, lpattern(dash) lcolor(black) lwidth(medium)) ///
+    xtitle("Distance to Admission Cutoff", size(medium)) ///
+    ytitle("Density", size(medium)) ///
+    xlabel(-50(10)50, labsize(small)) ///
+    title("Distribution of Running Variable", size(medium)) ///
+    graphregion(color(white)) ///
+    plotregion(color(white))
+
+graph export "$output/figures/histogram_running_var.pdf", replace as(pdf)
+di "Histogram saved to: $output/figures/histogram_running_var.pdf"
+
+restore
+
+*-------------------------------------------------------------------------------
 * Figure 1: Enrollment in any higher education
 *-------------------------------------------------------------------------------
 
@@ -49,6 +73,7 @@ rd_plot enrolls_he, ///
     bandwidth($bandwidth) ///
     binwidth(5) ///
     degree(1) ///
+    xsupport(50) ///
     absorb(ao_proceso t_codigo_carrera) ///
     cluster(ao_proceso#t_codigo_carrera) ///
     saving("$output/figures/rd_enrolls_he") ///
@@ -67,6 +92,7 @@ rd_plot enrolls_uni, ///
     bandwidth($bandwidth) ///
     binwidth(5) ///
     degree(1) ///
+    xsupport(50) ///
     absorb(ao_proceso t_codigo_carrera) ///
     cluster(ao_proceso#t_codigo_carrera) ///
     saving("$output/figures/rd_enrolls_uni") ///
@@ -85,11 +111,12 @@ rd_plot enrolls_target, ///
     bandwidth($bandwidth) ///
     binwidth(5) ///
     degree(1) ///
+    xsupport(50) ///
     absorb(ao_proceso t_codigo_carrera) ///
     cluster(ao_proceso#t_codigo_carrera) ///
     saving("$output/figures/rd_enrolls_target") ///
-    title("Effect on Target Program Enrollment") ///
-    yrange(0 1)
+    title("Enroll in the Target University") ///
+    yrange(0 .5)
 
 *-------------------------------------------------------------------------------
 * Summary
@@ -100,6 +127,7 @@ di "RD FIGURES COMPLETE"
 di _dup(70) "="
 di _n "Figures saved to: $output/figures/"
 di _n "Files created:"
+di "  - histogram_running_var.pdf"
 di "  - rd_enrolls_he.pdf"
 di "  - rd_enrolls_uni.pdf"
 di "  - rd_enrolls_target.pdf"

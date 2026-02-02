@@ -1,5 +1,5 @@
-*! rd_plot v1.0 - RD plot with binned scatter, fitted lines, and histogram
-*! Based on legacy code: 04_a2_figures_enrollment.do
+*! rd_plot v2.0 - RD plot with clean publication style
+*! Based on reference figure style: black dots, linear fit, subtle histogram
 *!
 *! Syntax:
 *!   rd_plot outcome, running(varname) treatment(varname) [options]
@@ -10,18 +10,18 @@
 *!   treatment() - treatment indicator (1 if above cutoff)
 *!
 *! Optional:
-*!   bandwidth() - bandwidth for sample restriction (default: 25)
+*!   bandwidth() - bandwidth for regression/fitted line (default: 25)
 *!   binwidth()  - width of bins for scatter (default: 5)
 *!   degree()    - polynomial degree: 1=linear, 2=quadratic (default: 1)
-*!   absorb()    - fixed effects to absorb (e.g., "año_proceso t_codigo_carrera")
-*!   cluster()   - cluster variable for SE (e.g., "año_proceso#t_codigo_carrera")
+*!   absorb()    - fixed effects to absorb
+*!   cluster()   - cluster variable for SE
 *!   saving()    - file path to save graph (without extension)
 *!   title()     - custom title for the graph
 *!   ytitle()    - custom y-axis title
 *!   xtitle()    - custom x-axis title
 *!   yrange()    - y-axis range as "min max" (default: auto)
+*!   xsupport()  - x-axis display range (default: 50, shows -50 to 50)
 *!   nohistogram - suppress histogram overlay
-*!   noci        - suppress confidence intervals display
 
 capture program drop rd_plot
 program define rd_plot, rclass
@@ -40,8 +40,8 @@ program define rd_plot, rclass
          YTitle(string) ///
          XTitle(string) ///
          YRange(numlist min=2 max=2) ///
-         noHISTogram ///
-         noCI]
+         XSupport(real 50) ///
+         noHISTogram]
 
     *---------------------------------------------------------------------------
     * Setup
@@ -53,18 +53,16 @@ program define rd_plot, rclass
     local bw `bandwidth'
     local bin `binwidth'
     local poly `degree'
+    local xsupp `xsupport'
 
-    * Mark sample
+    * Mark sample (full sample for display, bandwidth for regression)
     marksample touse
     markout `touse' `outcome' `rv' `treat'
 
-    * Apply bandwidth restriction
-    qui replace `touse' = 0 if abs(`rv') > `bw'
-
     * Check we have observations
-    qui count if `touse'
+    qui count if `touse' & abs(`rv') <= `bw'
     if r(N) == 0 {
-        di as error "No observations in bandwidth"
+        di as error "No observations within bandwidth"
         exit 2000
     }
 
@@ -73,25 +71,7 @@ program define rd_plot, rclass
     if "`outcome_label'" == "" local outcome_label "`outcome'"
 
     local rv_label: variable label `rv'
-    if "`rv_label'" == "" local rv_label "Distance to cutoff"
-
-    *---------------------------------------------------------------------------
-    * Center running variable for cleaner display at cutoff
-    * (Following legacy code lines 27-38)
-    *---------------------------------------------------------------------------
-
-    tempvar rv_centered
-
-    * Get max negative and min positive values
-    qui summarize `rv' if `touse' & `rv' < 0
-    local max_neg = r(max)
-
-    qui summarize `rv' if `touse' & `rv' > 0
-    local min_pos = r(min)
-
-    * Create centered variable
-    qui gen `rv_centered' = `rv' + abs(`max_neg') if `rv' < 0 & `touse'
-    qui replace `rv_centered' = `rv' - `min_pos' if `rv' >= 0 & `touse'
+    if "`rv_label'" == "" local rv_label "Test Score Relative to Cutoff"
 
     *---------------------------------------------------------------------------
     * Residualize outcome (remove fixed effects)
@@ -100,47 +80,38 @@ program define rd_plot, rclass
     tempvar outcome_resid
 
     if "`absorb'" != "" {
-        * Build absorb specification
-        local absorb_spec ""
-        foreach v of local absorb {
-            local absorb_spec "`absorb_spec' i.`v'"
-        }
-
         * Get interaction of absorb variables
         local absorb_interact: subinstr local absorb " " "#i.", all
         local absorb_interact "i.`absorb_interact'"
 
-        qui reghdfe `outcome' if `touse', absorb(`absorb_interact') residuals
-        qui predict `outcome_resid' if `touse', residuals
+        qui reghdfe `outcome' if `touse' & abs(`rv') <= `xsupp', absorb(`absorb_interact') residuals
+        qui predict `outcome_resid' if `touse' & abs(`rv') <= `xsupp', residuals
 
-        * Add back constant
-        local b_cons = _b[_cons]
-        qui replace `outcome_resid' = `outcome_resid' + `b_cons' if `touse'
+        * Add back mean
+        qui summarize `outcome' if `touse' & abs(`rv') <= `xsupp'
+        local outcome_mean = r(mean)
+        qui replace `outcome_resid' = `outcome_resid' + `outcome_mean' if `touse'
     }
     else {
         qui gen `outcome_resid' = `outcome' if `touse'
     }
 
     *---------------------------------------------------------------------------
-    * Generate bins using rdplot
+    * Generate bins for scatter plot (over full x support)
     *---------------------------------------------------------------------------
 
-    local nbins = round(`bw' / `bin')
+    tempvar bin_var bin_mean_y bin_mean_x bin_tag
 
-    qui rdplot `outcome_resid' `rv' if `touse', ///
-        c(0) p(`poly') ///
-        nbins(`nbins' `nbins') ///
-        kernel(uniform) ///
-        h(`bw' `bw') ///
-        support(-`bw' `bw') ///
-        hide genvars
+    * Create bin variable (centered on bin midpoint)
+    qui gen `bin_var' = floor(`rv' / `bin') * `bin' + `bin'/2 if `touse' & abs(`rv') <= `xsupp'
 
-    * Create bin identifier
-    tempvar bin_id
-    qui bysort rdplot_mean_y: gen `bin_id' = _n
+    * Compute bin means
+    qui bysort `bin_var': egen `bin_mean_y' = mean(`outcome_resid') if `touse' & abs(`rv') <= `xsupp'
+    qui bysort `bin_var': egen `bin_mean_x' = mean(`rv') if `touse' & abs(`rv') <= `xsupp'
+    qui bysort `bin_var': gen `bin_tag' = (_n == 1) if `touse' & abs(`rv') <= `xsupp'
 
     *---------------------------------------------------------------------------
-    * Run RD regression
+    * Run RD regression (within bandwidth only)
     *---------------------------------------------------------------------------
 
     * Build cluster option
@@ -155,28 +126,44 @@ program define rd_plot, rclass
         local reg_absorb "absorb(`absorb_interact')"
     }
 
-    * Run regression based on polynomial degree
+    * Run regression within bandwidth
     if `poly' == 1 {
-        qui reghdfe `outcome' `treat' `rv' 1.`treat'#c.`rv' if `touse', ///
+        qui reghdfe `outcome' `treat' `rv' 1.`treat'#c.`rv' if `touse' & abs(`rv') <= `bw', ///
             `reg_absorb' `cluster_opt'
     }
     else if `poly' == 2 {
         qui reghdfe `outcome' `treat' `rv' 1.`treat'#c.`rv' ///
-            c.`rv'#c.`rv' 1.`treat'#c.`rv'#c.`rv' if `touse', ///
+            c.`rv'#c.`rv' 1.`treat'#c.`rv'#c.`rv' if `touse' & abs(`rv') <= `bw', ///
             `reg_absorb' `cluster_opt'
     }
 
     * Store coefficient and SE
     local beta = _b[`treat']
     local se = _se[`treat']
-    local beta_fmt: display %6.3f `beta'
-    local se_fmt: display %6.3f `se'
-    local coef_text "β = `beta_fmt' (`se_fmt')"
+    local beta_fmt: display %5.3f `beta'
+    local se_fmt: display %5.3f `se'
+    local coef_text "First Stage: `beta_fmt' (`se_fmt')"
 
     * Return results
     return scalar beta = `beta'
     return scalar se = `se'
     return scalar N = e(N)
+
+    *---------------------------------------------------------------------------
+    * Generate fitted values (within bandwidth only)
+    *---------------------------------------------------------------------------
+
+    tempvar fitted_below fitted_above xgrid
+
+    * Get regression coefficients
+    local b0 = _b[_cons]
+    local b1 = _b[`treat']
+    local b2 = _b[`rv']
+    local b3 = _b[1.`treat'#c.`rv']
+
+    * Generate fitted values at data points
+    qui gen `fitted_below' = `b0' + `b2' * `rv' if `touse' & `rv' >= -`bw' & `rv' < 0
+    qui gen `fitted_above' = `b0' + `b1' + (`b2' + `b3') * `rv' if `touse' & `rv' >= 0 & `rv' <= `bw'
 
     *---------------------------------------------------------------------------
     * Set up graph parameters
@@ -188,93 +175,78 @@ program define rd_plot, rclass
         local ymax: word 2 of `yrange'
     }
     else {
-        qui summarize rdplot_mean_y if `touse'
-        local ymin = floor(r(min) * 20) / 20
-        local ymax = ceil(r(max) * 20) / 20
-        * Ensure some padding
+        qui summarize `bin_mean_y' if `bin_tag' == 1 & `touse'
+        local ymin = floor(r(min) * 10) / 10
+        local ymax = ceil(r(max) * 10) / 10
         local ymin = max(0, `ymin' - 0.05)
         local ymax = min(1, `ymax' + 0.05)
     }
 
-    local ygap = 0.05
-    if `ymax' - `ymin' > 0.5 {
-        local ygap = 0.1
+    local ygap = 0.1
+    if `ymax' - `ymin' <= 0.5 {
+        local ygap = 0.05
     }
 
-    * X-axis
-    local bin_gap = `bin' * 2
-    local bw_fmt: display %4.0f `bw'
+    * X-axis gaps
+    local xgap = 10
+    if `xsupp' <= 25 {
+        local xgap = 5
+    }
 
-    * Text position for coefficient
-    local text_y = `ymax' - 0.05
+    * Text position for coefficient (bottom right quadrant)
+    local text_y = `ymin' + 0.06
+    local text_x = `xsupp' * 0.35
 
     * Axis titles
     if "`ytitle'" == "" local ytitle "`outcome_label'"
     if "`xtitle'" == "" local xtitle "`rv_label'"
-    if "`title'" == ""  local title "RD Plot: `outcome_label'"
+    if "`title'" == ""  local title "`outcome_label'"
 
     *---------------------------------------------------------------------------
     * Create graph
     *---------------------------------------------------------------------------
 
-    * Build fit command based on degree
-    if `poly' == 1 {
-        local fit_cmd "lfit"
-    }
-    else {
-        local fit_cmd "qfit"
-    }
-
-    * Build histogram component
+    * Build histogram component (subtle, in background)
     local hist_cmd ""
     if "`histogram'" != "nohistogram" {
-        local hist_cmd "(histogram `rv_centered', yaxis(2) width(`bin') start(-`bw') frequency fintensity(40) fcolor(edkblue) lwidth(none))"
+        * Light blue, very transparent histogram
+        local hist_cmd "(histogram `rv' if `touse' & abs(`rv') <= `xsupp', yaxis(2) width(`bin') frequency fcolor(ltblue%15) lwidth(none))"
     }
 
     #delimit ;
     twoway
         `hist_cmd'
-        (`fit_cmd' `outcome_resid' `rv_centered' if `rv_centered' < 0 & `touse', lcolor(red) lwidth(medium))
-        (`fit_cmd' `outcome_resid' `rv_centered' if `rv_centered' >= 0 & `touse', lcolor(red) lwidth(medium))
-        (scatter rdplot_mean_y rdplot_mean_x if `bin_id' == 1 & `touse',
-            sort mcolor(navy) msize(small) msymbol(circle)
-            text(`text_y' 1 "`coef_text'", place(e) size(small) color(black)))
+        (line `fitted_below' `rv' if `touse' & `rv' >= -`bw' & `rv' < 0,
+            sort lcolor(black) lwidth(medthick))
+        (line `fitted_above' `rv' if `touse' & `rv' >= 0 & `rv' <= `bw',
+            sort lcolor(black) lwidth(medthick))
+        (scatter `bin_mean_y' `bin_mean_x' if `bin_tag' == 1 & `touse',
+            mcolor(black) msize(medsmall) msymbol(circle)
+            text(`text_y' `text_x' "`coef_text'", place(e) size(small) color(black)))
         ,
+        xline(0, lpattern(dash) lcolor(gs8) lwidth(medium))
         ytitle("`ytitle'", size(medsmall))
-        yscale(range(`ymin' `ymax'))
-        ylabel(`ymin'(`ygap')`ymax', labels labsize(small) angle(horizontal) format(%9.2f))
-        xline(0, lpattern(dash) lcolor(black))
+        yscale(range(`ymin' `ymax') noline)
+        ylabel(`ymin'(`ygap')`ymax', labsize(small) angle(horizontal) format(%9.2f) nogrid)
         xtitle("`xtitle'", size(medsmall))
-        xlabel(-`bw_fmt'(`bin_gap')`bw_fmt', labsize(small))
+        xscale(range(-`xsupp' `xsupp') noline)
+        xlabel(-`xsupp'(`xgap')`xsupp', labsize(small))
+        yscale(alt axis(2) off)
         legend(off)
-        title("`title'", size(medium))
-        plotregion(lcolor(black) lwidth(thin))
+        title("`title'", size(medsmall))
         graphregion(color(white))
-        scheme(s2color)
+        plotregion(color(white))
     ;
     #delimit cr
-
-    * Add histogram y-axis label if included
-    if "`histogram'" != "nohistogram" {
-        * Note: ytitle for axis 2 set in options above if needed
-    }
 
     *---------------------------------------------------------------------------
     * Save graph if requested
     *---------------------------------------------------------------------------
 
     if "`saving'" != "" {
-        qui graph save "`saving'.gph", replace
         qui graph export "`saving'.pdf", replace as(pdf)
-        di as text "Graph saved to: `saving'.gph and `saving'.pdf"
+        di as text "Graph saved to: `saving'.pdf"
     }
-
-    *---------------------------------------------------------------------------
-    * Clean up rdplot generated variables
-    *---------------------------------------------------------------------------
-
-    capture drop rdplot_id rdplot_mean_x rdplot_mean_y rdplot_ci_l rdplot_ci_r
-    capture drop rdplot_N rdplot_min_bin rdplot_max_bin rdplot_mean_bin rdplot_se_y rdplot_hat_y
 
     *---------------------------------------------------------------------------
     * Display results
@@ -285,8 +257,9 @@ program define rd_plot, rclass
     di as text "Outcome:     " as result "`outcome'"
     di as text "Running var: " as result "`rv'"
     di as text "Bandwidth:   " as result "`bw'"
+    di as text "X support:   " as result "[-`xsupp', `xsupp']"
     di as text "Polynomial:  " as result "`poly'"
-    di as text "Observations:" as result e(N)
+    di as text "Observations:" as result e(N) " (within bandwidth)"
     di as text "{hline 50}"
     di as text "RD estimate: " as result "`beta_fmt'" as text " (SE: " as result "`se_fmt'" as text ")"
     di as text "{hline 50}"

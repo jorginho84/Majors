@@ -146,46 +146,6 @@ esttab rdd_he rdd_uni rdd_target using "$output/tables/rdd_enrollment.csv", ///
 di _n "Results exported to: $output/tables/rdd_enrollment.tex"
 
 *-------------------------------------------------------------------------------
-* Quadratic specification (robustness)
-*-------------------------------------------------------------------------------
-
-di _n "=== Quadratic Specification (Robustness) ==="
-
-estimates clear
-
-* Enrolls in any HE
-reghdfe enrolls_he above_cutoff score_rd 1.above_cutoff#c.score_rd ///
-    c.score_rd#c.score_rd 1.above_cutoff#c.score_rd#c.score_rd, ///
-    absorb(`fe') cluster(i.`cluster_var')
-estimates store rdd_he_q
-
-* Enrolls in university
-reghdfe enrolls_uni above_cutoff score_rd 1.above_cutoff#c.score_rd ///
-    c.score_rd#c.score_rd 1.above_cutoff#c.score_rd#c.score_rd, ///
-    absorb(`fe') cluster(i.`cluster_var')
-estimates store rdd_uni_q
-
-* Enrolls in target
-reghdfe enrolls_target above_cutoff score_rd 1.above_cutoff#c.score_rd ///
-    c.score_rd#c.score_rd 1.above_cutoff#c.score_rd#c.score_rd, ///
-    absorb(`fe') cluster(i.`cluster_var')
-estimates store rdd_target_q
-
-* Export quadratic results
-esttab rdd_he_q rdd_uni_q rdd_target_q using "$output/tables/rdd_enrollment_quadratic.tex", ///
-    replace ///
-    keep(above_cutoff) ///
-    label ///
-    se(3) b(3) ///
-    star(* 0.10 ** 0.05 *** 0.01) ///
-    title("RDD Estimates: Enrollment Outcomes (Quadratic)") ///
-    mtitles("Any HE" "University" "Target Program") ///
-    note("Standard errors clustered at program-year level in parentheses.") ///
-    addnote("Quadratic specification with different slopes above/below cutoff.") ///
-    scalars("N Observations") ///
-    substitute(\_ _)
-
-*-------------------------------------------------------------------------------
 * Display summary of main results
 *-------------------------------------------------------------------------------
 
