@@ -35,6 +35,41 @@ use "$processed/applications_rd.dta", clear
 rename codigo_carrera t_codigo_carrera
 
 *-------------------------------------------------------------------------------
+* Drop non-binding status 26 observations
+*
+* In the DEMRE mechanism, estado_preferencia == 26 at program j means the
+* student was assigned to a higher-ranked (more preferred) program k.
+* Crossing j's cutoff would not change their assignment — j is non-binding.
+*
+* We identify these as: status 26 at j AND status 24 at some k with
+* preferencia_k < preferencia_j (k is ranked higher = smaller number).
+*
+* Note: this must run BEFORE the oversubscribed restriction, since the
+* higher-ranked admission k may be at a non-oversubscribed program.
+*-------------------------------------------------------------------------------
+
+* Find the most preferred program each student was admitted to (status 24)
+gen     admitted_pref = preferencia if estado_preferencia == 24
+bysort mrun ao_proceso: egen min_admitted_pref = min(admitted_pref)
+
+* Count before
+local n_before = _N
+di _n "=== Binding Cutoff Filter ==="
+di "Observations before filter: " `n_before'
+
+count if estado_preferencia == 26 & ///
+        min_admitted_pref < preferencia & min_admitted_pref != .
+di "Non-binding status 26 observations dropped: " r(N)
+
+* Drop: status 26 at j AND admitted to a higher-ranked program (lower pref number)
+drop if estado_preferencia == 26 & ///
+        min_admitted_pref < preferencia & min_admitted_pref != .
+
+di "Observations after filter: " _N
+
+drop admitted_pref min_admitted_pref
+
+*-------------------------------------------------------------------------------
 * Restrict to oversubscribed programs (with waiting lists)
 * Only these have binding cutoffs for valid RDD identification
 *-------------------------------------------------------------------------------
