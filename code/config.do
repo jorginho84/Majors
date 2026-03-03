@@ -49,6 +49,7 @@ global psu_raw      "$raw/PSU_scores"
 global app_raw      "$raw/MINEDUC/Applications"
 global mat_raw      "$raw/MINEDUC/Matricula Educacion Superior"
 global tit_raw      "$raw/MINEDUC/Base Titulados"
+global demre_raw    "$raw/DEMRE"
 
 *-------------------------------------------------------------------------------
 * Analysis parameters
