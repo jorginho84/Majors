@@ -151,11 +151,27 @@ program define rd_plot, rclass
 
     *---------------------------------------------------------------------------
     * Generate fitted values (within bandwidth only)
+    *
+    * Run OLS on the residualized outcome (same variable as the dots) so that
+    * the displayed line is consistent with the scatter.  The FE+cluster
+    * regression above is used only for the reported coefficient and SE;
+    * by Frisch-Waugh the OLS coefficient on treat is identical.
     *---------------------------------------------------------------------------
 
     tempvar fitted_below fitted_above xgrid
 
-    * Get regression coefficients
+    * OLS on residualized outcome within bandwidth (no absorb — FEs already removed)
+    if `poly' == 1 {
+        qui regress `outcome_resid' `treat' `rv' 1.`treat'#c.`rv' ///
+            if `touse' & abs(`rv') <= `bw'
+    }
+    else if `poly' == 2 {
+        qui regress `outcome_resid' `treat' `rv' 1.`treat'#c.`rv' ///
+            c.`rv'#c.`rv' 1.`treat'#c.`rv'#c.`rv' ///
+            if `touse' & abs(`rv') <= `bw'
+    }
+
+    * Get regression coefficients for visual line
     local b0 = _b[_cons]
     local b1 = _b[`treat']
     local b2 = _b[`rv']
@@ -231,7 +247,8 @@ program define rd_plot, rclass
         xtitle("`xtitle'", size(medsmall))
         xscale(range(-`xsupp' `xsupp') noline)
         xlabel(-`xsupp'(`xgap')`xsupp', labsize(small))
-        yscale(alt axis(2) off)
+        yscale(noline axis(2))
+        ylabel(, axis(2) labsize(small) angle(horizontal) nogrid)
         legend(off)
         title("`title'", size(medsmall))
         graphregion(color(white))
