@@ -116,7 +116,7 @@ rd_plot enrolls_target, ///
     absorb(ao_proceso t_codigo_carrera) ///
     cluster(ao_proceso#t_codigo_carrera) ///
     saving("$output/figures/rd_enrolls_target") ///
-    title("Enroll in the Target University")
+    title("Enroll in the Target Program")
 
 *-------------------------------------------------------------------------------
 * Summary
