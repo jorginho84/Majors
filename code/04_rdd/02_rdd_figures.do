@@ -1,5 +1,6 @@
 /*------------------------------------------------------------------------------
                     Threshold-Crossing Effects in Higher Education
+                    Barrios-Borghesan-Diaz-Rodriguez
 
                     02_rdd_figures.do
 
