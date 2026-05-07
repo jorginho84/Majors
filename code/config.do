@@ -16,14 +16,22 @@ clear all
 set more off
 
 *-------------------------------------------------------------------------------
-* Project paths - User-specific override
+* Project paths - Auto-detection by user, with config_user.do override
 *-------------------------------------------------------------------------------
 
 * Default root path (server - jrodriguezo)
 global root "/home/jrodriguezo/majors"
 
-* Check for user-specific config file and load it
-* This allows each coauthor to override the root path
+* Auto-detect known users by Stata username (c(username))
+if "`c(username)'" == "jorge-home" {
+    global root "/Users/jorge-home/Documents/Research/Majors"
+}
+if "`c(username)'" == "jigodoy" {
+    global root "C:/Users/jigodoy/Documents/GitHub/Majors"
+    global data "C:/Users/jigodoy/Documents/jose-local/data"
+}
+
+* config_user.do can override any of the above (gitignored, for unusual setups)
 local config_user_paths `" "config_user.do" "../code/config_user.do" "'
 foreach p of local config_user_paths {
     capture confirm file `p'
@@ -38,7 +46,7 @@ foreach p of local config_user_paths {
 *-------------------------------------------------------------------------------
 
 global code     "$root/code"
-global data     "$root/data"
+if "$data" == "" global data "$root/data"
 global raw      "$data"
 global processed "$data/processed"
 global output   "$root/output"
