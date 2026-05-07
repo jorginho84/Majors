@@ -15,7 +15,20 @@ do "code/config.do"
 * Import and append applications across years
 *-------------------------------------------------------------------------------
 
-* First year: import and save
+* Helper macro: standardize puntaje to numeric within each year.
+* Must run immediately after import, before appending, to avoid type conflicts
+* across years (2007-2015 use integer×100 format; 2016 uses comma-decimal).
+capture program drop clean_puntaje
+program clean_puntaje
+    capture confirm string variable puntaje
+    if !_rc {
+        replace puntaje = subinstr(puntaje, ",", ".", .)
+        destring puntaje, replace force
+    }
+    replace puntaje = puntaje / 100 if puntaje > 10000 & puntaje != .
+end
+
+* First year: import, clean puntaje, and save
 local y = $year_start
 import delimited "$app_raw/C_POSTULACIONES_SELECCION_PSU_`y'_PRIV_MRUN.csv", ///
     delimiter(";") varnames(1) clear encoding(utf-8)
@@ -28,6 +41,8 @@ capture rename año_proceso ao_proceso
 capture rename ano_proceso ao_proceso
 capture rename a_o_proceso ao_proceso
 capture rename aæo_proceso ao_proceso
+
+clean_puntaje
 
 tempfile applications
 save `applications'
@@ -46,7 +61,9 @@ forvalues y = `=$year_start + 1'/$year_end {
     capture rename a_o_proceso ao_proceso
     capture rename aæo_proceso ao_proceso
 
-    append using `applications', force
+    clean_puntaje
+
+    append using `applications'
     save `applications', replace
 }
 
@@ -58,17 +75,7 @@ forvalues y = `=$year_start + 1'/$year_end {
 keep mrun ao_proceso preferencia codigo_carrera estado_preferencia puntaje ///
      nombre_carrera sede_carrera sigla_universidad
 
-* Clean application score (PUNTAJE)
-* Some years have comma as decimal separator
-capture confirm string variable puntaje
-if !_rc {
-    replace puntaje = subinstr(puntaje, ",", ".", .)
-    destring puntaje, replace
-}
-
-* Divide by 100 if scores are in old scale (> 10000)
-replace puntaje = puntaje / 100 if puntaje > 10000
-
+* puntaje already cleaned per-year in the loop above; just rename
 rename puntaje application_score
 
 * Label key variables
