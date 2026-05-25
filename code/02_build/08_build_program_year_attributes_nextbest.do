@@ -210,57 +210,143 @@ keep ao_proceso codigo_carrera estado_preferencia cutoff_regular ///
 
 make_program_code_h, codevar(codigo_carrera) yearvar(ao_proceso) newvar(codigo_carrera_h)
 
-* Construir psu_lm como en el código anterior
-capture drop psu_lm
+
+/**********************************************************************
+* Construir promedio PSU Lenguaje-Matemática canónico
+*
+* psu_lm es la variable oficial para selectividad.
+* Regla:
+*   1. Usar promedio de lyc_actual y mate_actual si ambos existen.
+*   2. Usar promlm_actual solo como fallback.
+*   3. Limpiar valores fuera de rango.
+**********************************************************************/
+
+capture drop psu_lm psu_lm_source
+capture drop lyc_num mate_num promlm_num
+
+gen double psu_lm = .
+gen str20 psu_lm_source = ""
+
+************************************************************
+* 1. Convertir Lenguaje a numérico
+************************************************************
 
 capture confirm variable lyc_actual
-local has_lyc = (_rc == 0)
-
-capture confirm variable mate_actual
-local has_mate = (_rc == 0)
-
-if `has_lyc' == 1 & `has_mate' == 1 {
-
+if _rc == 0 {
     capture confirm numeric variable lyc_actual
-    if _rc == 0 gen double lyc_num = lyc_actual
+    if _rc == 0 {
+        gen double lyc_num = lyc_actual
+    }
     else {
-        gen str20 lyc_clean = trim(lyc_actual)
+        gen str30 lyc_clean = trim(lyc_actual)
         replace lyc_clean = subinstr(lyc_clean, ",", ".", .)
         gen double lyc_num = real(lyc_clean)
         drop lyc_clean
     }
+}
+else {
+    gen double lyc_num = .
+}
 
+************************************************************
+* 2. Convertir Matemática a numérico
+************************************************************
+
+capture confirm variable mate_actual
+if _rc == 0 {
     capture confirm numeric variable mate_actual
-    if _rc == 0 gen double mate_num = mate_actual
+    if _rc == 0 {
+        gen double mate_num = mate_actual
+    }
     else {
-        gen str20 mate_clean = trim(mate_actual)
+        gen str30 mate_clean = trim(mate_actual)
         replace mate_clean = subinstr(mate_clean, ",", ".", .)
         gen double mate_num = real(mate_clean)
         drop mate_clean
     }
-
-    gen double psu_lm = (lyc_num + mate_num) / 2 if !missing(lyc_num, mate_num)
-    drop lyc_num mate_num
 }
 else {
-    capture confirm variable promlm_actual
+    gen double mate_num = .
+}
+
+************************************************************
+* 3. Convertir promlm_actual a numérico como fallback
+************************************************************
+
+capture confirm variable promlm_actual
+if _rc == 0 {
+    capture confirm numeric variable promlm_actual
     if _rc == 0 {
-        capture confirm numeric variable promlm_actual
-        if _rc == 0 gen double psu_lm = promlm_actual
-        else {
-            gen str20 promlm_clean = trim(promlm_actual)
-            replace promlm_clean = subinstr(promlm_clean, ",", ".", .)
-            gen double psu_lm = real(promlm_clean)
-            drop promlm_clean
-        }
+        gen double promlm_num = promlm_actual
     }
     else {
-        gen double psu_lm = .
+        gen str30 promlm_clean = trim(promlm_actual)
+        replace promlm_clean = subinstr(promlm_clean, ",", ".", .)
+        gen double promlm_num = real(promlm_clean)
+        drop promlm_clean
     }
 }
+else {
+    gen double promlm_num = .
+}
+
+************************************************************
+* 4. Regla principal: promedio de Lenguaje y Matemática
+************************************************************
+
+replace psu_lm = (lyc_num + mate_num) / 2 ///
+    if !missing(lyc_num, mate_num) ///
+    & lyc_num > 0 ///
+    & mate_num > 0
+
+replace psu_lm_source = "lyc_mate" ///
+    if !missing(psu_lm)
+
+************************************************************
+* 5. Fallback: usar promlm_actual solo si no se pudo calcular
+************************************************************
+
+replace psu_lm = promlm_num ///
+    if missing(psu_lm) ///
+    & !missing(promlm_num) ///
+    & promlm_num > 0
+
+replace psu_lm_source = "promlm_actual" ///
+    if psu_lm_source == "" ///
+    & !missing(psu_lm)
+
+************************************************************
+* 6. Limpiar valores fuera de rango razonable PSU
+************************************************************
 
 replace psu_lm = . if psu_lm <= 0
 replace psu_lm = . if psu_lm < 100 | psu_lm > 1000
+
+replace psu_lm_source = "" if missing(psu_lm)
+
+label variable psu_lm ///
+    "PSU LM average used in analysis"
+
+label variable psu_lm_source ///
+    "Source used to construct PSU LM average"
+
+************************************************************
+* 7. Diagnóstico de construcción
+************************************************************
+
+di as text "=================================================="
+di as result "Diagnóstico psu_lm"
+di as text "=================================================="
+
+tab psu_lm_source, missing
+
+count if missing(psu_lm)
+di as text "psu_lm missing: " as result %12.0fc r(N)
+
+count if missing(promlm_actual) & !missing(psu_lm)
+di as text "promlm_actual missing pero psu_lm recuperado: " as result %12.0fc r(N)
+
+drop lyc_num mate_num promlm_num
 
 gen byte admitted = estado_preferencia == 24 if !missing(estado_preferencia)
 replace admitted = 0 if missing(admitted)
@@ -853,3 +939,50 @@ replace tuition_mean = . if tuition_mean < 500000
 ************************************************************
 
 save "$processed/program_year_attributes_nextbest.dta", replace
+
+
+
+/**********************************************************************
+* 7. Verificación para uso en 09 / next-best all-targets
+**********************************************************************/
+
+use "$processed/program_year_attributes_nextbest.dta", clear
+
+di as text "=================================================="
+di as result "Verificación final para next-best attributes"
+di as text "=================================================="
+
+foreach v in ///
+    ao_proceso ///
+    codigo_carrera ///
+    codigo_carrera_h ///
+    selectivity_program_year ///
+    p50_selectivity_program_year ///
+    graduation_rate_target_8y ///
+    cutoff_regular ///
+    program_size {
+
+    capture confirm variable `v'
+    if _rc != 0 {
+        di as error "Falta variable necesaria para 09: `v'"
+        exit 111
+    }
+    else {
+        di as result "OK: `v'"
+    }
+}
+
+duplicates report ao_proceso codigo_carrera
+
+count
+di as result "Total program-years in attributes lookup: " r(N)
+
+summarize selectivity_program_year graduation_rate_target_8y ///
+          cutoff_regular program_size, detail
+
+di as text "=================================================="
+di as result "08 terminado correctamente"
+di as result "Output:"
+di as result "$processed/program_year_attributes_nextbest.dta"
+di as text "=================================================="n
+

@@ -195,13 +195,16 @@ twoway ///
         lwidth(medthick) ///
         color(black)), ///
     xline(0, lpattern(dash) lcolor(gs8)) ///
-    xlabel(-50(10)50) ///
-    xscale(range(-50 50)) ///
-    xtitle("Distance to Admission Cutoff") ///
-    ytitle("Frequency", axis(1)) ///
-    ytitle("Retakes PSU in t+1 or t+2", axis(2)) ///
+	xlabel(-50(10)50) ///
+	xscale(range(-50 50)) ///
+	yscale(axis(1) range(0 .)) ///
+	yscale(axis(2) range(0 .)) ///
+	ylabel(0(.1)1, axis(2)) ///
+	xtitle("Distance to Admission Cutoff") ///
+	ytitle("Frequency", axis(1)) ///
+	ytitle("Retakes PSU in t+1 or t+2", axis(2)) ///
     title("Retakes PSU Within Two Years") ///
-    text(`text_y' `text_x' "RDD estimate: `beta_txt' (`se_txt')", ///
+    text(0.12 40 "RDD estimate: `beta_txt' (`se_txt')", ///
         yaxis(2) size(small) placement(w)) ///
     note("Regression BW = ±`bw_reg'. Plot range = ±`bw_plot'. FE: program-year. SE clustered by program-year. N=`N', clusters=`G'.", ///
         size(vsmall)) ///

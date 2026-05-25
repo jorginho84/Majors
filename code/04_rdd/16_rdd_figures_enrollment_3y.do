@@ -188,14 +188,15 @@ program define make_rdd_figure_3y
                 yaxis(2) ///
                 lwidth(medthick) ///
                 color(black)), ///
-            xline(0, lpattern(dash) lcolor(gs8)) ///
             xlabel(-50(10)50) ///
-            xscale(range(-50 50)) ///
-            xtitle("Distance to Admission Cutoff") ///
-            ytitle("Frequency", axis(1)) ///
-            ytitle("`ytitle'", axis(2)) ///
-            title("`title'") ///
-            text(`text_y' `text_x' "RDD estimate: `beta_txt' (`se_txt')", ///
+			xscale(range(-50 50)) ///
+			yscale(axis(1) range(0 .)) ///
+			yscale(axis(2) range(0 1)) ///
+			ylabel(0(.2)1, axis(2)) ///
+			xtitle("Distance to Admission Cutoff") ///
+			ytitle("Frequency", axis(1)) ///
+			ytitle("`ytitle'", axis(2)) ///
+            text(0.12 40 "RDD estimate: `beta_txt' (`se_txt')", ///
                 yaxis(2) size(small) placement(w)) ///
             note("Regression BW = ±`bw_reg'. Plot range = ±`bw_plot'. FE: program-year. SE clustered by program-year. N=`N', clusters=`G'.", ///
                 size(vsmall)) ///

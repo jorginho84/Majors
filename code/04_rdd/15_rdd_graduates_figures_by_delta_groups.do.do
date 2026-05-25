@@ -1,24 +1,30 @@
 /**********************************************************************
-* rdd_graduates_figures_by_delta_groups.do
+* 15_rdd_graduates_figures_by_delta_groups.do
 *
 * Objetivo:
-*   Crear grupos simples de delta_selectivity:
+*   Estimar RDD por grupos de delta_selectivity para outcomes de
+*   graduación a 8 años, usando la base canónica creada por el 14.
 *
-*       d1: < -10
-*       d2: [-10,0)
-*       d3: [0,20)
-*       d4: [20,50)
-*       d5: >= 50
+* Input:
+*   $processed/analysis_sample_delta_groups.dta
 *
-*   Luego estimar RDD por grupo para:
-*       - enrolls_target
-*       - graduates_target_8y
-*       - graduates_uni_8y
-*       - graduates_he_8y
+* Outcomes:
+*   enrolls_target
+*   graduates_target_8y
+*   graduates_uni_8y
+*   graduates_he_8y
 *
-*   Exporta solo:
-*       - bar_N_delta_groups.pdf
-*       - rdd_*_delta.pdf
+* Outputs:
+*   Solo figuras PDF en:
+*       $output/figures/delta_groups/
+*
+* Figuras:
+*   n_grad8y_groups.pdf
+*   rdd_fs_target.pdf
+*   rdd_grad_target8y.pdf
+*   rdd_grad_uni8y.pdf
+*   rdd_grad_he8y.pdf
+*
 **********************************************************************/
 
 clear all
@@ -29,79 +35,113 @@ do "C:/Users/jigodoy/Documents/GitHub/Majors/code/config.do"
 local bw 25
 
 capture mkdir "$output/figures"
-capture mkdir "$output/figures/nextbest_graduation"
+capture mkdir "$output/figures/delta_groups"
 
 
 /**********************************************************************
-* 1. Cargar base
+* 1. Cargar base canónica creada por el 14
 **********************************************************************/
 
-use "$processed/analysis_sample_with_delta_groups_manual_graduation.dta", clear
+use "$processed/analysis_sample_delta_groups.dta", clear
 
 
 /**********************************************************************
-* 2. Revisar variables necesarias
+* 2. Verificar variables necesarias
 **********************************************************************/
 
-foreach v in score_rd above_cutoff program_year_id ///
-             delta_selectivity has_nextbest ///
-             enrolls_target ///
-             graduates_target_8y graduates_uni_8y graduates_he_8y {
+foreach v in ///
+    score_rd ///
+    above_cutoff ///
+    program_year_id ///
+    delta_selectivity ///
+    has_nextbest ///
+    enrolls_target ///
+    graduates_target_8y ///
+    graduates_uni_8y ///
+    graduates_he_8y {
 
     capture confirm variable `v'
 
     if _rc != 0 {
         di as error "Falta variable necesaria: `v'"
+        di as error "Revisar que el 14 haya creado analysis_sample_delta_groups.dta desde una base con graduación 8y."
         exit 111
     }
 }
 
 
 /**********************************************************************
-* 3. Crear grupos simples de delta_selectivity
+* 3. Definición manual de grupos de delta_selectivity
+*
+* IMPORTANTE:
+* Este bloque debe ser idéntico en 14, 15 y 18 si se quiere modificar
+* manualmente los cortes de forma consistente.
+*
+* Grupos vigentes:
+*   d1: < -10
+*   d2: [-10,10)
+*   d3: [10,30)
+*   d4: [30,50)
+*   d5: >= 50
 **********************************************************************/
 
 capture drop delta_group
+capture drop group_delta_selectivity
 
-gen delta_group = .
+gen byte delta_group = .
 
 replace delta_group = 1 if ///
-    !missing(delta_selectivity) & delta_selectivity < -10
+    !missing(delta_selectivity) ///
+    & delta_selectivity < -10
 
 replace delta_group = 2 if ///
-    !missing(delta_selectivity) & delta_selectivity >= -10 & delta_selectivity < 0
+    !missing(delta_selectivity) ///
+    & delta_selectivity >= -10 ///
+    & delta_selectivity < 10
 
 replace delta_group = 3 if ///
-    !missing(delta_selectivity) & delta_selectivity >= 0 & delta_selectivity < 20
+    !missing(delta_selectivity) ///
+    & delta_selectivity >= 10 ///
+    & delta_selectivity < 30
 
 replace delta_group = 4 if ///
-    !missing(delta_selectivity) & delta_selectivity >= 20 & delta_selectivity < 50
+    !missing(delta_selectivity) ///
+    & delta_selectivity >= 30 ///
+    & delta_selectivity < 50
 
 replace delta_group = 5 if ///
-    !missing(delta_selectivity) & delta_selectivity >= 50
+    !missing(delta_selectivity) ///
+    & delta_selectivity >= 50
 
-capture label drop dgrp
-
-label define dgrp ///
+label define delta_group_lbl ///
     1 "d1: < -10" ///
-    2 "d2: [-10,0)" ///
-    3 "d3: [0,20)" ///
-    4 "d4: [20,50)" ///
+    2 "d2: [-10,10)" ///
+    3 "d3: [10,30)" ///
+    4 "d4: [30,50)" ///
     5 "d5: >= 50", replace
 
-label values delta_group dgrp
+label values delta_group delta_group_lbl
+
+* Alias de compatibilidad con códigos previos
+gen byte group_delta_selectivity = delta_group
+label values group_delta_selectivity delta_group_lbl
 
 
 /**********************************************************************
-* 4. Diagnóstico mínimo
+* 4. Diagnósticos de consistencia
 **********************************************************************/
 
 di as text "=================================================="
-di as result "Frecuencia de delta_group |score_rd| <= `bw'"
+di as result "Diagnóstico 15: delta_group dentro de BW"
 di as text "=================================================="
 
 tab delta_group if abs(score_rd) <= `bw', missing
 
+di as text "=================================================="
+di as result "has_nextbest dentro de BW"
+di as text "=================================================="
+
+tab has_nextbest if abs(score_rd) <= `bw', missing
 
 di as text "=================================================="
 di as result "delta_group por lado del cutoff"
@@ -109,83 +149,34 @@ di as text "=================================================="
 
 tab above_cutoff delta_group if abs(score_rd) <= `bw', missing
 
+di as text "=================================================="
+di as result "Distribución delta_selectivity dentro de BW"
+di as text "=================================================="
+
+summarize delta_selectivity if abs(score_rd) <= `bw', detail
 
 di as text "=================================================="
-di as result "Rangos reales de delta_selectivity por grupo"
+di as result "Muestras por outcome dentro de BW"
 di as text "=================================================="
 
-tabstat delta_selectivity if abs(score_rd) <= `bw', ///
-    by(delta_group) ///
-    stat(n min p25 median p75 max mean) ///
-    columns(statistics)
+foreach y in enrolls_target graduates_target_8y graduates_uni_8y graduates_he_8y {
+
+    di as text "--------------------------------------------------"
+    di as result "`y'"
+
+    tab delta_group if abs(score_rd) <= `bw' ///
+        & !missing(`y', above_cutoff, score_rd, program_year_id), missing
+}
 
 
 /**********************************************************************
-* 5. Chequeo de missing corregido
-*    No usar: tab missing(x) missing(y)
-*    Stata no permite expresiones dentro de tab.
-**********************************************************************/
-
-capture drop miss_delta_sel miss_delta_group
-
-gen miss_delta_sel   = missing(delta_selectivity)
-gen miss_delta_group = missing(delta_group)
-
-capture label drop misslbl
-
-label define misslbl ///
-    0 "Observed" ///
-    1 "Missing", replace
-
-label values miss_delta_sel misslbl
-label values miss_delta_group misslbl
-
-di as text "=================================================="
-di as result "Chequeo missing: delta_selectivity vs delta_group"
-di as text "=================================================="
-
-tab miss_delta_sel miss_delta_group ///
-    if abs(score_rd) <= `bw', missing
-
-
-di as text "=================================================="
-di as result "has_nextbest dentro del bandwidth"
-di as text "=================================================="
-
-tab has_nextbest if abs(score_rd) <= `bw', missing
-
-di as text "=================================================="
-di as result "has_nextbest por lado del cutoff"
-di as text "=================================================="
-
-tab above_cutoff has_nextbest if abs(score_rd) <= `bw', missing
-
-
-/************************************************************
-* Si este chequeo está bien, debería pasar algo así:
-*
-*   delta_selectivity observed -> delta_group observed
-*   delta_selectivity missing  -> delta_group missing
-*
-* Es decir, los missing NO deberían quedar dentro de d5.
-************************************************************/
-
-
-/**********************************************************************
-* 6. Guardar base auxiliar simple
-**********************************************************************/
-
-save "$processed/analysis_sample_delta_groups.dta", replace
-
-
-/**********************************************************************
-* 7. Figura descriptiva única: N por grupo
+* 5. Figura descriptiva: N por grupo en muestra graduation 8y
 **********************************************************************/
 
 preserve
 
     keep if abs(score_rd) <= `bw'
-    keep if !missing(delta_group)
+    keep if !missing(delta_group, graduates_target_8y, above_cutoff, score_rd, program_year_id)
 
     collapse (count) N = score_rd, by(delta_group)
 
@@ -195,24 +186,26 @@ preserve
                     2 "d2" ///
                     3 "d3" ///
                     4 "d4" ///
-                    5 "d5")) ///
+                    5 "d5") ///
+            label(labsize(vsmall))) ///
         blabel(bar, format(%12.0fc) size(small)) ///
-        title("Observations by delta group") ///
-        subtitle("d1 < -10; d2 [-10,0); d3 [0,20); d4 [20,50); d5 >= 50") ///
+        yscale(range(0 .)) ///
         ytitle("Number of observations") ///
+        title("Observations by delta group") ///
+        subtitle("Graduation 8y sample; |score_rd| <= `bw'") ///
         graphregion(color(white)) ///
         plotregion(color(white))
 
-    graph export "$output/figures/nextbest_graduation/bar_N_delta_groups.pdf", replace
+    graph export "$output/figures/delta_groups/n_grad8y_groups.pdf", replace
 
 restore
 
 
 /**********************************************************************
-* 8. Estimar RDD por grupo
+* 6. Estimar RDD por delta_group
+*
+* Resultados se guardan solo en tempfile.
 **********************************************************************/
-
-use "$processed/analysis_sample_delta_groups.dta", clear
 
 local outcomes ///
     enrolls_target ///
@@ -220,14 +213,15 @@ local outcomes ///
     graduates_uni_8y ///
     graduates_he_8y
 
+tempfile rdd_delta_results
+
 tempname handle
 
 postfile `handle' ///
     str40 outcome ///
     byte delta_group ///
     double beta se ci_low ci_high N clusters ///
-    using "$processed/rdd_delta_results.dta", replace
-
+    using `rdd_delta_results', replace
 
 foreach y of local outcomes {
 
@@ -246,12 +240,20 @@ foreach y of local outcomes {
 
         local K : word count `clustlist'
 
-        if `N' > 0 & `K' > 1 {
+        quietly summarize above_cutoff if abs(score_rd) <= `bw' ///
+            & delta_group == `g' ///
+            & !missing(`y', above_cutoff, score_rd, program_year_id), meanonly
 
-            local glabel : label dgrp `g'
+        local min_above = r(min)
+        local max_above = r(max)
+
+        if `N' > 0 & `K' > 1 & `min_above' != `max_above' {
+
+            local glabel : label delta_group_lbl `g'
 
             di as text "=================================================="
-            di as result "Outcome: `y' | `glabel'"
+            di as result "RDD | outcome=`y' | `glabel'"
+            di as result "N=`N', clusters=`K'"
             di as text "=================================================="
 
             capture noisily reghdfe `y' ///
@@ -287,75 +289,127 @@ foreach y of local outcomes {
 
 postclose `handle'
 
+
 /**********************************************************************
-* 9. Crear figuras RDD como BARRAS con intervalos de confianza
+* 7. Crear figuras RDD por delta_group
 **********************************************************************/
 
-use "$processed/rdd_delta_results.dta", clear
+use `rdd_delta_results', clear
+
+capture confirm variable beta
+if _rc != 0 {
+    di as error "No se generaron resultados RDD."
+    exit 111
+}
 
 gen beta_label = string(beta, "%5.3f")
 
 
-foreach y in enrolls_target graduates_target_8y graduates_uni_8y graduates_he_8y {
+capture program drop make_grad_delta_plot
+
+program define make_grad_delta_plot
+
+    syntax, OUTCOME(string) TITLE(string) SAVING(string)
 
     preserve
 
-        keep if outcome == "`y'"
+        keep if outcome == "`outcome'"
         sort delta_group
 
-        local mytitle ""
-
-        if "`y'" == "enrolls_target" {
-            local mytitle "First stage: enrolls_target"
+        quietly count
+        if r(N) == 0 {
+            restore
+            exit
         }
 
-        if "`y'" == "graduates_target_8y" {
-            local mytitle "Graduation from target program within 8 years"
+        /************************************************************
+        * Escalas fijas por outcome
+        ************************************************************/
+
+        local ymin = 0
+        local ymax = 0.10
+        local ystep = 0.02
+
+        if "`outcome'" == "enrolls_target" {
+            local ymin = 0.45
+            local ymax = 0.65
+            local ystep = 0.05
         }
 
-        if "`y'" == "graduates_uni_8y" {
-            local mytitle "University graduation within 8 years"
+        if "`outcome'" == "graduates_target_8y" {
+            local ymin = 0.12
+            local ymax = 0.30
+            local ystep = 0.04
         }
 
-        if "`y'" == "graduates_he_8y" {
-            local mytitle "Higher education graduation within 8 years"
+        if inlist("`outcome'", "graduates_uni_8y", "graduates_he_8y") {
+            local ymin = -0.02
+            local ymax = 0.10
+            local ystep = 0.02
         }
 
         twoway ///
-            (bar beta delta_group, barwidth(0.65)) ///
-            (rcap ci_high ci_low delta_group, lwidth(medthin)) ///
+            (bar beta delta_group, ///
+                barwidth(0.65) ///
+                fcolor(navy%70) ///
+                lcolor(navy)) ///
+            (rcap ci_high ci_low delta_group, ///
+                lwidth(vthin) ///
+                lcolor(maroon)) ///
             (scatter beta delta_group, ///
                 msymbol(none) ///
                 mlabel(beta_label) ///
                 mlabposition(12) ///
                 mlabsize(small)), ///
-            yline(0, lpattern(dash)) ///
+            yline(0, lpattern(dash) lcolor(gs8)) ///
+            yscale(range(`ymin' `ymax')) ///
+            ylabel(`ymin'(`ystep')`ymax', labsize(vsmall)) ///
             xlabel(1 "d1" ///
                    2 "d2" ///
                    3 "d3" ///
                    4 "d4" ///
                    5 "d5", ///
-                   labsize(small)) ///
+                   labsize(vsmall)) ///
             xscale(range(0.5 5.5)) ///
             xtitle("Delta selectivity group") ///
             ytitle("RDD coefficient on above_cutoff") ///
-            title("`mytitle'") ///
-            subtitle("d1 < -10; d2 [-10,0); d3 [0,20); d4 [20,50); d5 >= 50") ///
-            note("Sample restricted to observed delta selectivity. FE: program-year. SE clustered by program-year.", ///
+            title("`title'") ///
+            subtitle("d1 < -10; d2 [-10,10); d3 [10,30); d4 [30,50); d5 >= 50") ///
+            note("FE: program-year. SE clustered by program-year. BW = ±25.", ///
                 size(vsmall)) ///
             legend(off) ///
             graphregion(color(white)) ///
             plotregion(color(white))
 
-        graph export "$output/figures/nextbest_graduation/rdd_`y'_delta_bar.pdf", replace
+        graph export "`saving'.pdf", replace
 
     restore
-}
+
+end
+
+
+
+make_grad_delta_plot, ///
+    outcome("graduates_target_8y") ///
+    title("Graduation from target program within 8 years") ///
+    saving("$output/figures/delta_groups/rdd_grad_target8y")
+
+make_grad_delta_plot, ///
+    outcome("graduates_uni_8y") ///
+    title("University graduation within 8 years") ///
+    saving("$output/figures/delta_groups/rdd_grad_uni8y")
+
+make_grad_delta_plot, ///
+    outcome("graduates_he_8y") ///
+    title("Higher education graduation within 8 years") ///
+    saving("$output/figures/delta_groups/rdd_grad_he8y")
+
+
 /**********************************************************************
-* 10. Mostrar resultados finales
+* 8. Mostrar resultados finales
 **********************************************************************/
 
-use "$processed/rdd_delta_results.dta", clear
+use `rdd_delta_results', clear
 
 sort outcome delta_group
 
@@ -368,12 +422,21 @@ list outcome delta_group beta se ci_low ci_high N clusters, ///
 
 
 di as text "=================================================="
-di as result "Listo."
-di as result "Base auxiliar:"
+di as result "15 terminado correctamente."
+di as result "Input:"
 di as result "$processed/analysis_sample_delta_groups.dta"
-di as result "Resultados:"
-di as result "$processed/rdd_delta_results.dta"
-di as result "Figuras:"
-di as result "$output/figures/nextbest_graduation/bar_N_delta_groups.pdf"
-di as result "$output/figures/nextbest_graduation/rdd_*_delta.pdf"
+di as text "Figuras guardadas en:"
+di as result "$output/figures/delta_groups/"
+di as text "Archivos esperados:"
+di as result "  n_grad8y_groups.pdf"
+di as result "  rdd_fs_target.pdf"
+di as result "  rdd_grad_target8y.pdf"
+di as result "  rdd_grad_uni8y.pdf"
+di as result "  rdd_grad_he8y.pdf"
 di as text "=================================================="
+
+
+
+
+
+

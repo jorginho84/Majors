@@ -10,8 +10,7 @@
 * Input:
 * $processed/analysis_sample_with_selectivity_post2012_pooled_top20.dta
 *
-* Output:
-* PDFs y GPH individuales.
+
 ************************************************************
 
 clear all
@@ -28,9 +27,9 @@ global bandwidth 25
 
 use "$processed/analysis_sample_with_selectivity_post2012_pooled_top20.dta", clear
 
-capture mkdir "$output/figures"
-capture mkdir "$output/figures/selective_pooled_top20"
 
+capture mkdir "$output/figures"
+capture mkdir "$output/figures/Selective"
 
 ************************************************************
 * 1. Verificaciones iniciales
@@ -174,55 +173,84 @@ program define make_rd_hist_plot
         local vline_top = 1.05 * `freq_max'
 
 
+		********************************************************
+        * 2.7 Figura                                           
         ********************************************************
-        * 2.7 Figura
-        *
-        * La línea vertical del cutoff se dibuja con scatteri
-        * como capa final, no con xline(), para que quede encima
-        * del histograma.
-        ********************************************************
+
+        local ymin = 0
+        local ymax = 1
+        local ystep = 0.1
+
+        if "`varlist'" == "enrolls_target" {
+            local ymin = 0
+            local ymax = 0.8
+            local ystep = 0.1
+        }
+
+        if inlist("`varlist'", "enrolls_uni", "enrolls_he") {
+            local ymin = 0
+            local ymax = 1
+            local ystep = 0.1
+        }
 
         twoway ///
             (bar freq x if source == "hist", ///
-                yaxis(1) barwidth(0.95) ///
-                fcolor(gs14) lcolor(gs14)) ///
+                yaxis(1) ///
+                barwidth(0.95) ///
+                fcolor(eltblue%25) ///
+                lcolor(eltblue%10)) ///
             (scatter y_mean x if source == "rd" & x < 0, ///
-                yaxis(2) msymbol(circle) msize(small)) ///
+                yaxis(2) ///
+                msymbol(circle) ///
+                msize(small) ///
+                mcolor(black) ///
+                mfcolor(black) ///
+                mlcolor(black)) ///
             (scatter y_mean x if source == "rd" & x >= 0, ///
-                yaxis(2) msymbol(circle) msize(small)) ///
+                yaxis(2) ///
+                msymbol(circle) ///
+                msize(small) ///
+                mcolor(black) ///
+                mfcolor(black) ///
+                mlcolor(black)) ///
             (lfit y_mean x [aw=n] if source == "rd" & x < 0, ///
-                yaxis(2) lwidth(medthick)) ///
+                yaxis(2) ///
+                lcolor(black) ///
+                lwidth(medthick)) ///
             (lfit y_mean x [aw=n] if source == "rd" & x >= 0, ///
-                yaxis(2) lwidth(medthick)) ///
+                yaxis(2) ///
+                lcolor(black) ///
+                lwidth(medthick)) ///
             (scatteri 0 0 `vline_top' 0, ///
-                recast(line) yaxis(1) ///
-                lpattern(dash) lcolor(gs8) lwidth(medthick)) ///
+                recast(line) ///
+                yaxis(1) ///
+                lpattern(dash) ///
+                lcolor(gs8) ///
+                lwidth(medthick)) ///
             , ///
             xscale(range(-25 25)) ///
-            xlabel(-25(5)25) ///
-            xtitle("Distance to Admission Cutoff") ///
-            ytitle("Frequency", axis(1)) ///
-            ytitle("`outcomelabel'", axis(2)) ///
-            ylabel(, axis(1) angle(horizontal)) ///
-            ylabel(, axis(2) angle(horizontal)) ///
-            title("`outcomelabel'") ///
-            subtitle("Pooled top 20% program-years") ///
+            xlabel(-25(5)25, labsize(vsmall)) ///
+            xtitle("Distance to Admission Cutoff", size(vsmall)) ///
+            ytitle("Frequency", axis(1) size(vsmall)) ///
+            ytitle("`outcomelabel'", axis(2) size(vsmall)) ///
+            ylabel(, axis(1) angle(horizontal) labsize(vsmall)) ///
+            ylabel(`ymin'(`ystep')`ymax', axis(2) angle(horizontal) labsize(vsmall)) ///
+            yscale(axis(2) range(`ymin' `ymax')) ///
+            title("`outcomelabel'", size(medsmall)) ///
+            subtitle("Pooled top 20% program-years", size(small)) ///
             text(`text_y1' `text_x' "`rdd_text'", ///
-                size(small) placement(e)) ///
+                size(small) placement(e) color(black)) ///
             text(`text_y2' `text_x' "`n_text'", ///
-                size(small) placement(e)) ///
+                size(small) placement(e) color(black)) ///
             legend(off) ///
             graphregion(color(white)) ///
             plotregion(color(white))
-
-        graph save "`saving'.gph", replace
-        graph export "`saving'.pdf", replace
+        
+		graph export "`saving'.pdf", replace
 
     restore
 
 end
-
-
 ************************************************************
 * 3. Crear figuras individuales
 ************************************************************
@@ -233,7 +261,7 @@ end
 
 make_rd_hist_plot enrolls_he, ///
     outcomelabel("Enrolls in Higher Education") ///
-    saving("$output/figures/selective_pooled_top20/rd_hist_enrolls_he_selective_pooled_top20")
+    saving("$output/figures/Selective/rd_hist_enrolls_he_selective_pooled_top20")
 
 
 ************************************************************
@@ -242,7 +270,7 @@ make_rd_hist_plot enrolls_he, ///
 
 make_rd_hist_plot enrolls_uni, ///
     outcomelabel("Enrolls in University") ///
-    saving("$output/figures/selective_pooled_top20/rd_hist_enrolls_uni_selective_pooled_top20")
+    saving("$output/figures/Selective/rd_hist_enrolls_uni_selective_pooled_top20")
 
 
 ************************************************************
@@ -251,7 +279,7 @@ make_rd_hist_plot enrolls_uni, ///
 
 make_rd_hist_plot enrolls_target, ///
     outcomelabel("Enrolls in Target Program") ///
-    saving("$output/figures/selective_pooled_top20/rd_hist_enrolls_target_selective_pooled_top20")
+    saving("$output/figures/Selective/rd_hist_enrolls_target_selective_pooled_top20")
 
 
 ************************************************************
