@@ -383,7 +383,7 @@ count
 
 tempfile titulados_all
 save `titulados_all', replace
-
+save "$processed/diagnostic_titulados_all.dta", replace
 
 ************************************************************
 * 3. Preparar muestra de postulaciones

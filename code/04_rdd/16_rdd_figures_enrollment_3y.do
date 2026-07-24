@@ -193,6 +193,7 @@ program define make_rdd_figure_3y
 			yscale(axis(1) range(0 .)) ///
 			yscale(axis(2) range(0 1)) ///
 			ylabel(0(.2)1, axis(2)) ///
+			title("`title'", size(medsmall)) ///
 			xtitle("Distance to Admission Cutoff") ///
 			ytitle("Frequency", axis(1)) ///
 			ytitle("`ytitle'", axis(2)) ///
