@@ -18,7 +18,7 @@ N_total_pt = π (E_p × Post2012_t) + μ_p + α_f(p),t + ν_pt
 
 with program fixed effects `μ_p` and field × year fixed effects `α_f(p),t`. The sample is **incumbent (pre-2012 CRUCH) programs only** — entrants have no DEMRE pre-period. Expected `π < 0`: entrant integration diverts marginal matriculants and pulls realized enrollment below cupos.
 
-Full conceptual and econometric write-up: **[issue #1](https://github.com/jorginho84/Majors/issues/1)**.
+Full conceptual and econometric write-up: **[issue #1](https://github.com/jorginho84/Majors/issues/1)**, which is also the running record of this thread — progress, estimates and blockers are reported there as comments. Issue #1 is the reference example for the repo convention of [one issue per research thread](../../README.md#how-we-work).
 
 ---
 

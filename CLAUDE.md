@@ -8,6 +8,7 @@ Research project analyzing threshold-crossing effects in Chilean higher educatio
 2. **Code lives locally**: All edits happen locally, Git repo is local only
 3. **Always sync before running**: After modifying any code, sync to server before executing
 4. **Server is for running only**: Never edit files directly on the server
+5. **One issue per research thread**: Every time we start exploring a new topic, open a GitHub issue **before** writing code, following the structure of [#1](https://github.com/jorginho84/Majors/issues/1) — see `.github/ISSUE_TEMPLATE/research-thread.md`. Then **report progress as comments on that issue** as the work advances: what ran, what the estimates were, what broke, what is still blocked. The issue is the running record of the thread, not just its kickoff.
 
 ## Project Structure
 

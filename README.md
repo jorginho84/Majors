@@ -30,12 +30,24 @@ majors/
 │   ├── 01_clean/             # Data cleaning scripts
 │   ├── 02_build/             # Sample construction
 │   ├── 03_descriptive/       # Descriptive statistics
-│   └── 04_rdd/               # RDD estimation
+│   ├── 04_rdd/               # RDD estimation
+│   └── Sua/                  # SUA entry IV design (see its README)
 ├── output/                   # Tables and figures
 ├── old/                      # Legacy code (reference)
 ├── docs/                     # Notes and documentation
 └── WORKFLOW.md               # Detailed task tracking
 ```
+
+## How we work
+
+**One issue per research thread.** Every time we start exploring a new empirical question, we
+open a GitHub issue *before* writing code, using the
+[research-thread template](.github/ISSUE_TEMPLATE/research-thread.md) — the structure follows
+[issue #1](https://github.com/jorginho84/Majors/issues/1), our reference example.
+
+**Progress is reported in that issue.** As the work advances we add comments recording what ran,
+the estimates, what broke, and what is still blocked. The issue is the running record of the
+thread, not just its kickoff.
 
 ## Authors
 
