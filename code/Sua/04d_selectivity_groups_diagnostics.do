@@ -19,7 +19,7 @@
 clear all
 set more off
 
-do "C:/Users/jigodoy/Documents/GitHub/Majors/code/config.do"
+do "code/config.do"
 
 /**********************************************************************
 * 1. Abrir panel principal

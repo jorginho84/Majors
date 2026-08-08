@@ -52,14 +52,14 @@
 clear all
 set more off
 
-do "C:/Users/jigodoy/Documents/GitHub/Majors/code/config.do"
+do "code/config.do"
 
 /**********************************************************************
 * 0. Rutas y archivos temporales
 **********************************************************************/
 
 local geo_codebook ///
-    "C:/Users/jigodoy/Documents/GitHub/education_and_productitivity/Data/worked/geographic_codebook.dta"
+    "$raw/geographic_codebook.dta"
 
 local output_geo ///
     "$processed/sies_program_year_geo_2007_2016.dta"
