@@ -16,6 +16,8 @@ clear all
 set more off
 set varabbrev off
 
+do "code/config.do"
+
 use ///
     "$processed/analysis_sample_with_fields_graduation_8y.dta", ///
     clear

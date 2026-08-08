@@ -19,10 +19,10 @@
 **********************************************************************/
 
 
-do "C:/Users/jigodoy/Documents/GitHub/Majors/code/config.do"
+do "code/config.do"
 
 import delimited ///
-    "C:/Users/jigodoy/Documents/jose-local/data/MINEDUC/Matricula Educacion Superior/Matrícula_Ed_Superior_2011.csv", ///
+    "$mat_raw/Matrícula_Ed_Superior_2011.csv", ///
     clear ///
     varnames(1) ///
     encoding("UTF-8") ///

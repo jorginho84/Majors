@@ -17,6 +17,8 @@ clear all
 set more off
 set varabbrev off
 
+do "code/config.do"
+
 
 /**********************************************************************
 * 0. Paths
