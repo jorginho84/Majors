@@ -1,0 +1,22 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Descriptive statistics within main RDD bandwidth}
+\begin{tabular}{l*{1}{ccccc}}
+\toprule
+                    &\multicolumn{5}{c}{(1)}                                         \\
+                    &\multicolumn{5}{c}{}                                            \\
+                    &       count&        mean&          sd&         min&         max\\
+\midrule
+Running variable (application\_score - cutoff)&      838307&   -2.327123&    13.63246&         -25&          25\\
+Above cutoff indicator (1 if score\_rd >= 0)&      838307&    .4331027&    .4955048&           0&           1\\
+Enrolled in target program&      838307&    .3690688&    .4825529&           0&           1\\
+Enrolled in university&      838307&    .8326818&    .3732599&           0&           1\\
+Enrolled in higher education&      838307&    .8702754&    .3360003&           0&           1\\
+Graduated from target program within 8 years&      838307&    .1396326&    .3466057&           0&           1\\
+Graduated from university within 8 years&      838307&    .4022667&    .4903555&           0&           1\\
+Graduated from higher education within 8 years&      838307&    .4230598&     .494045&           0&           1\\
+\midrule
+Observations        &      838307&            &            &            &            \\
+\bottomrule
+\end{tabular}
+\end{table}
