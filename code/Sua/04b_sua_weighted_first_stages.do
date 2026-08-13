@@ -3,75 +3,51 @@
 
 PURPOSE
 
-Estimate the relevant selectivity-weighted SUA first stages.
+Compare the three SUA exposure measures across alternative definitions of the
+academic market and two fixed-effect specifications.
 
-SECTION A: MARKET-DEFINITION COMPARISON
+FIELD DEFINITIONS
 
-    Field definitions:
-        1. Broad area
-        2. ISCED subarea
-        3. Generic career area
+    1. Broad area
+    2. ISCED subarea
+    3. Generic career area
 
-    Exposures:
-        1. Triangular kernel, h = 50 PSU points
-        2. Gaussian kernel, h = 50 PSU points
+EXPOSURES
 
-    Fixed effects:
+    1. Total exposure
+    2. Triangular exposure
+    3. Gaussian exposure
+
+SPECIFICATIONS
+
+    baseline:
         Program FE
-        Corresponding field x year FE
+        Field x year FE
 
-SECTION B: REGION-YEAR SENSITIVITY
-
-    Field definition:
-        Broad area only
-
-    Exposures:
-        1. Triangular
-        2. Gaussian
-
-    Fixed effects:
+    regionyear:
         Program FE
-        Broad-field x year FE
-        Pre-treatment region x year FE
+        Field x year FE
+        Region x year FE
 
 OUTCOME
 
     N_firstyear_incumbent
 
-INSTRUMENT
-
-    Selectivity-weighted exposure x Post2012
-
 SCALING
 
-    One unit equals 10 percentage points of exposure.
+    One unit of z_unw10, z_tri10, or z_gau10 corresponds to
+    10 percentage points of the respective exposure.
 
 INFERENCE
 
     Standard errors clustered by pre-treatment market.
 
-ANALYTICAL SAMPLE
+TOTAL REGRESSIONS
 
-The original weighted first-stage sample is preserved so that the estimates
-remain comparable with the previously reported results. In particular, the
-sample requires nonmissing first-year enrollment, mean PSU, and all three
-previously constructed exposure instruments.
-
-The unweighted exposure is not estimated in this file. It remains in
-04_sua_first_stage.do.
-
-OUTPUT
-
-Eight regression rows:
-
-    baseline   x broad  x triangular
-    baseline   x broad  x gaussian
-    baseline   x ISCED  x triangular
-    baseline   x ISCED  x gaussian
-    baseline   x generic x triangular
-    baseline   x generic x gaussian
-    regionyear x broad  x triangular
-    regionyear x broad  x gaussian
+    3 field definitions
+    x 3 exposure measures
+    x 2 FE specifications
+    = 18 regressions
 *******************************************************************************/
 
 clear all
@@ -108,9 +84,14 @@ local markettypes ///
     cine_subarea ///
     generic_area
 
-local kernels ///
+local exposures ///
+    unw ///
     tri ///
     gau
+
+local specifications ///
+    baseline ///
+    regionyear
 
 
 /*******************************************************************************
@@ -128,10 +109,8 @@ local results_xlsx ///
 3. RESULTS STORAGE
 *******************************************************************************/
 
-tempfile weighted_results
-
+tempfile first_stage_results
 tempname post_results
-
 
 postfile `post_results' ///
     str12 specification ///
@@ -147,54 +126,35 @@ postfile `post_results' ///
     long N ///
     long programs ///
     long markets ///
-    using `weighted_results', ///
+    using `first_stage_results', ///
     replace
 
 
 /*******************************************************************************
-4. ESTIMATION LOOP
-*
-* For every field definition:
-*
-*     baseline:
-*         Program FE
-*         Corresponding field x year FE
-*
-* For Broad area only:
-*
-*     regionyear:
-*         Program FE
-*         Broad-field x year FE
-*         Pre-treatment region x year FE
+4. ESTIMATION
 *******************************************************************************/
 
 foreach markettype of local markettypes {
 
     /***************************************************************************
-    4.1 MAP FIELD-DEFINITION NAMES
+    4.1 FIELD-DEFINITION LABEL
     ***************************************************************************/
 
     if "`markettype'" == "broad_area" {
-
-        local field_label ///
-            "broad"
+        local field_definition "broad"
     }
 
     if "`markettype'" == "cine_subarea" {
-
-        local field_label ///
-            "isced"
+        local field_definition "isced"
     }
 
     if "`markettype'" == "generic_area" {
-
-        local field_label ///
-            "generic"
+        local field_definition "generic"
     }
 
 
     /***************************************************************************
-    4.2 LOAD REGION-LEVEL WEIGHTED PANEL
+    4.2 LOAD CORRESPONDING REGION-LEVEL PANEL
     ***************************************************************************/
 
     local input ///
@@ -202,21 +162,18 @@ foreach markettype of local markettypes {
 
     use "`input'", clear
 
-
     display ""
     display "============================================================"
-    display " FIELD DEFINITION: `field_label'"
+    display " FIELD DEFINITION: `field_definition'"
     display " GEOGRAPHY: REGION"
     display "============================================================"
 
 
     /***************************************************************************
-    4.3 PRESERVE ORIGINAL ANALYTICAL SAMPLE
+    4.3 COMMON ANALYTICAL SAMPLE
     *
-    * These conditions reproduce the sample used by the original 04b.
-    *
-    * mean_psu_lm_firstyear and z_unw10 are retained only as common-sample
-    * requirements. They are not outcomes or regressors in this file.
+    * Requiring all three instruments keeps Total, Triangular and Gaussian
+    * directly comparable within each field definition.
     ***************************************************************************/
 
     drop if missing( ///
@@ -235,9 +192,9 @@ foreach markettype of local markettypes {
     assert _N > 0
 
 
-    /***************************************************************************
-    4.4 REQUIRE PRE- AND POST-2012 SUPPORT
-    ***************************************************************************/
+    /*
+    Require each program to have observations before and after the reform.
+    */
 
     bysort program_id: ///
         egen byte has_pre = ///
@@ -259,31 +216,32 @@ foreach markettype of local markettypes {
 
 
     /***************************************************************************
-    4.5 VERIFY THE PANEL
+    4.4 VERIFY PANEL AND EXPOSURES
     ***************************************************************************/
 
     isid ///
         program_id ///
         ao_proceso
 
+    foreach instrument in ///
+        z_unw10 ///
+        z_tri10 ///
+        z_gau10 {
 
-    /*
-    The instruments should be zero before 2012.
-    */
-
-    assert z_tri10 == 0 ///
-        if ao_proceso <= 2011
-
-    assert z_gau10 == 0 ///
-        if ao_proceso <= 2011
+        assert `instrument' == 0 ///
+            if ao_proceso <= 2011
+    }
 
 
     /***************************************************************************
-    4.6 CONSTRUCT FIXED-EFFECT IDENTIFIERS
+    4.5 FIXED-EFFECT IDENTIFIERS
     ***************************************************************************/
 
     /*
-    Corresponding field x year FE.
+    Field definition x year FE.
+
+    Since each input panel corresponds to a different field definition,
+    field_pre represents Broad, ISCED or Generic as appropriate.
     */
 
     egen long field_year = ///
@@ -295,8 +253,6 @@ foreach markettype of local markettypes {
 
     /*
     Pre-treatment region x year FE.
-
-    This is used only for Broad area.
     */
 
     egen long region_year = ///
@@ -307,32 +263,15 @@ foreach markettype of local markettypes {
 
 
     /***************************************************************************
-    4.7 SPECIFICATIONS TO ESTIMATE
-    *
-    * All field definitions receive the baseline specification.
-    *
-    * Broad area additionally receives region x year FE.
-    ***************************************************************************/
-
-    local specifications ///
-        baseline
-
-    if "`markettype'" == "broad_area" {
-
-        local specifications ///
-            baseline ///
-            regionyear
-    }
-
-
-    /***************************************************************************
-    4.8 ESTIMATE RELEVANT SPECIFICATIONS
+    4.6 SPECIFICATIONS
     ***************************************************************************/
 
     foreach specification of local specifications {
 
         /*
-        Choose the fixed-effect structure.
+        Baseline:
+            Program FE
+            Field x year FE
         */
 
         if "`specification'" == "baseline" {
@@ -346,6 +285,13 @@ foreach markettype of local markettypes {
         }
 
 
+        /*
+        Region-year:
+            Program FE
+            Field x year FE
+            Region x year FE
+        */
+
         if "`specification'" == "regionyear" {
 
             local absorbed_fe ///
@@ -358,36 +304,58 @@ foreach markettype of local markettypes {
         }
 
 
-        foreach kernel of local kernels {
+        /***********************************************************************
+        4.7 EXPOSURE MEASURES
+        ***********************************************************************/
+
+        foreach exposure of local exposures {
 
             /*
-            Select weighted exposure.
+            Total exposure.
             */
 
-            if "`kernel'" == "tri" {
+            if "`exposure'" == "unw" {
+
+                local instrument ///
+                    z_unw10
+
+                local exposure_title ///
+                    "TOTAL EXPOSURE"
+            }
+
+
+            /*
+            Triangular exposure.
+            */
+
+            if "`exposure'" == "tri" {
 
                 local instrument ///
                     z_tri10
 
-                local exposure_label ///
+                local exposure_title ///
                     "TRIANGULAR"
             }
 
 
-            if "`kernel'" == "gau" {
+            /*
+            Gaussian exposure.
+            */
+
+            if "`exposure'" == "gau" {
 
                 local instrument ///
                     z_gau10
 
-                local exposure_label ///
+                local exposure_title ///
                     "GAUSSIAN"
             }
 
 
             display ""
             display "------------------------------------------------------------"
-            display "Field          = `field_label'"
-            display "Exposure       = `exposure_label'"
+            display "Field          = `field_definition'"
+            display "Exposure       = `exposure_title'"
             display "Specification  = `specification'"
             display "`specification_title'"
             display "------------------------------------------------------------"
@@ -406,9 +374,9 @@ foreach markettype of local markettypes {
                 vce(cluster market_pre)
 
 
-            /*
-            Coefficient and standard error.
-            */
+            /*******************************************************************
+            COEFFICIENT AND INFERENCE
+            *******************************************************************/
 
             local beta = ///
                 _b[`instrument']
@@ -427,7 +395,7 @@ foreach markettype of local markettypes {
 
 
             /*
-            Confidence interval.
+            95% confidence interval.
             */
 
             local critical_value = ///
@@ -443,7 +411,7 @@ foreach markettype of local markettypes {
 
 
             /*
-            Cluster-robust Wald F test.
+            Cluster-robust Wald F statistic.
             */
 
             test `instrument'
@@ -455,9 +423,9 @@ foreach markettype of local markettypes {
                 r(p)
 
 
-            /*
-            Counts in the actual reghdfe sample.
-            */
+            /*******************************************************************
+            SAMPLE COUNTS
+            *******************************************************************/
 
             quietly levelsof ///
                 program_id ///
@@ -477,14 +445,14 @@ foreach markettype of local markettypes {
                 word count `sample_markets'
 
 
-            /*
-            Store one result row.
-            */
+            /*******************************************************************
+            STORE RESULTS
+            *******************************************************************/
 
             post `post_results' ///
                 ("`specification'") ///
-                ("`field_label'") ///
-                ("`kernel'") ///
+                ("`field_definition'") ///
+                ("`exposure'") ///
                 (`beta') ///
                 (`se') ///
                 (`t') ///
@@ -497,9 +465,9 @@ foreach markettype of local markettypes {
                 (`N_markets')
 
 
-            /*
-            Display compact results.
-            */
+            /*******************************************************************
+            DISPLAY COMPACT RESULT
+            *******************************************************************/
 
             display ///
                 "Beta          = " ///
@@ -532,7 +500,6 @@ foreach markettype of local markettypes {
     }
 }
 
-
 postclose `post_results'
 
 
@@ -540,22 +507,25 @@ postclose `post_results'
 5. LOAD AND VALIDATE RESULTS
 *******************************************************************************/
 
-use `weighted_results', clear
+use `first_stage_results', clear
 
 
 /*
-Expected rows:
+There must be:
 
-    6 baseline rows:
-        3 field definitions x 2 exposures
-
-    2 region-year rows:
-        Broad x 2 exposures
+    3 field definitions
+    x 3 exposures
+    x 2 specifications
+    = 18 rows
 */
 
 count
-assert r(N) == 8
+assert r(N) == 18
 
+
+/*
+Each row must identify a unique regression.
+*/
 
 isid ///
     specification ///
@@ -564,11 +534,28 @@ isid ///
 
 
 /*
-Confirm that region-year is only estimated for Broad area.
+There must be nine baseline and nine region-year regressions.
 */
 
-assert field_definition == "broad" ///
-    if specification == "regionyear"
+count if specification == "baseline"
+assert r(N) == 9
+
+count if specification == "regionyear"
+assert r(N) == 9
+
+
+/*
+There must be six regressions for each field definition.
+*/
+
+foreach field in ///
+    broad ///
+    isced ///
+    generic {
+
+    count if field_definition == "`field'"
+    assert r(N) == 6
+}
 
 
 /*******************************************************************************
@@ -591,6 +578,10 @@ replace field_label = ///
 
 
 gen str20 exposure_label = ""
+
+replace exposure_label = ///
+    "Total exposure" ///
+    if exposure == "unw"
 
 replace exposure_label = ///
     "Triangular" ///
@@ -633,9 +624,12 @@ replace field_order = 3 ///
 gen byte exposure_order = .
 
 replace exposure_order = 1 ///
-    if exposure == "tri"
+    if exposure == "unw"
 
 replace exposure_order = 2 ///
+    if exposure == "tri"
+
+replace exposure_order = 3 ///
     if exposure == "gau"
 
 
@@ -682,12 +676,13 @@ order ///
 
 
 /*******************************************************************************
-9. DISPLAY BASELINE MARKET COMPARISON
+9. DISPLAY BASELINE RESULTS
 *******************************************************************************/
 
 display ""
 display "============================================================"
 display " BASELINE: MARKET-DEFINITION COMPARISON"
+display " Program FE + field x year FE"
 display "============================================================"
 
 
@@ -707,17 +702,18 @@ list ///
 
 
 /*******************************************************************************
-10. DISPLAY REGION-YEAR SENSITIVITY
+10. DISPLAY REGION-YEAR RESULTS
 *******************************************************************************/
 
 display ""
 display "============================================================"
-display " BROAD AREA: SENSITIVITY TO REGION x YEAR FE"
+display " REGION x YEAR: MARKET-DEFINITION COMPARISON"
+display " Program FE + field x year FE + region x year FE"
 display "============================================================"
 
 
 list ///
-    specification ///
+    field_label ///
     exposure_label ///
     beta ///
     se ///
@@ -726,8 +722,8 @@ list ///
     N ///
     programs ///
     markets ///
-    if field_definition == "broad", ///
-    sepby(specification) ///
+    if specification == "regionyear", ///
+    sepby(field_definition) ///
     noobs clean
 
 
