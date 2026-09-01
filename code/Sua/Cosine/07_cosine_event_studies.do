@@ -3,47 +3,33 @@
 
 PURPOSE
 
-Compare event-study estimates for three cosine exposure measures:
+Estimate event studies for the five cosine-exposure definitions:
 
-1. Original Geo-PSU cosine
-   - vector: school region × PSU bin
+    1. PSU only
+    2. PSU x campus region
+    3. PSU + campus region
+    4. PSU x campus region x Broad field
+    5. PSU + campus region + Broad field
 
-2. PSU cosine, same region × field
-   - vector: PSU bin
-   - incumbent-entrant pairs restricted to same university region × field
+SAMPLES
 
-3. Geo-PSU cosine, same region × field
-   - vector: school region × PSU bin
-   - incumbent-entrant pairs restricted to same university region × field
+    1. Full analytical sample
+    2. Programs with at least 10 first-year students in 2011
 
-COMMON SAMPLE:
-    All three exposures must be observed.
+SPECIFICATIONS
 
-OUTCOME:
-    N_firstyear
+    1. Program FE + Broad-field x year FE
+    2. Program FE + Broad-field x year FE
+       + campus-region x year FE
 
-UNIT:
-    SIES codigo_unico × year
+The code estimates all 20 combinations but exports only two figures for the
+full analytical sample. Each figure displays the five exposure definitions.
 
-SPECIFICATIONS:
+Exposure is divided by its original cross-program SD without subtracting its
+mean. Economically meaningful zero exposure therefore remains equal to zero.
 
-1. Baseline, for all three exposure measures:
-       Program FE
-       Field × year FE
-
-2. Region-year robustness, for the original Geo-PSU cosine:
-       Program FE
-       Field × year FE
-       Region × year FE
-
-    SE clustered by program in both specifications.
-
-REFERENCE YEAR:
-    2011
-
-IMPORTANT:
-    Year × exposure interactions are created manually so that
-    2011 is genuinely omitted.
+2011 is explicitly omitted.
+Standard errors are clustered by program.
 *******************************************************************************/
 
 clear all
@@ -54,7 +40,7 @@ do "code/config.do"
 
 
 /*******************************************************************************
-0. INPUTS
+1. INPUTS AND OUTPUTS
 *******************************************************************************/
 
 local panel ///
@@ -63,27 +49,33 @@ local panel ///
 local roster ///
     "$processed/sua_exposure/sua_university_sies_roster.dta"
 
-local exp_orig ///
-    "$processed/cosine_exposure_incumbents_2011_final.dta"
+local exposure ///
+    "$processed/cosine_exposure_incumbents_2011_psu_campus_region.dta"
 
-local exp_rf ///
-    "$processed/cosine_exposure_incumbents_2011_same_region_field.dta"
+local graph_baseline ///
+    "$output/cosine_event_studies_baseline"
+
+local graph_regionyear ///
+    "$output/cosine_event_studies_regionyear"
 
 
 /*******************************************************************************
-1. NATIVE SIES PROGRAM-YEAR PANEL
+2. ANALYTICAL PANEL OF INCUMBENT PROGRAMS
 *******************************************************************************/
 
 use "`panel'", clear
 
-keep if inrange(ao_proceso, 2007, 2016)
+keep if ///
+    inrange(ao_proceso, 2007, 2016)
 
-isid codigo_unico ao_proceso
+isid ///
+    codigo_unico ///
+    ao_proceso
 
 
-/*******************************************************************************
-2. ATTACH SUA ROSTER
-*******************************************************************************/
+/*
+Identify incumbent and entrant universities.
+*/
 
 preserve
 
@@ -91,8 +83,6 @@ preserve
 
     keep ///
         cod_inst ///
-        sigla_universidad ///
-        first_sua_year ///
         entrant_2012
 
     duplicates drop
@@ -107,109 +97,92 @@ restore
 
 merge m:1 cod_inst ///
     using `roster_clean', ///
-    keep(master match) ///
-    gen(_m_roster)
+    keep(match) ///
+    nogen
 
-
-keep if _m_roster == 3
-drop _m_roster
-
-
-/*
-Keep incumbent SUA universities only.
-*/
-
-keep if entrant_2012 == 0
+keep if ///
+    entrant_2012 == 0
 
 
 /*******************************************************************************
-3. ORIGINAL COSINE EXPOSURE
+3. MERGE THE FIVE COSINE-EXPOSURE MEASURES
 *******************************************************************************/
 
 preserve
 
-    use "`exp_orig'", clear
+    use "`exposure'", clear
 
-    isid codigo_unico_2011
-
-    rename ///
-        codigo_unico_2011 ///
+    rename codigo_unico_2011 ///
         codigo_unico
 
     keep ///
         codigo_unico ///
-        cosine_exposure_std
+        exp_psu ///
+        exp_psu_region ///
+        exp_psu_plus_region ///
+        exp_psu_region_field ///
+        exp_psu_plus_region_field ///
+        sd_exp_psu ///
+        sd_exp_psu_region ///
+        sd_exp_psu_plus_region ///
+        sd_exp_psu_region_field ///
+        sd_exp_psu_plus_region_field
 
-    rename ///
-        cosine_exposure_std ///
-        z_exp_orig
 
-    tempfile orig_clean
-    save `orig_clean', replace
+    /*
+    Short names for raw exposure measures.
+    */
+
+    rename exp_psu_region ///
+        exp_psu_reg
+
+    rename exp_psu_plus_region ///
+        exp_psu_addreg
+
+    rename exp_psu_region_field ///
+        exp_psu_regfld
+
+    rename exp_psu_plus_region_field ///
+        exp_psu_addregfld
+
+
+    /*
+    Exposure measured in original cross-program SD units.
+    */
+
+    rename sd_exp_psu ///
+        exp_psu_sd
+
+    rename sd_exp_psu_region ///
+        exp_psu_reg_sd
+
+    rename sd_exp_psu_plus_region ///
+        exp_psu_addreg_sd
+
+    rename sd_exp_psu_region_field ///
+        exp_psu_regfld_sd
+
+    rename sd_exp_psu_plus_region_field ///
+        exp_psu_addregfld_sd
+
+
+    isid codigo_unico
+
+    tempfile exposure_clean
+    save `exposure_clean', replace
 
 restore
 
 
 merge m:1 codigo_unico ///
-    using `orig_clean', ///
-    gen(_m_orig)
-
-tabulate _m_orig, missing
-
-drop if _m_orig == 2
-drop _m_orig
+    using `exposure_clean', ///
+    keep(match) ///
+    nogen
 
 
 /*******************************************************************************
-4. RESTRICTED COSINE EXPOSURES
+4. REQUIRE PRE- AND POST-2012 OBSERVATIONS
 *******************************************************************************/
-
-preserve
-
-    use "`exp_rf'", clear
-
-    isid codigo_unico_2011
-
-    rename ///
-        codigo_unico_2011 ///
-        codigo_unico
-
-    keep ///
-        codigo_unico ///
-        z_exp_psu_rf ///
-        z_exp_geo_rf
-
-    tempfile rf_clean
-    save `rf_clean', replace
-
-restore
-
-
-merge m:1 codigo_unico ///
-    using `rf_clean', ///
-    gen(_m_rf)
-
-tabulate _m_rf, missing
-
-drop if _m_rf == 2
-drop _m_rf
-
-
-/*******************************************************************************
-5. COMMON EXPOSURE SAMPLE
-*******************************************************************************/
-
-drop if missing( ///
-    N_firstyear, ///
-    z_exp_orig, ///
-    z_exp_psu_rf, ///
-    z_exp_geo_rf ///
-)
-
-
-/*
-Require programs observed both before and after 2012.
-*/
 
 bysort codigo_unico: ///
     egen byte has_pre = ///
@@ -223,560 +196,1199 @@ keep if ///
     has_pre == 1 & ///
     has_post == 1
 
-drop has_pre has_post
-
-
-isid codigo_unico ao_proceso
+drop ///
+    has_pre ///
+    has_post
 
 
 /*******************************************************************************
-6. FIX FIELD AND REGION AT 2011
-*
-* Same construction used in the original cosine first stage.
+5. FIX PROGRAM CHARACTERISTICS IN 2011
 *******************************************************************************/
 
-gen str56 field_tmp = ///
-    area_conocimiento ///
-    if ao_proceso == 2011
+preserve
+
+    keep if ///
+        ao_proceso == 2011
+
+    keep ///
+        codigo_unico ///
+        area_conocimiento ///
+        id_region ///
+        N_firstyear
+
+    drop if missing( ///
+        codigo_unico, ///
+        area_conocimiento, ///
+        id_region, ///
+        N_firstyear ///
+    )
+
+    isid codigo_unico
+
+    rename area_conocimiento ///
+        field_2011
+
+    rename id_region ///
+        region_2011
+
+    rename N_firstyear ///
+        enroll_2011
+
+    tempfile characteristics_2011
+    save `characteristics_2011', replace
+
+restore
 
 
-bysort codigo_unico: ///
-    egen str56 field_pre = ///
-        mode(field_tmp), ///
-        minmode
+merge m:1 codigo_unico ///
+    using `characteristics_2011', ///
+    keep(match) ///
+    nogen
 
-drop field_tmp
+drop if ///
+    missing(N_firstyear)
 
+assert ///
+    N_firstyear >= 0
 
-gen double region_tmp = ///
-    id_region ///
-    if ao_proceso == 2011
-
-bysort codigo_unico: ///
-    egen double region_pre = ///
-        max(region_tmp)
-
-drop region_tmp
-
-
-drop if missing(field_pre) | ///
-    field_pre == ""
-
-drop if missing(region_pre)
+isid ///
+    codigo_unico ///
+    ao_proceso
 
 
 /*******************************************************************************
-7. ESTIMATION IDENTIFIERS
+6. ANALYTICAL SAMPLES
+*******************************************************************************/
+
+local min_enroll 10
+
+gen byte sample_min10 = ///
+    enroll_2011 >= `min_enroll'
+
+label variable sample_min10 ///
+    "At least 10 first-year students in 2011"
+
+bysort codigo_unico: ///
+    assert sample_min10 == sample_min10[1]
+
+
+/*******************************************************************************
+7. VALIDATE EXPOSURE MEASURES
+*******************************************************************************/
+
+foreach variable in ///
+    exp_psu ///
+    exp_psu_reg ///
+    exp_psu_addreg ///
+    exp_psu_regfld ///
+    exp_psu_addregfld ///
+    exp_psu_sd ///
+    exp_psu_reg_sd ///
+    exp_psu_addreg_sd ///
+    exp_psu_regfld_sd ///
+    exp_psu_addregfld_sd {
+
+    assert ///
+        `variable' >= 0 ///
+        if !missing(`variable')
+
+    tempvar variable_min variable_max
+
+    bysort codigo_unico: ///
+        egen double `variable_min' = ///
+            min(`variable')
+
+    bysort codigo_unico: ///
+        egen double `variable_max' = ///
+            max(`variable')
+
+    assert abs( ///
+        `variable_max' - `variable_min' ///
+    ) < 1e-10
+
+    drop ///
+        `variable_min' ///
+        `variable_max'
+}
+
+
+/*
+Confirm that SD scaling preserves zero exposure.
+*/
+
+assert exp_psu_sd == 0 ///
+    if exp_psu == 0
+
+assert exp_psu_reg_sd == 0 ///
+    if exp_psu_reg == 0
+
+assert exp_psu_addreg_sd == 0 ///
+    if exp_psu_addreg == 0
+
+assert exp_psu_regfld_sd == 0 ///
+    if exp_psu_regfld == 0
+
+assert exp_psu_addregfld_sd == 0 ///
+    if exp_psu_addregfld == 0
+
+
+/*******************************************************************************
+8. FIXED-EFFECT IDENTIFIERS
 *******************************************************************************/
 
 egen long program_id = ///
     group(codigo_unico)
 
-
 egen long field_year = ///
     group( ///
-        field_pre ///
+        field_2011 ///
         ao_proceso ///
     )
-
 
 egen long region_year = ///
     group( ///
-        region_pre ///
+        region_2011 ///
         ao_proceso ///
     )
 
+label variable field_year ///
+    "Broad-field x admission-year FE"
+
+label variable region_year ///
+    "Campus-region x admission-year FE"
+
 
 /*******************************************************************************
-8. SAMPLE DIAGNOSTICS
+9. SAMPLE DIAGNOSTICS
 *******************************************************************************/
 
-count
-local N_obs = r(N)
-
-
-egen byte tag_prog = ///
+egen byte tag_program = ///
     tag(program_id)
-
-count if tag_prog
-local N_prog = r(N)
 
 
 display ""
-display "===== COSINE EVENT-STUDY SAMPLE ====="
+display "============================================================"
+display " COSINE EVENT-STUDY SAMPLES"
+display "============================================================"
+
+
+count
+
+local full_observations = ///
+    r(N)
 
 display ///
-    "Program-year observations = " ///
-    %9.0fc `N_obs'
+    "Full-sample program-year observations = " ///
+    %9.0fc `full_observations'
+
+
+count if ///
+    tag_program == 1
+
+local full_programs = ///
+    r(N)
 
 display ///
-    "Programs = " ///
-    %9.0fc `N_prog'
+    "Full-sample programs                  = " ///
+    %9.0fc `full_programs'
+
+
+count if ///
+    sample_min10 == 1
+
+local min10_observations = ///
+    r(N)
+
+display ///
+    "Min-10 program-year observations      = " ///
+    %9.0fc `min10_observations'
+
+
+count if ///
+    tag_program == 1 & ///
+    sample_min10 == 1
+
+local min10_programs = ///
+    r(N)
+
+display ///
+    "Min-10 programs                       = " ///
+    %9.0fc `min10_programs'
 
 
 /*
-Exposure correlations in common sample.
+Flag unexpected changes without stopping execution.
 */
 
-pwcorr ///
-    z_exp_orig ///
-    z_exp_psu_rf ///
-    z_exp_geo_rf
+if `full_observations' != 9105 {
+
+    display as error ///
+        "Warning: expected 9,105 observations in the full sample."
+}
+
+if `full_programs' != 996 {
+
+    display as error ///
+        "Warning: expected 996 programs in the full sample."
+}
+
+if `min10_observations' != 8618 {
+
+    display as error ///
+        "Warning: expected 8,618 observations in the min-10 sample."
+}
+
+if `min10_programs' != 939 {
+
+    display as error ///
+        "Warning: expected 939 programs in the min-10 sample."
+}
+
+
+drop tag_program
 
 
 /*******************************************************************************
-9. RESULTS DATASET
+10. MANUAL YEAR INTERACTIONS
 *******************************************************************************/
 
-tempfile cos_es
+/*
+Each exposure is measured in original cross-program SD units.
 
-tempname post_cos
+Each coefficient describes the enrollment difference associated with a
+one-SD increase in exposure in year t relative to 2011.
+*/
+
+foreach measure in ///
+    psu ///
+    psureg ///
+    psuaddreg ///
+    psuregfld ///
+    psuaddregfld {
+
+    if "`measure'" == "psu" {
+
+        local exposure_variable ///
+            "exp_psu_sd"
+    }
+
+    if "`measure'" == "psureg" {
+
+        local exposure_variable ///
+            "exp_psu_reg_sd"
+    }
+
+    if "`measure'" == "psuaddreg" {
+
+        local exposure_variable ///
+            "exp_psu_addreg_sd"
+    }
+
+    if "`measure'" == "psuregfld" {
+
+        local exposure_variable ///
+            "exp_psu_regfld_sd"
+    }
+
+    if "`measure'" == "psuaddregfld" {
+
+        local exposure_variable ///
+            "exp_psu_addregfld_sd"
+    }
 
 
-postfile `post_cos' ///
-    str12 specification ///
-    str8 exposure ///
+    foreach year in ///
+        2007 2008 2009 2010 ///
+        2012 2013 2014 2015 2016 {
+
+        gen double es_`measure'_`year' = ///
+            `exposure_variable' * ///
+            (ao_proceso == `year')
+
+        assert es_`measure'_`year' == 0 ///
+            if ao_proceso != `year'
+    }
+}
+
+
+/*******************************************************************************
+11. TEMPORARY EVENT-STUDY RESULTS
+*******************************************************************************/
+
+tempfile event_results
+
+tempname results_handle
+
+postfile `results_handle' ///
+    str5 sample ///
+    str2 spec ///
+    str12 measure ///
     int year ///
     double beta ///
     double se ///
-    double lb ///
-    double ub ///
-    double pre_F ///
-    double pre_p ///
-    using `cos_es', ///
+    double lower_ci ///
+    double upper_ci ///
+    double pretrend_F ///
+    double pretrend_p ///
+    long observations ///
+    long programs ///
+    using `event_results', ///
     replace
 
 
 /*******************************************************************************
-10. EVENT STUDIES
-*
-* Manual interactions guarantee that 2011 is genuinely omitted.
+12. ESTIMATE ALL EVENT STUDIES
 *******************************************************************************/
-
-foreach specification in baseline regionyear {
-
-    if "`specification'" == "baseline" {
-        local exposure_list orig psu geo
-        local absorbed_fe program_id field_year
-    }
-
-    if "`specification'" == "regionyear" {
-        local exposure_list orig
-        local absorbed_fe program_id field_year region_year
-    }
-
-    foreach e of local exposure_list {
-
-    /*
-    Select standardized exposure.
-    */
-
-    if "`e'" == "orig" {
-        local x z_exp_orig
-    }
-
-    if "`e'" == "psu" {
-        local x z_exp_psu_rf
-    }
-
-    if "`e'" == "geo" {
-        local x z_exp_geo_rf
-    }
-
-
-    display ""
-    display "=========================================="
-    display "COSINE EVENT STUDY: `e' - `specification'"
-    display "=========================================="
-
-
-    /*
-    Create year-specific interactions.
-    2011 is intentionally absent.
-    */
-
-    foreach y in ///
-        2007 ///
-        2008 ///
-        2009 ///
-        2010 ///
-        2012 ///
-        2013 ///
-        2014 ///
-        2015 ///
-        2016 {
-
-        capture drop es_`e'_`y'
-
-        gen double es_`e'_`y' = ///
-            `x' * ///
-            (ao_proceso == `y')
-    }
-
-
-    /*
-    Event-study regression.
-    */
-
-    reghdfe ///
-        N_firstyear ///
-        es_`e'_2007 ///
-        es_`e'_2008 ///
-        es_`e'_2009 ///
-        es_`e'_2010 ///
-        es_`e'_2012 ///
-        es_`e'_2013 ///
-        es_`e'_2014 ///
-        es_`e'_2015 ///
-        es_`e'_2016, ///
-        absorb( ///
-            `absorbed_fe' ///
-        ) ///
-        vce(cluster program_id)
-
-
-    /*
-    Joint pre-trend test:
-    H0: beta_2007 = ... = beta_2010 = 0
-    */
-
-    test ///
-        es_`e'_2007 ///
-        es_`e'_2008 ///
-        es_`e'_2009 ///
-        es_`e'_2010
-
-
-    local pre_F = r(F)
-    local pre_p = r(p)
-
-
-    display ///
-        "Pretrend F = " ///
-        %8.3f `pre_F'
-
-    display ///
-        "Pretrend p = " ///
-        %8.4f `pre_p'
-
-
-    /*
-    Store annual estimates.
-    */
-
-    forvalues y = 2007/2016 {
-
-        if `y' == 2011 {
-
-            /*
-            Genuine reference year.
-            */
-
-            local b  = 0
-            local se = 0
-            local lb = 0
-            local ub = 0
-        }
-
-        else {
-
-            local b = ///
-                _b[es_`e'_`y']
-
-            local se = ///
-                _se[es_`e'_`y']
-
-            local crit = ///
-                invttail(e(df_r), 0.025)
-
-            local lb = ///
-                `b' - `crit' * `se'
-
-            local ub = ///
-                `b' + `crit' * `se'
-        }
-
-
-        post `post_cos' ///
-            ("`specification'") ///
-            ("`e'") ///
-            (`y') ///
-            (`b') ///
-            (`se') ///
-            (`lb') ///
-            (`ub') ///
-            (`pre_F') ///
-            (`pre_p')
-    }
-}
-
-}
-
-
-/*******************************************************************************
-10.1 CLOSE RESULTS FILE
-*******************************************************************************/
-
-postclose `post_cos'
-
-
-/*******************************************************************************
-11. LOAD AND VERIFY RESULTS
-*******************************************************************************/
-
-use `cos_es', clear
-
-
-count
-
-display ///
-    "Event-study result rows = " ///
-    %9.0fc r(N)
 
 /*
-Three baseline exposures plus one region-year exposure, each with ten years.
+Samples:
+
+    full  = full analytical sample
+    min10 = at least 10 first-year students in 2011
+
+Specifications:
+
+    fy = program FE + Broad-field x year FE
+
+    ry = program FE + Broad-field x year FE
+         + campus-region x year FE
 */
 
-assert r(N) == 40
+foreach sample in ///
+    full ///
+    min10 {
+
+    local sample_if ""
+
+    if "`sample'" == "min10" {
+
+        local sample_if ///
+            "if sample_min10 == 1"
+    }
 
 
-isid specification exposure year
+    foreach spec in ///
+        fy ///
+        ry {
 
-sort specification exposure year
+        if "`spec'" == "fy" {
+
+            local absorb_fe ///
+                "program_id field_year"
+
+            local specification_label ///
+                "Program + Broad-field x year FE"
+        }
+
+        if "`spec'" == "ry" {
+
+            local absorb_fe ///
+                "program_id field_year region_year"
+
+            local specification_label ///
+                "Program + Broad-field x year FE + campus-region x year FE"
+        }
 
 
-list ///
-    specification ///
-    exposure ///
-    year ///
+        foreach measure in ///
+            psu ///
+            psureg ///
+            psuaddreg ///
+            psuregfld ///
+            psuaddregfld {
+
+            if "`measure'" == "psu" {
+
+                local measure_label ///
+                    "PSU only"
+            }
+
+            if "`measure'" == "psureg" {
+
+                local measure_label ///
+                    "PSU x campus region"
+            }
+
+            if "`measure'" == "psuaddreg" {
+
+                local measure_label ///
+                    "PSU + campus region"
+            }
+
+            if "`measure'" == "psuregfld" {
+
+                local measure_label ///
+                    "PSU x campus region x Broad field"
+            }
+
+            if "`measure'" == "psuaddregfld" {
+
+                local measure_label ///
+                    "PSU + campus region + Broad field"
+            }
+
+
+            local annual_interactions ""
+
+            foreach year in ///
+                2007 2008 2009 2010 ///
+                2012 2013 2014 2015 2016 {
+
+                local annual_interactions ///
+                    "`annual_interactions' es_`measure'_`year'"
+            }
+
+
+            display ""
+            display "============================================================"
+            display " COSINE EXPOSURE EVENT STUDY"
+            display "============================================================"
+            display "Sample         = `sample'"
+            display "Measure        = `measure_label'"
+            display "Fixed effects  = `specification_label'"
+            display "Omitted year   = 2011"
+            display "============================================================"
+
+
+            reghdfe ///
+                N_firstyear ///
+                `annual_interactions' ///
+                `sample_if', ///
+                absorb( ///
+                    `absorb_fe' ///
+                ) ///
+                vce(cluster program_id)
+
+
+            /*
+            Save the effective estimation sample.
+            */
+
+            tempvar estimation_sample
+
+            gen byte `estimation_sample' = ///
+                e(sample)
+
+
+            local observations = ///
+                e(N)
+
+            local residual_df = ///
+                e(df_r)
+
+
+            tempvar tag_estimation_program
+
+            egen byte `tag_estimation_program' = ///
+                tag(program_id) ///
+                if `estimation_sample' == 1
+
+            quietly count if ///
+                `tag_estimation_program' == 1
+
+            local programs = ///
+                r(N)
+
+
+            /*
+            Joint pretrend test: 2007-2010.
+            */
+
+            test ///
+                es_`measure'_2007 ///
+                es_`measure'_2008 ///
+                es_`measure'_2009 ///
+                es_`measure'_2010
+
+            local pretrend_F = ///
+                r(F)
+
+            local pretrend_p = ///
+                r(p)
+
+
+            /*
+            Critical value using the regression residual degrees of freedom.
+            */
+
+            local critical_value = ///
+                invttail( ///
+                    `residual_df', ///
+                    0.025 ///
+                )
+
+
+            display ///
+                "Joint pretrend F = " ///
+                %9.3f `pretrend_F'
+
+            display ///
+                "Joint pretrend p = " ///
+                %9.4f `pretrend_p'
+
+            display ///
+                "Observations     = " ///
+                %9.0fc `observations'
+
+            display ///
+                "Programs         = " ///
+                %9.0fc `programs'
+
+
+            /*
+            Store annual coefficients.
+            */
+
+            forvalues year = 2007/2016 {
+
+                if `year' == 2011 {
+
+                    local coefficient = 0
+                    local standard_error = 0
+                    local lower_bound = 0
+                    local upper_bound = 0
+                }
+
+                else {
+
+                    local coefficient = ///
+                        _b[es_`measure'_`year']
+
+                    local standard_error = ///
+                        _se[es_`measure'_`year']
+
+                    local lower_bound = ///
+                        `coefficient' - ///
+                        `critical_value' * ///
+                        `standard_error'
+
+                    local upper_bound = ///
+                        `coefficient' + ///
+                        `critical_value' * ///
+                        `standard_error'
+                }
+
+
+                post `results_handle' ///
+                    ("`sample'") ///
+                    ("`spec'") ///
+                    ("`measure'") ///
+                    (`year') ///
+                    (`coefficient') ///
+                    (`standard_error') ///
+                    (`lower_bound') ///
+                    (`upper_bound') ///
+                    (`pretrend_F') ///
+                    (`pretrend_p') ///
+                    (`observations') ///
+                    (`programs')
+            }
+
+
+            drop ///
+                `estimation_sample' ///
+                `tag_estimation_program'
+        }
+    }
+}
+
+
+postclose `results_handle'
+
+
+/*******************************************************************************
+13. PREPARE EVENT-STUDY RESULTS
+*******************************************************************************/
+
+use `event_results', clear
+
+
+gen byte sample_order = .
+
+replace sample_order = 1 ///
+    if sample == "full"
+
+replace sample_order = 2 ///
+    if sample == "min10"
+
+
+gen str24 sample_label = ""
+
+replace sample_label = ///
+    "Full sample" ///
+    if sample == "full"
+
+replace sample_label = ///
+    "At least 10 in 2011" ///
+    if sample == "min10"
+
+
+gen byte spec_order = .
+
+replace spec_order = 1 ///
+    if spec == "fy"
+
+replace spec_order = 2 ///
+    if spec == "ry"
+
+
+gen str52 spec_label = ""
+
+replace spec_label = ///
+    "Program + Broad-field x year FE" ///
+    if spec == "fy"
+
+replace spec_label = ///
+    "+ campus-region x year FE" ///
+    if spec == "ry"
+
+
+gen byte measure_order = .
+
+replace measure_order = 1 ///
+    if measure == "psu"
+
+replace measure_order = 2 ///
+    if measure == "psureg"
+
+replace measure_order = 3 ///
+    if measure == "psuaddreg"
+
+replace measure_order = 4 ///
+    if measure == "psuregfld"
+
+replace measure_order = 5 ///
+    if measure == "psuaddregfld"
+
+
+gen str44 measure_label = ""
+
+replace measure_label = ///
+    "PSU only" ///
+    if measure == "psu"
+
+replace measure_label = ///
+    "PSU x campus region" ///
+    if measure == "psureg"
+
+replace measure_label = ///
+    "PSU + campus region" ///
+    if measure == "psuaddreg"
+
+replace measure_label = ///
+    "PSU x campus region x Broad field" ///
+    if measure == "psuregfld"
+
+replace measure_label = ///
+    "PSU + campus region + Broad field" ///
+    if measure == "psuaddregfld"
+
+
+sort ///
+    sample_order ///
+    spec_order ///
+    measure_order ///
+    year
+
+
+format ///
     beta ///
     se ///
-    lb ///
-    ub ///
-    pre_F ///
-    pre_p, ///
-    sepby(specification exposure) ///
-    noobs
+    lower_ci ///
+    upper_ci ///
+    %9.4f
+
+format ///
+    pretrend_F ///
+    %9.3f
+
+format ///
+    pretrend_p ///
+    %9.4f
 
 
 /*******************************************************************************
-12. LABEL EXPOSURES
-*******************************************************************************/
-
-gen byte exp_id = .
-
-
-replace exp_id = 1 ///
-    if exposure == "orig"
-
-replace exp_id = 2 ///
-    if exposure == "psu"
-
-replace exp_id = 3 ///
-    if exposure == "geo"
-
-
-assert !missing(exp_id)
-
-
-label define cos_lbl ///
-    1 "Original Geo-PSU" ///
-    2 "PSU, same region x field" ///
-    3 "Geo-PSU, same region x field"
-
-label values exp_id cos_lbl
-
-
-/*******************************************************************************
-13. HORIZONTAL OFFSETS
-*******************************************************************************/
-
-gen double year_plot = year
-
-
-replace year_plot = ///
-    year - 0.10 ///
-    if exposure == "orig"
-
-
-replace year_plot = ///
-    year ///
-    if exposure == "psu"
-
-
-replace year_plot = ///
-    year + 0.10 ///
-    if exposure == "geo"
-
-
-/*******************************************************************************
-14. VALID OBSERVATIONS FOR PLOTTING
-*******************************************************************************/
-
-gen byte plot_ok = ///
-    !missing(beta) & ///
-    !missing(lb) & ///
-    !missing(ub)
-
-
-count if plot_ok
-
-display ///
-    "Valid graph points = " ///
-    %9.0fc r(N)
-
-
-assert r(N) == 40
-
-
-/*******************************************************************************
-15. FIGURE 2
-*
-* Same paper-style format as the SUA exposure event-study figure.
-*
-* 2011 is shown as ONE common black reference point rather than three
-* overlapping exposure-specific markers.
-*******************************************************************************/
-
-twoway ///
-    (rcap lb ub year_plot ///
-        if plot_ok & ///
-        specification == "baseline" & ///
-        year != 2011 & ///
-        exposure == "orig", ///
-        lcolor(navy%55) ///
-        lwidth(thin)) ///
-    (rcap lb ub year_plot ///
-        if plot_ok & ///
-        specification == "baseline" & ///
-        year != 2011 & ///
-        exposure == "psu", ///
-        lcolor(forest_green%55) ///
-        lwidth(thin)) ///
-    (rcap lb ub year_plot ///
-        if plot_ok & ///
-        specification == "baseline" & ///
-        year != 2011 & ///
-        exposure == "geo", ///
-        lcolor(maroon%55) ///
-        lwidth(thin)) ///
-    (scatter beta year_plot ///
-        if plot_ok & ///
-        specification == "baseline" & ///
-        year != 2011 & ///
-        exposure == "orig", ///
-        msymbol(O) ///
-        msize(medlarge) ///
-        mcolor(navy) ///
-        mlcolor(navy)) ///
-    (scatter beta year_plot ///
-        if plot_ok & ///
-        specification == "baseline" & ///
-        year != 2011 & ///
-        exposure == "psu", ///
-        msymbol(T) ///
-        msize(medlarge) ///
-        mcolor(forest_green) ///
-        mlcolor(forest_green)) ///
-    (scatter beta year_plot ///
-        if plot_ok & ///
-        specification == "baseline" & ///
-        year != 2011 & ///
-        exposure == "geo", ///
-        msymbol(D) ///
-        msize(medlarge) ///
-        mcolor(maroon) ///
-        mlcolor(maroon)) ///
-    (scatteri 0 2011, ///
-        msymbol(O) ///
-        msize(medsmall) ///
-        mcolor(black) ///
-        mlcolor(black)) ///
-    , ///
-    xline(2011, ///
-        lcolor(gs8) ///
-        lpattern(dash) ///
-        lwidth(medthin)) ///
-    yline(0, ///
-        lcolor(gs7) ///
-        lpattern(solid) ///
-        lwidth(medthin)) ///
-    xlabel( ///
-        2007(1)2016, ///
-        labsize(medsmall) ///
-    ) ///
-    ylabel(, ///
-        format(%9.0f) ///
-        labsize(medsmall) ///
-        grid ///
-        glcolor(gs14) ///
-        glwidth(vthin) ///
-    ) ///
-    xtitle( ///
-        "Year", ///
-        size(medium) ///
-    ) ///
-    ytitle( ///
-        "Effect on first-year enrollment", ///
-        size(medium) ///
-    ) ///
-    title( ///
-        "Event study: cosine exposure and incumbent enrollment", ///
-        size(medium) ///
-        color(black) ///
-    ) ///
-    subtitle( ///
-        "95% confidence intervals; 2011 omitted", ///
-        size(small) ///
-        color(gs6) ///
-    ) ///
-    legend( ///
-        order( ///
-            4 "Original Geo-PSU" ///
-            5 "PSU, same region x field" ///
-            6 "Geo-PSU, same region x field" ///
-        ) ///
-        rows(1) ///
-        position(6) ///
-        region( ///
-            lcolor(none) ///
-            fcolor(none) ///
-        ) ///
-        size(small) ///
-    ) ///
-    graphregion(color(white)) ///
-    plotregion(color(white)) ///
-    bgcolor(white)
-
-
-graph export ///
-    "$output/cosine_event_study_three_exposures_revised.pdf", ///
-    replace
-
-
-
-/*******************************************************************************
-17. COMPACT PRE-TREND RESULTS
+14. DISPLAY ANNUAL COEFFICIENTS
 *******************************************************************************/
 
 display ""
-display "===== COSINE PRE-TREND TESTS ====="
+display "============================================================"
+display " COSINE EVENT-STUDY COEFFICIENTS"
+display "============================================================"
 
+list ///
+    sample_label ///
+    spec ///
+    measure_label ///
+    year ///
+    beta ///
+    se ///
+    lower_ci ///
+    upper_ci, ///
+    sepby( ///
+        sample ///
+        spec ///
+        measure ///
+    ) ///
+    noobs clean
+
+
+/*******************************************************************************
+15. COMPACT PRETREND SUMMARY
+*******************************************************************************/
 
 preserve
 
     keep ///
-        specification ///
-        exposure ///
-        pre_F ///
-        pre_p
+        sample ///
+        sample_label ///
+        sample_order ///
+        spec ///
+        spec_label ///
+        spec_order ///
+        measure ///
+        measure_label ///
+        measure_order ///
+        pretrend_F ///
+        pretrend_p ///
+        observations ///
+        programs
 
     duplicates drop
 
-    sort specification exposure
+    isid ///
+        sample ///
+        spec ///
+        measure
 
-    list, ///
+    count
+    assert r(N) == 20
+
+    sort ///
+        sample_order ///
+        spec_order ///
+        measure_order
+
+
+    display ""
+    display "============================================================"
+    display " COSINE EVENT-STUDY PRETREND SUMMARY"
+    display "============================================================"
+
+    list ///
+        sample_label ///
+        spec ///
+        measure_label ///
+        pretrend_F ///
+        pretrend_p ///
+        observations ///
+        programs, ///
+        sepby( ///
+            sample ///
+            spec ///
+        ) ///
         noobs clean
 
 restore
 
+
+/*******************************************************************************
+16. HORIZONTAL POSITIONS FOR THE FIVE MEASURES
+*******************************************************************************/
+
+/*
+The offsets are only visual. All five estimates continue to correspond to
+the same admission year.
+*/
+
+gen double graph_year = ///
+    year
+
+replace graph_year = ///
+    year - 0.16 ///
+    if measure == "psu"
+
+replace graph_year = ///
+    year - 0.08 ///
+    if measure == "psureg"
+
+replace graph_year = ///
+    year ///
+    if measure == "psuaddreg"
+
+replace graph_year = ///
+    year + 0.08 ///
+    if measure == "psuregfld"
+
+replace graph_year = ///
+    year + 0.16 ///
+    if measure == "psuaddregfld"
+
+
+/*******************************************************************************
+17. CREATE THE TWO FULL-SAMPLE FIGURES
+*******************************************************************************/
+
+foreach spec in ///
+    fy ///
+    ry {
+
+    if "`spec'" == "fy" {
+
+        local graph_title ///
+            "Cosine exposure event studies"
+
+        local graph_subtitle ///
+            "Program FE and Broad-field x year FE; 2011 omitted"
+
+        local graph_output ///
+            "`graph_baseline'"
+
+        local graph_name ///
+            "cosine_event_baseline"
+    }
+
+    if "`spec'" == "ry" {
+
+        local graph_title ///
+            "Cosine exposure event studies"
+
+        local graph_subtitle ///
+            "Program FE, Broad-field x year FE, and campus-region x year FE; 2011 omitted"
+
+        local graph_output ///
+            "`graph_regionyear'"
+
+        local graph_name ///
+            "cosine_event_regionyear"
+    }
+
+
+    /*
+    Pretrend p-values for the graph note.
+    */
+
+    foreach measure in ///
+        psu ///
+        psureg ///
+        psuaddreg ///
+        psuregfld ///
+        psuaddregfld {
+
+        quietly summarize ///
+            pretrend_p ///
+            if ///
+                sample == "full" & ///
+                spec == "`spec'" & ///
+                measure == "`measure'", ///
+            meanonly
+
+        local p_`measure' : ///
+            display %6.4f r(mean)
+    }
+
+
+    /*
+    Common vertical range across the five measures.
+    */
+
+    quietly summarize ///
+        lower_ci ///
+        if ///
+            sample == "full" & ///
+            spec == "`spec'" & ///
+            year != 2011, ///
+        meanonly
+
+    local graph_min = ///
+        r(min)
+
+
+    quietly summarize ///
+        upper_ci ///
+        if ///
+            sample == "full" & ///
+            spec == "`spec'" & ///
+            year != 2011, ///
+        meanonly
+
+    local graph_max = ///
+        r(max)
+
+
+    if `graph_min' > 0 {
+
+        local graph_min = 0
+    }
+
+    if `graph_max' < 0 {
+
+        local graph_max = 0
+    }
+
+
+    local graph_span = ///
+        `graph_max' - `graph_min'
+
+    if `graph_span' <= 0 {
+
+        local graph_span = 1
+    }
+
+
+    local graph_min = ///
+        `graph_min' - ///
+        0.08 * `graph_span'
+
+    local graph_max = ///
+        `graph_max' + ///
+        0.08 * `graph_span'
+
+
+    /*
+    The first five plots are confidence intervals.
+    Plots 6-10 are coefficient markers.
+    Plot 11 is the single omitted-year marker.
+    */
+
+    twoway ///
+        (rspike ///
+            lower_ci ///
+            upper_ci ///
+            graph_year ///
+            if ///
+                sample == "full" & ///
+                spec == "`spec'" & ///
+                measure == "psu" & ///
+                year != 2011, ///
+            lcolor(navy%45) ///
+            lwidth(thin)) ///
+        (rspike ///
+            lower_ci ///
+            upper_ci ///
+            graph_year ///
+            if ///
+                sample == "full" & ///
+                spec == "`spec'" & ///
+                measure == "psureg" & ///
+                year != 2011, ///
+            lcolor(maroon%45) ///
+            lwidth(thin)) ///
+        (rspike ///
+            lower_ci ///
+            upper_ci ///
+            graph_year ///
+            if ///
+                sample == "full" & ///
+                spec == "`spec'" & ///
+                measure == "psuaddreg" & ///
+                year != 2011, ///
+            lcolor(forest_green%45) ///
+            lwidth(thin)) ///
+        (rspike ///
+            lower_ci ///
+            upper_ci ///
+            graph_year ///
+            if ///
+                sample == "full" & ///
+                spec == "`spec'" & ///
+                measure == "psuregfld" & ///
+                year != 2011, ///
+            lcolor(dkorange%45) ///
+            lwidth(thin)) ///
+        (rspike ///
+            lower_ci ///
+            upper_ci ///
+            graph_year ///
+            if ///
+                sample == "full" & ///
+                spec == "`spec'" & ///
+                measure == "psuaddregfld" & ///
+                year != 2011, ///
+            lcolor(purple%45) ///
+            lwidth(thin)) ///
+        (scatter ///
+            beta ///
+            graph_year ///
+            if ///
+                sample == "full" & ///
+                spec == "`spec'" & ///
+                measure == "psu" & ///
+                year != 2011, ///
+            mcolor(navy) ///
+            mlcolor(navy) ///
+            msymbol(circle) ///
+            msize(medsmall)) ///
+        (scatter ///
+            beta ///
+            graph_year ///
+            if ///
+                sample == "full" & ///
+                spec == "`spec'" & ///
+                measure == "psureg" & ///
+                year != 2011, ///
+            mcolor(maroon) ///
+            mlcolor(maroon) ///
+            msymbol(triangle) ///
+            msize(medsmall)) ///
+        (scatter ///
+            beta ///
+            graph_year ///
+            if ///
+                sample == "full" & ///
+                spec == "`spec'" & ///
+                measure == "psuaddreg" & ///
+                year != 2011, ///
+            mcolor(forest_green) ///
+            mlcolor(forest_green) ///
+            msymbol(diamond) ///
+            msize(medsmall)) ///
+        (scatter ///
+            beta ///
+            graph_year ///
+            if ///
+                sample == "full" & ///
+                spec == "`spec'" & ///
+                measure == "psuregfld" & ///
+                year != 2011, ///
+            mcolor(dkorange) ///
+            mlcolor(dkorange) ///
+            msymbol(square) ///
+            msize(medsmall)) ///
+        (scatter ///
+            beta ///
+            graph_year ///
+            if ///
+                sample == "full" & ///
+                spec == "`spec'" & ///
+                measure == "psuaddregfld" & ///
+                year != 2011, ///
+            mcolor(purple) ///
+            mlcolor(purple) ///
+            msymbol(X) ///
+            msize(medsmall)) ///
+        (scatter ///
+            beta ///
+            year ///
+            if ///
+                sample == "full" & ///
+                spec == "`spec'" & ///
+                measure == "psu" & ///
+                year == 2011, ///
+            mcolor(gs6) ///
+            mlcolor(gs6) ///
+            msymbol(Oh) ///
+            msize(medsmall)) ///
+        , ///
+        xline( ///
+            2011, ///
+            lcolor(gs8) ///
+            lpattern(dash) ///
+            lwidth(medthin) ///
+        ) ///
+        yline( ///
+            0, ///
+            lcolor(gs7) ///
+            lpattern(solid) ///
+            lwidth(medthin) ///
+        ) ///
+        xscale( ///
+            range(2006.65 2016.35) ///
+        ) ///
+        yscale( ///
+            range(`graph_min' `graph_max') ///
+        ) ///
+        xlabel( ///
+            2007(1)2016, ///
+            format(%4.0f) ///
+            labsize(small) ///
+        ) ///
+        ylabel( ///
+            , ///
+            format(%5.1f) ///
+            angle(horizontal) ///
+            labsize(small) ///
+            grid ///
+            glcolor(gs14) ///
+            glwidth(vthin) ///
+        ) ///
+        xtitle( ///
+            "Admission year", ///
+            size(small) ///
+        ) ///
+        ytitle( ///
+            "Enrollment coefficient per SD of exposure", ///
+            size(small) ///
+        ) ///
+        title( ///
+            "`graph_title'", ///
+            size(medsmall) ///
+        ) ///
+        subtitle( ///
+            "`graph_subtitle'", ///
+            size(small) ///
+        ) ///
+        legend( ///
+            order( ///
+                6  "PSU" ///
+                7  "PSU x R" ///
+                8  "PSU + R" ///
+                9  "PSU x R x F" ///
+                10 "PSU + R + F" ///
+            ) ///
+            rows(2) ///
+            position(6) ///
+            size(small) ///
+            region( ///
+                lcolor(none) ///
+                fcolor(none) ///
+            ) ///
+        ) ///
+        note( ///
+			"R denotes campus region; F denotes Broad field. 95% CIs; SEs clustered by program." ///
+			"Joint pretrend p-values: PSU = `p_psu'; PSU x R = `p_psureg'; PSU + R = `p_psuaddreg'." ///
+			"PSU x R x F = `p_psuregfld'; PSU + R + F = `p_psuaddregfld'.", ///
+			size(vsmall) ///
+		) ///
+        graphregion( ///
+            color(white) ///
+        ) ///
+        plotregion( ///
+            color(white) ///
+        ) ///
+        bgcolor(white) ///
+        scheme(s1color) ///
+        name( ///
+            `graph_name', ///
+            replace ///
+        )
+
+
+    graph export ///
+        "`graph_output'.png", ///
+        width(3000) ///
+        replace
+
+    capture noisily graph export ///
+        "`graph_output'.pdf", ///
+        replace
+}
+
+
+/*******************************************************************************
+18. END
+*******************************************************************************/
+
+display ""
+display "============================================================"
+display " COSINE EXPOSURE EVENT STUDIES COMPLETED"
+display "============================================================"
+
+display ///
+    "Baseline graph:    `graph_baseline'.png"
+
+display ///
+    "Region-year graph: `graph_regionyear'.png"
+
+display ""
+display "07_cosine_event_studies.do completed successfully."

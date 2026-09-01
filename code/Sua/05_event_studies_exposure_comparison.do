@@ -605,74 +605,6 @@ display ///
     "Exported combined results: `results_xlsx'"
 
 
-/*******************************************************************************
-12. COMPACT JOINT PRETREND SUMMARY
-*
-* This produces exactly six rows:
-*
-*     2 specifications x 3 exposure measures
-*******************************************************************************/
-
-preserve
-
-    keep ///
-        specification ///
-        exposure ///
-        exposure_label ///
-        pre_F ///
-        pre_p ///
-        N ///
-        programs ///
-        markets
-
-    duplicates drop
-
-    isid ///
-        specification ///
-        exposure
-
-    count
-    assert r(N) == 6
-
-    sort ///
-        specification ///
-        exposure
-
-
-    display ""
-    display "============================================================"
-    display " JOINT PRETREND TESTS"
-    display "============================================================"
-
-
-    format ///
-        pre_F ///
-        pre_p ///
-        %9.4f
-
-
-    list ///
-        specification ///
-        exposure_label ///
-        pre_F ///
-        pre_p ///
-        N ///
-        programs ///
-        markets, ///
-        sepby(specification) ///
-        noobs clean
-
-
-    /*
-    Add the compact six-row summary as a second Excel sheet.
-    */
-
-    export excel ///
-        using "`results_xlsx'", ///
-        sheet("pretrends", replace) ///
-        firstrow(variables)
-
-restore
 
 
 /*******************************************************************************
@@ -754,7 +686,7 @@ foreach specification in baseline regionyear {
     if "`specification'" == "baseline" {
 
         local figure_title ///
-            "Baseline specification"
+            "Program and field x year fixed effects"
 
         local figure_subtitle ///
             "Program FE and field x year FE"
@@ -923,8 +855,6 @@ display "============================================================"
 display ///
     "Combined DTA: `results_dta'"
 
-display ///
-    "Combined XLSX: `results_xlsx'"
 
 display ///
     "Baseline PDF: `figure_baseline'.pdf"
