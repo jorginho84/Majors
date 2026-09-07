@@ -1,5 +1,5 @@
 /*******************************************************************************
-07_cosine_event_studies.do
+04_cosine_estimate_event_studies.do
 
 PURPOSE
 

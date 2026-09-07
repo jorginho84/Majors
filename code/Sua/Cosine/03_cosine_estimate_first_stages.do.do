@@ -1,5 +1,5 @@
 /*******************************************************************************
-06c_cosine_first_stages_full_and_min10.do
+03_cosine_estimate_first_stages.do
 
 PURPOSE
 

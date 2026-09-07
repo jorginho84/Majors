@@ -3,7 +3,7 @@
 
 PURPOSE
 
-Estimate event studies for the logarithmic SUA first-stage exercise.
+Estimate event studies for the revised logarithmic SUA first-stage exercise.
 
 EXPOSURE MEASURES
 
@@ -11,9 +11,11 @@ EXPOSURE MEASURES
     2. Triangular
     3. Gaussian
 
+
 FIELD DEFINITION
 
     Broad field x pre-treatment region.
+
 
 FIXED-EFFECT SPECIFICATIONS
 
@@ -26,35 +28,46 @@ FIXED-EFFECT SPECIFICATIONS
            Broad-field x year FE
            Pre-treatment region x year FE
 
+
 MODEL
 
     log(N_firstyear_pt)
-        = sum_{year != 2011}
-          beta_year,k
-          [log(E_p^k) x 1(t = year)]
+
+        = sum_{s != 2011}
+          beta_s,k
+          [log_tilde(E_p^k) x 1(t=s)]
+
+        + sum_{s != 2011}
+          theta_s,k
+          [1(E_p^k>0) x 1(t=s)]
+
         + fixed effects
         + error_pt
 
-SAMPLE
 
-Each exposure measure uses its own positive-exposure sample:
+where
 
-    Total:       exp_unw > 0
-    Triangular:  exp_tri50 > 0
-    Gaussian:    exp_gau50 > 0
+    log_tilde(E_p^k) =
+        log(E_p^k)     if E_p^k > 0
+        0              if E_p^k = 0
 
-Programs with zero exposure are excluded because log(0) is undefined.
-Consequently, samples may differ across exposure measures.
 
-INTERPRETATION
+Programs with zero exposure are retained.
 
-beta_year,k is the enrollment-exposure elasticity in the indicated year
-relative to 2011, the explicitly omitted year.
+The year-specific positive-exposure indicators allow zero exposure
+to be distinguished from positive exposure in each event year.
+
+The plotted coefficients are beta_s,k, the year-specific coefficients
+on log_tilde(E_p^k), relative to 2011.
+
+2011 is explicitly omitted from both sets of interactions.
+
 
 INFERENCE
 
 Standard errors are clustered by the Broad-field x pre-treatment-region
 market.
+
 
 OUTPUTS
 
@@ -113,14 +126,6 @@ keep if ///
     inrange(ao_proceso, 2007, 2016)
 
 
-/*
-Use the same initial analytical sample as the log-log first stages.
-
-Undefined exposure observations are excluded. Economically defined exposure
-values equal to zero remain in the initial panel but are excluded separately
-from the corresponding logarithmic regression.
-*/
-
 drop if missing( ///
     program_id, ///
     ao_proceso, ///
@@ -135,7 +140,8 @@ drop if missing( ///
 
 
 /*
-The logarithmic outcome requires strictly positive enrollment.
+The dependent variable is logarithmic enrollment.
+Zero exposure is retained.
 */
 
 keep if ///
@@ -225,7 +231,7 @@ assert ///
 
 
 /*******************************************************************************
-6. POSITIVE-EXPOSURE INDICATORS AND LOG EXPOSURES
+6. POSITIVE-EXPOSURE INDICATORS AND LOG-TILDE EXPOSURES
 *******************************************************************************/
 
 /*
@@ -235,9 +241,11 @@ Total exposure.
 gen byte positive_total = ///
     exp_unw > 0
 
-gen double ln_exp_total = ///
+gen double ln_exp_total = 0
+
+replace ln_exp_total = ///
     ln(exp_unw) ///
-    if positive_total == 1
+    if exp_unw > 0
 
 
 /*
@@ -247,9 +255,11 @@ Triangular exposure.
 gen byte positive_triangular = ///
     exp_tri50 > 0
 
-gen double ln_exp_triangular = ///
+gen double ln_exp_triangular = 0
+
+replace ln_exp_triangular = ///
     ln(exp_tri50) ///
-    if positive_triangular == 1
+    if exp_tri50 > 0
 
 
 /*
@@ -259,26 +269,28 @@ Gaussian exposure.
 gen byte positive_gaussian = ///
     exp_gau50 > 0
 
-gen double ln_exp_gaussian = ///
+gen double ln_exp_gaussian = 0
+
+replace ln_exp_gaussian = ///
     ln(exp_gau50) ///
-    if positive_gaussian == 1
+    if exp_gau50 > 0
 
 
 /*
-Validate logarithmic exposures within their corresponding samples.
+Checks.
 */
 
 assert ///
-    !missing(ln_exp_total) ///
-    if positive_total == 1
+    ln_exp_total == 0 ///
+    if exp_unw == 0
 
 assert ///
-    !missing(ln_exp_triangular) ///
-    if positive_triangular == 1
+    ln_exp_triangular == 0 ///
+    if exp_tri50 == 0
 
 assert ///
-    !missing(ln_exp_gaussian) ///
-    if positive_gaussian == 1
+    ln_exp_gaussian == 0 ///
+    if exp_gau50 == 0
 
 
 /*******************************************************************************
@@ -299,14 +311,17 @@ egen long log_region_year = ///
 
 
 /*******************************************************************************
-8. MANUAL LOG EXPOSURE x YEAR INTERACTIONS
+8. MANUAL EVENT-STUDY INTERACTIONS
 
-Interactions are created for:
+For each exposure measure and year s != 2011, construct:
 
-    2007-2010
-    2012-2016
+    log_tilde(E_p^k) x 1(t=s)
 
-No interaction is created for 2011. Therefore, 2011 is explicitly omitted.
+and
+
+    1(E_p^k>0) x 1(t=s)
+
+2011 is omitted from both sets.
 *******************************************************************************/
 
 foreach year in ///
@@ -320,8 +335,11 @@ foreach year in ///
 
     gen double es_total_`year' = ///
         ln_exp_total * ///
-        (ao_proceso == `year') ///
-        if positive_total == 1
+        (ao_proceso == `year')
+
+    gen byte D_total_`year' = ///
+        positive_total * ///
+        (ao_proceso == `year')
 
 
     /*
@@ -330,8 +348,11 @@ foreach year in ///
 
     gen double es_triangular_`year' = ///
         ln_exp_triangular * ///
-        (ao_proceso == `year') ///
-        if positive_triangular == 1
+        (ao_proceso == `year')
+
+    gen byte D_triangular_`year' = ///
+        positive_triangular * ///
+        (ao_proceso == `year')
 
 
     /*
@@ -340,14 +361,16 @@ foreach year in ///
 
     gen double es_gaussian_`year' = ///
         ln_exp_gaussian * ///
-        (ao_proceso == `year') ///
-        if positive_gaussian == 1
+        (ao_proceso == `year')
+
+    gen byte D_gaussian_`year' = ///
+        positive_gaussian * ///
+        (ao_proceso == `year')
 }
 
 
 /*
-All pre-2011 and post-2011 interactions must equal zero outside their
-corresponding year.
+Check that all interactions are zero outside their corresponding year.
 */
 
 foreach exposure_measure in ///
@@ -361,9 +384,11 @@ foreach exposure_measure in ///
 
         assert ///
             es_`exposure_measure'_`year' == 0 ///
-            if ///
-            positive_`exposure_measure' == 1 & ///
-            ao_proceso != `year'
+            if ao_proceso != `year'
+
+        assert ///
+            D_`exposure_measure'_`year' == 0 ///
+            if ao_proceso != `year'
     }
 }
 
@@ -378,6 +403,7 @@ egen byte tag_program = ///
 display ""
 display "============================================================"
 display " LOG EVENT-STUDY INITIAL SAMPLE"
+display " ZERO EXPOSURE RETAINED"
 display "============================================================"
 
 count
@@ -385,7 +411,6 @@ count
 display ///
     "Initial program-year observations = " ///
     %9.0fc r(N)
-
 
 count if ///
     tag_program == 1
@@ -486,9 +511,6 @@ foreach specification in ///
 
         if "`exposure_measure'" == "total" {
 
-            local positive_sample ///
-                positive_total
-
             local exposure_label ///
                 "Total exposure"
         }
@@ -496,18 +518,12 @@ foreach specification in ///
 
         if "`exposure_measure'" == "triangular" {
 
-            local positive_sample ///
-                positive_triangular
-
             local exposure_label ///
                 "Triangular exposure"
         }
 
 
         if "`exposure_measure'" == "gaussian" {
-
-            local positive_sample ///
-                positive_gaussian
 
             local exposure_label ///
                 "Gaussian exposure"
@@ -526,7 +542,7 @@ foreach specification in ///
             "Exposure      = `exposure_label'"
 
         display ///
-            "Sample        = Positive exposure only"
+            "Zero exposure = RETAINED"
 
         display ///
             "Omitted year  = 2011"
@@ -549,7 +565,15 @@ foreach specification in ///
             es_`exposure_measure'_2014 ///
             es_`exposure_measure'_2015 ///
             es_`exposure_measure'_2016 ///
-            if `positive_sample' == 1, ///
+            D_`exposure_measure'_2007 ///
+            D_`exposure_measure'_2008 ///
+            D_`exposure_measure'_2009 ///
+            D_`exposure_measure'_2010 ///
+            D_`exposure_measure'_2012 ///
+            D_`exposure_measure'_2013 ///
+            D_`exposure_measure'_2014 ///
+            D_`exposure_measure'_2015 ///
+            D_`exposure_measure'_2016, ///
             absorb( ///
                 `absorbed_effects' ///
             ) ///
@@ -557,8 +581,7 @@ foreach specification in ///
 
 
         /*
-        Save the effective estimation sample before running additional
-        commands.
+        Save effective estimation sample before additional commands.
         */
 
         tempvar estimation_sample
@@ -601,6 +624,11 @@ foreach specification in ///
 
         /***********************************************************************
         11.5 JOINT PRETREND TEST
+
+        Test only the log-exposure coefficients.
+
+        The D x year terms are controls and are not part of the main
+        pretrend test.
         ***********************************************************************/
 
         test ///
@@ -649,14 +677,14 @@ foreach specification in ///
 
 
         /***********************************************************************
-        11.7 STORE ANNUAL COEFFICIENTS
+        11.7 STORE ANNUAL LOG-EXPOSURE COEFFICIENTS
         ***********************************************************************/
 
         forvalues year = 2007/2016 {
 
 
             /*
-            Explicitly store the omitted 2011 coefficient as zero.
+            Explicitly store omitted 2011 as zero.
             */
 
             if `year' == 2011 {
@@ -806,6 +834,7 @@ format ///
 display ""
 display "============================================================"
 display " LOG EVENT-STUDY COEFFICIENTS"
+display " ZERO EXPOSURE RETAINED"
 display "============================================================"
 
 list ///
@@ -885,6 +914,7 @@ preserve
 
 restore
 
+
 /*******************************************************************************
 16. COMMON VERTICAL SCALE
 *******************************************************************************/
@@ -908,7 +938,9 @@ local graph_max = ///
 
 
 local graph_span = ///
-    `graph_max' - `graph_min'
+    `graph_max' - ///
+    `graph_min'
+
 
 if `graph_span' <= 0 {
 
@@ -1171,7 +1203,7 @@ foreach specification in ///
             size(small) ///
         ) ///
         note( ///
-            "Positive enrollment and exposure only; samples differ by exposure measure." ///
+            "Zero exposure retained; D x year controls included and not plotted." ///
             "95% confidence intervals; standard errors clustered by pre-treatment market." ///
             "Joint pretrend p-values: Total = `total_p'; Triangular = `triangular_p'; Gaussian = `gaussian_p'.", ///
             size(vsmall) ///
@@ -1195,10 +1227,7 @@ foreach specification in ///
         "`figure_output'.png", ///
         width(2400) ///
         replace
-
-    graph export ///
-        "`figure_output'.pdf", ///
-        replace
+    
 }
 
 
@@ -1214,14 +1243,11 @@ display "============================================================"
 display ///
     "Baseline PNG: `graph_baseline'.png"
 
-display ///
-    "Baseline PDF: `graph_baseline'.pdf"
 
 display ///
     "Region-year PNG: `graph_regionyear'.png"
 
-display ///
-    "Region-year PDF: `graph_regionyear'.pdf"
+
 
 display ""
 display "05a_sua_log_event_studies.do completed successfully."

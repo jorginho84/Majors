@@ -1,5 +1,5 @@
 
-
+*01_cosine_build_inputs_2011.do
 /**********************************************************************
 * 1. Construir composición región × PSU de incumbentes y entrantes
 *

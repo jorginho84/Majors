@@ -3,7 +3,7 @@
 
 PURPOSE
 
-Estimate log-log SUA first stages for:
+Estimate log SUA first stages for:
 
     FIELD DEFINITIONS
         1. Broad area
@@ -25,23 +25,31 @@ Estimate log-log SUA first stages for:
                Field x year FE
                Region x year FE
 
+
 MODEL
 
     log(N_firstyear_pt)
-        = beta_k [log(E_p^k) x D_pt^k]
+        = beta_k [log_tilde(E_p^k) x Post_t]
+        + theta_k [1(E_p^k > 0) x Post_t]
         + fixed effects
         + error_pt
 
-where:
+where
 
-    D_pt^k = 1(E_p^k > 0) x Post_t
+    log_tilde(E_p^k) =
+        0                if E_p^k = 0
+        log(E_p^k)       if E_p^k > 0
 
-Programs with zero exposure are excluded from the corresponding log
-regression. The dummy is retained in the construction but is not included
-separately because, within the positive-exposure sample, it equals Post_t.
+Programs with zero exposure are retained.
 
-The coefficient beta_k is the differential post-2012 enrollment elasticity
-with respect to exposure among programs with positive exposure.
+The dummy 1(E_p^k > 0) x Post_t distinguishes zero exposure from
+positive exposure after 2012.
+
+The coefficient beta_k on log_tilde(E_p^k) x Post_t is the main
+coefficient reported in the table.
+
+Because the dependent variable is log enrollment, observations with
+zero first-year enrollment are excluded.
 
 No external results files are created.
 *******************************************************************************/
@@ -107,6 +115,9 @@ postfile `results_handle' ///
     double p_value ///
     double lower_95 ///
     double upper_95 ///
+    double D_beta ///
+    double D_standard_error ///
+    double D_p_value ///
     long observations ///
     long programs ///
     long markets ///
@@ -178,8 +189,13 @@ foreach market_definition of local market_definitions {
         exp_gau50 ///
     )
 
+
     /*
-    log(N) requires strictly positive enrollment.
+    The dependent variable is log enrollment.
+    Therefore N_firstyear_incumbent must be strictly positive.
+
+    IMPORTANT:
+    Zero exposure is NOT excluded.
     */
 
     keep if ///
@@ -193,7 +209,7 @@ foreach market_definition of local market_definitions {
 
 
     /***************************************************************************
-    3.4 REQUIRE POSITIVE ENROLLMENT OBSERVATIONS BEFORE AND AFTER 2012
+    3.4 REQUIRE POSITIVE OUTCOME OBSERVATIONS BEFORE AND AFTER 2012
     ***************************************************************************/
 
     bysort program_id: ///
@@ -231,7 +247,7 @@ foreach market_definition of local market_definitions {
 
 
     /*
-    Exposure must be constant over time within each incumbent program.
+    Exposure must be fixed over time within program.
     */
 
     foreach raw_exposure in ///
@@ -239,32 +255,30 @@ foreach market_definition of local market_definitions {
         exp_tri50 ///
         exp_gau50 {
 
-        tempvar minimum_exposure maximum_exposure
+        tempvar min_exp max_exp
 
         bysort program_id: ///
-            egen double `minimum_exposure' = ///
+            egen double `min_exp' = ///
                 min(`raw_exposure')
 
         bysort program_id: ///
-            egen double `maximum_exposure' = ///
+            egen double `max_exp' = ///
                 max(`raw_exposure')
 
         assert ///
             abs( ///
-                `maximum_exposure' - ///
-                `minimum_exposure' ///
+                `max_exp' - ///
+                `min_exp' ///
             ) < 1e-10
 
         drop ///
-            `minimum_exposure' ///
-            `maximum_exposure'
+            `min_exp' ///
+            `max_exp'
     }
 
 
     /***************************************************************************
     3.6 POST-TREATMENT INDICATOR
-    *
-    * Use the existing variable when available. Otherwise, construct it.
     ***************************************************************************/
 
     capture confirm variable post2012
@@ -272,16 +286,11 @@ foreach market_definition of local market_definitions {
     if _rc {
 
         gen byte post2012 = ///
-            ao_proceso >= 2012
+            inrange(ao_proceso, 2012, 2016)
     }
 
-
-    /*
-    Validate the existing or newly created variable.
-    */
-
     assert ///
-        post2012 == (ao_proceso >= 2012)
+        post2012 == inrange(ao_proceso, 2012, 2016)
 
     assert ///
         inlist(post2012, 0, 1)
@@ -302,28 +311,70 @@ foreach market_definition of local market_definitions {
     3.8 TOTAL EXPOSURE
     ***************************************************************************/
 
+    /*
+    Dummy for positive exposure.
+    */
+
     gen byte positive_total_exposure = ///
         exp_unw > 0
 
-    gen byte exposed_post_total = ///
-        positive_total_exposure * post2012
+    assert ///
+        inlist(positive_total_exposure, 0, 1)
 
-    gen double ln_total_exposure = ///
+
+    /*
+    Construct log-tilde exposure:
+
+        = log(E) if E > 0
+        = 0      if E = 0
+    */
+
+    gen double ln_total_exposure = 0
+
+    replace ln_total_exposure = ///
         ln(exp_unw) ///
-        if positive_total_exposure == 1
+        if exp_unw > 0
+
+
+    /*
+    Post interaction of log-tilde exposure.
+    */
 
     gen double log_total_post = ///
-        ln_total_exposure * exposed_post_total ///
-        if positive_total_exposure == 1
+        ln_total_exposure * post2012
+
+
+    /*
+    Positive-exposure dummy x Post.
+    */
+
+    gen byte D_total_post = ///
+        positive_total_exposure * post2012
+
+
+    /*
+    Checks.
+    */
+
+    assert ///
+        ln_total_exposure == 0 ///
+        if exp_unw == 0
 
     assert ///
         log_total_post == 0 ///
-        if positive_total_exposure == 1 & ///
-           ao_proceso <= 2011
+        if exp_unw == 0
 
     assert ///
-        !missing(log_total_post) ///
-        if positive_total_exposure == 1
+        D_total_post == 0 ///
+        if exp_unw == 0
+
+    assert ///
+        log_total_post == 0 ///
+        if ao_proceso <= 2011
+
+    assert ///
+        D_total_post == 0 ///
+        if ao_proceso <= 2011
 
 
     /***************************************************************************
@@ -333,25 +384,43 @@ foreach market_definition of local market_definitions {
     gen byte positive_triangular_exposure = ///
         exp_tri50 > 0
 
-    gen byte exposed_post_triangular = ///
-        positive_triangular_exposure * post2012
+    assert ///
+        inlist(positive_triangular_exposure, 0, 1)
 
-    gen double ln_triangular_exposure = ///
+
+    gen double ln_triangular_exposure = 0
+
+    replace ln_triangular_exposure = ///
         ln(exp_tri50) ///
-        if positive_triangular_exposure == 1
+        if exp_tri50 > 0
+
 
     gen double log_triangular_post = ///
-        ln_triangular_exposure * exposed_post_triangular ///
-        if positive_triangular_exposure == 1
+        ln_triangular_exposure * post2012
+
+    gen byte D_triangular_post = ///
+        positive_triangular_exposure * post2012
+
+
+    assert ///
+        ln_triangular_exposure == 0 ///
+        if exp_tri50 == 0
 
     assert ///
         log_triangular_post == 0 ///
-        if positive_triangular_exposure == 1 & ///
-           ao_proceso <= 2011
+        if exp_tri50 == 0
 
     assert ///
-        !missing(log_triangular_post) ///
-        if positive_triangular_exposure == 1
+        D_triangular_post == 0 ///
+        if exp_tri50 == 0
+
+    assert ///
+        log_triangular_post == 0 ///
+        if ao_proceso <= 2011
+
+    assert ///
+        D_triangular_post == 0 ///
+        if ao_proceso <= 2011
 
 
     /***************************************************************************
@@ -361,32 +430,47 @@ foreach market_definition of local market_definitions {
     gen byte positive_gaussian_exposure = ///
         exp_gau50 > 0
 
-    gen byte exposed_post_gaussian = ///
-        positive_gaussian_exposure * post2012
+    assert ///
+        inlist(positive_gaussian_exposure, 0, 1)
 
-    gen double ln_gaussian_exposure = ///
+
+    gen double ln_gaussian_exposure = 0
+
+    replace ln_gaussian_exposure = ///
         ln(exp_gau50) ///
-        if positive_gaussian_exposure == 1
+        if exp_gau50 > 0
+
 
     gen double log_gaussian_post = ///
-        ln_gaussian_exposure * exposed_post_gaussian ///
-        if positive_gaussian_exposure == 1
+        ln_gaussian_exposure * post2012
+
+    gen byte D_gaussian_post = ///
+        positive_gaussian_exposure * post2012
+
+
+    assert ///
+        ln_gaussian_exposure == 0 ///
+        if exp_gau50 == 0
 
     assert ///
         log_gaussian_post == 0 ///
-        if positive_gaussian_exposure == 1 & ///
-           ao_proceso <= 2011
+        if exp_gau50 == 0
 
     assert ///
-        !missing(log_gaussian_post) ///
-        if positive_gaussian_exposure == 1
+        D_gaussian_post == 0 ///
+        if exp_gau50 == 0
+
+    assert ///
+        log_gaussian_post == 0 ///
+        if ao_proceso <= 2011
+
+    assert ///
+        D_gaussian_post == 0 ///
+        if ao_proceso <= 2011
 
 
     /***************************************************************************
     3.11 FIXED-EFFECT IDENTIFIERS
-    *
-    * Use specific names for the logarithmic exercise. Existing variables
-    * are retained and not overwritten.
     ***************************************************************************/
 
     capture confirm variable log_field_year
@@ -421,30 +505,42 @@ foreach market_definition of local market_definitions {
         tag(program_id)
 
     display ""
-    display "POSITIVE-EXPOSURE PROGRAMS"
+    display "============================================================"
+    display " EXPOSURE SUPPORT"
+    display "============================================================"
+
+    count if ///
+        tag_program == 1
+
+    display ///
+        "Programs in log-outcome sample = " ///
+        %9.0fc r(N)
+
 
     count if ///
         tag_program == 1 & ///
         positive_total_exposure == 1
 
     display ///
-        "Total exposure      = " ///
+        "Positive total exposure        = " ///
         %9.0fc r(N)
+
 
     count if ///
         tag_program == 1 & ///
         positive_triangular_exposure == 1
 
     display ///
-        "Triangular exposure = " ///
+        "Positive triangular exposure   = " ///
         %9.0fc r(N)
+
 
     count if ///
         tag_program == 1 & ///
         positive_gaussian_exposure == 1
 
     display ///
-        "Gaussian exposure   = " ///
+        "Positive Gaussian exposure     = " ///
         %9.0fc r(N)
 
     drop tag_program
@@ -506,11 +602,11 @@ foreach market_definition of local market_definitions {
 
             if "`exposure_measure'" == "total" {
 
-                local positive_sample ///
-                    positive_total_exposure
-
                 local log_post_variable ///
                     log_total_post
+
+                local D_post_variable ///
+                    D_total_post
 
                 local exposure_label ///
                     "Total"
@@ -523,11 +619,11 @@ foreach market_definition of local market_definitions {
 
             if "`exposure_measure'" == "triangular" {
 
-                local positive_sample ///
-                    positive_triangular_exposure
-
                 local log_post_variable ///
                     log_triangular_post
+
+                local D_post_variable ///
+                    D_triangular_post
 
                 local exposure_label ///
                     "Triangular"
@@ -540,11 +636,11 @@ foreach market_definition of local market_definitions {
 
             if "`exposure_measure'" == "gaussian" {
 
-                local positive_sample ///
-                    positive_gaussian_exposure
-
                 local log_post_variable ///
                     log_gaussian_post
+
+                local D_post_variable ///
+                    D_gaussian_post
 
                 local exposure_label ///
                     "Gaussian"
@@ -557,18 +653,25 @@ foreach market_definition of local market_definitions {
             display "Exposure       = `exposure_label'"
             display "Specification  = `fe_specification'"
             display "`specification_label'"
-            display "Sample         = Positive exposure only"
+            display "Zero exposure  = RETAINED"
             display "------------------------------------------------------------"
 
 
             /*******************************************************************
-            6. LOG-LOG FIRST-STAGE REGRESSION
+            6. LOG FIRST-STAGE REGRESSION
+
+            Both terms enter:
+
+                log-tilde(E) x Post
+                1(E>0) x Post
+
+            No positive-exposure sample restriction.
             *******************************************************************/
 
             reghdfe ///
                 ln_firstyear_enrollment ///
                 `log_post_variable' ///
-                if `positive_sample' == 1, ///
+                `D_post_variable', ///
                 absorb( ///
                     `absorbed_effects' ///
                 ) ///
@@ -576,7 +679,7 @@ foreach market_definition of local market_definitions {
 
 
             /*******************************************************************
-            7. COEFFICIENT AND INFERENCE
+            7. MAIN LOG-EXPOSURE COEFFICIENT
             *******************************************************************/
 
             local beta = ///
@@ -604,7 +707,7 @@ foreach market_definition of local market_definitions {
 
 
             /*
-            Cluster-robust Wald F statistic.
+            Wald F for main log-exposure coefficient.
             */
 
             test `log_post_variable'
@@ -613,6 +716,22 @@ foreach market_definition of local market_definitions {
                 r(F)
 
             local p_value = ///
+                r(p)
+
+
+            /*******************************************************************
+            7.1 DUMMY x POST COEFFICIENT
+            *******************************************************************/
+
+            local D_beta = ///
+                _b[`D_post_variable']
+
+            local D_standard_error = ///
+                _se[`D_post_variable']
+
+            test `D_post_variable'
+
+            local D_p_value = ///
                 r(p)
 
 
@@ -632,6 +751,7 @@ foreach market_definition of local market_definitions {
             local programs = ///
                 r(N)
 
+
             egen byte `tag_estimation_market' = ///
                 tag(market_pre) ///
                 if e(sample)
@@ -641,6 +761,7 @@ foreach market_definition of local market_definitions {
 
             local markets = ///
                 r(N)
+
 
             drop ///
                 `tag_estimation_program' ///
@@ -661,6 +782,9 @@ foreach market_definition of local market_definitions {
                 (`p_value') ///
                 (`lower_95') ///
                 (`upper_95') ///
+                (`D_beta') ///
+                (`D_standard_error') ///
+                (`D_p_value') ///
                 (`observations') ///
                 (`programs') ///
                 (`markets')
@@ -670,32 +794,55 @@ foreach market_definition of local market_definitions {
             10. DISPLAY COMPACT RESULT
             *******************************************************************/
 
+            display ""
+            display "MAIN LOG-EXPOSURE TERM"
+
             display ///
-                "Beta elasticity = " ///
+                "Beta log(E)xPost = " ///
                 %9.4f `beta'
 
             display ///
-                "SE              = " ///
+                "SE                = " ///
                 %9.4f `standard_error'
 
             display ///
-                "Wald F          = " ///
+                "Wald F            = " ///
                 %9.4f `F_statistic'
 
             display ///
-                "p-value         = " ///
+                "p-value           = " ///
                 %9.4f `p_value'
 
+
+            display ""
+            display "POSITIVE-EXPOSURE DUMMY CONTROL"
+
             display ///
-                "Observations    = " ///
+                "Beta D x Post     = " ///
+                %9.4f `D_beta'
+
+            display ///
+                "SE                = " ///
+                %9.4f `D_standard_error'
+
+            display ///
+                "p-value           = " ///
+                %9.4f `D_p_value'
+
+
+            display ""
+            display "SAMPLE"
+
+            display ///
+                "Observations      = " ///
                 %9.0fc `observations'
 
             display ///
-                "Programs        = " ///
+                "Programs          = " ///
                 %9.0fc `programs'
 
             display ///
-                "Markets         = " ///
+                "Markets           = " ///
                 %9.0fc `markets'
         }
     }
@@ -713,7 +860,10 @@ use `log_first_stage_results', clear
 count
 
 /*
-Three fields x three exposures x two FE specifications = 18 regressions.
+Three field definitions
+x three exposure measures
+x two FE specifications
+= 18 regressions.
 */
 
 assert r(N) == 18
@@ -724,14 +874,11 @@ isid ///
     exposure_measure
 
 
-/*
-Validate the expected number of results by specification.
-*/
-
 count if ///
     fe_specification == "baseline"
 
 assert r(N) == 9
+
 
 count if ///
     fe_specification == "regionyear"
@@ -748,11 +895,14 @@ format ///
     standard_error ///
     lower_95 ///
     upper_95 ///
+    D_beta ///
+    D_standard_error ///
     %9.4f
 
 format ///
     F_statistic ///
     p_value ///
+    D_p_value ///
     %9.4f
 
 format ///
@@ -760,6 +910,7 @@ format ///
     programs ///
     markets ///
     %12.0fc
+
 
 label variable fe_specification ///
     "Fixed-effect specification"
@@ -771,16 +922,16 @@ label variable exposure_measure ///
     "Exposure measure"
 
 label variable beta ///
-    "Post-2012 exposure elasticity"
+    "Coefficient on log(E) x Post"
 
 label variable standard_error ///
     "Clustered standard error"
 
 label variable F_statistic ///
-    "Cluster-robust Wald F"
+    "Cluster-robust Wald F for log(E) x Post"
 
 label variable p_value ///
-    "p-value"
+    "p-value for log(E) x Post"
 
 label variable lower_95 ///
     "95% CI lower bound"
@@ -788,9 +939,18 @@ label variable lower_95 ///
 label variable upper_95 ///
     "95% CI upper bound"
 
+label variable D_beta ///
+    "Coefficient on 1(E>0) x Post"
+
+label variable D_standard_error ///
+    "SE for 1(E>0) x Post"
+
+label variable D_p_value ///
+    "p-value for 1(E>0) x Post"
+
 
 /*******************************************************************************
-13. DISPLAY RESULTS
+13. DISPLAY MAIN RESULTS
 *******************************************************************************/
 
 sort ///
@@ -800,8 +960,8 @@ sort ///
 
 display ""
 display "============================================================"
-display " SUA LOG-LOG FIRST-STAGE RESULTS"
-display " POSITIVE-EXPOSURE PROGRAMS ONLY"
+display " SUA LOG FIRST-STAGE RESULTS"
+display " ZERO-EXPOSURE PROGRAMS RETAINED"
 display "============================================================"
 
 list ///
@@ -823,7 +983,30 @@ list ///
 
 
 /*******************************************************************************
-14. INTERPRETATION
+14. DISPLAY DUMMY-CONTROL RESULTS
+*******************************************************************************/
+
+display ""
+display "============================================================"
+display " POSITIVE-EXPOSURE DUMMY x POST"
+display "============================================================"
+
+list ///
+    fe_specification ///
+    field_definition ///
+    exposure_measure ///
+    D_beta ///
+    D_standard_error ///
+    D_p_value, ///
+    sepby( ///
+        fe_specification ///
+        field_definition ///
+    ) ///
+    noobs clean
+
+
+/*******************************************************************************
+15. INTERPRETATION
 *******************************************************************************/
 
 display ""
@@ -832,14 +1015,23 @@ display " INTERPRETATION"
 display "============================================================"
 
 display ""
-display "Beta is the differential post-2012 enrollment elasticity"
-display "with respect to exposure among programs with positive exposure."
+display "Zero-exposure programs are retained."
 display ""
-display "A 1% higher exposure is associated with an approximately"
-display "Beta% differential change in first-year enrollment after 2012."
+display "The constructed exposure variable equals:"
+display "    log(E) if E > 0"
+display "    0      if E = 0"
 display ""
-display "Programs with zero exposure are excluded from the corresponding"
-display "logarithmic regression."
+display "The regression includes both:"
+display "    log-tilde(E) x Post"
+display "    1(E>0) x Post"
 display ""
-display "The treatment dummy is retained in the construction but is not"
-display "included separately because it equals Post within this sample."
+display "The dummy interaction separates the difference between"
+display "zero and positive exposure from variation in exposure intensity."
+display ""
+display "The main reported beta is the coefficient on"
+display "log-tilde(E) x Post."
+display ""
+display "Zero first-year enrollment observations are excluded because"
+display "the dependent variable is log enrollment."
+display ""
+display "============================================================"

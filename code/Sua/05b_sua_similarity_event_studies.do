@@ -4,10 +4,11 @@
 PURPOSE
 
 Estimate event studies for conditional PSU similarity within exposed SUA
-markets, using two functional forms:
+markets, using:
 
     1. Levels
     2. Logarithms
+
 
 DECOMPOSITION
 
@@ -18,43 +19,63 @@ where:
     M_m   = entrant share of total market enrollment
     Q_p^k = PSU similarity with entrants, conditional on entrant presence
 
+
 MEASURES
 
     1. Triangular conditional similarity
     2. Gaussian conditional similarity
 
-SAMPLES
+
+SAMPLE
 
 Levels:
 
     - Markets with positive entrant presence
-    - Economically meaningful Q = 0 observations are retained
+    - Q = 0 retained
+    - First-year enrollment may equal zero
 
 Logs:
 
     - Markets with positive entrant presence
     - Positive first-year enrollment
-    - Positive conditional similarity
-    - The sample is defined separately for each similarity measure
+    - Q = 0 retained
+
+
+LOG TRANSFORMATION
+
+    log_tilde(Q_p^k) =
+        log(Q_p^k)     if Q_p^k > 0
+        0              if Q_p^k = 0
+
+For every event year, the log specification also includes:
+
+    1(Q_p^k > 0) x 1(t = s)
+
+These indicator interactions are controls and are not plotted.
+
 
 SPECIFICATION
 
     Program fixed effects
-    Broad-field x pre-treatment region x year fixed effects
+    Broad-field x year fixed effects
+    Pre-treatment region x year fixed effects
     Standard errors clustered by pre-treatment market
     2011 explicitly omitted
+
 
 INTERPRETATION
 
 Levels:
 
-    Each coefficient measures the enrollment association corresponding to a
-0.10 increase in conditional similarity, relative to 2011.
+    Each plotted coefficient measures the enrollment association
+    corresponding to a 0.10 increase in conditional similarity,
+    relative to 2011.
 
 Logs:
 
-    Each coefficient is the enrollment-similarity elasticity in the indicated
-    year, relative to 2011.
+    Each plotted coefficient is the enrollment-similarity elasticity
+    associated with log similarity in year s relative to 2011,
+    while retaining Q = 0 observations through the indicator controls.
 *******************************************************************************/
 
 clear all
@@ -65,6 +86,24 @@ do "code/config.do"
 
 
 /*******************************************************************************
+0. CHECK REQUIRED COMMAND
+*******************************************************************************/
+
+capture which reghdfe
+
+if _rc {
+
+    display as error ///
+        "reghdfe is not installed."
+
+    display as error ///
+        "Run: ssc install reghdfe, replace"
+
+    exit 199
+}
+
+
+/*******************************************************************************
 1. INPUT AND OUTPUTS
 *******************************************************************************/
 
@@ -72,10 +111,10 @@ local input_panel ///
     "$processed/sua_incumbent_panel_w_broad_area_region_2007_2016.dta"
 
 local graph_levels ///
-    "$output/sua_similarity_event_study_exposed_markets"
+    "$output/sua_similarity_event_study_altfe"
 
 local graph_logs ///
-    "$output/sua_similarity_log_event_study"
+    "$output/sua_similarity_log_event_study_altfe"
 
 
 /*******************************************************************************
@@ -106,9 +145,19 @@ isid ///
 assert ///
     N_firstyear_incumbent >= 0
 
+assert ///
+    exp_unw >= 0
+
+assert ///
+    exp_tri50 >= 0
+
+assert ///
+    exp_gau50 >= 0
+
 
 /*
-Require each program to appear before and after SUA entry.
+Require programs to appear both before and after SUA entry
+in the common panel.
 */
 
 bysort program_id: ///
@@ -133,9 +182,7 @@ drop ///
 *******************************************************************************/
 
 /*
-M_m is the entrant share of total pre-treatment market enrollment.
-
-Q_p^k is defined only when M_m > 0.
+Q is defined only for markets with positive entrant presence.
 */
 
 gen double entrant_share = ///
@@ -144,10 +191,6 @@ gen double entrant_share = ///
 keep if ///
     entrant_share > 0
 
-
-/*
-Conditional similarity measures.
-*/
 
 gen double q_tri = ///
     exp_tri50 / entrant_share
@@ -163,10 +206,6 @@ label variable q_gau ///
     "Gaussian similarity conditional on entrants"
 
 
-/*
-Validate the range of the similarity measures.
-*/
-
 assert inrange( ///
     q_tri, ///
     0, ///
@@ -181,9 +220,7 @@ assert inrange( ///
 
 
 /*
-Confirm the decomposition:
-
-    E_p^k = M_m * Q_p^k
+Verify decomposition.
 */
 
 assert ///
@@ -200,10 +237,10 @@ assert ///
 
 
 /*
-Conditional similarity must be fixed over time within programs.
+Q must be fixed over time within program.
 */
 
-foreach variable in ///
+foreach q_variable in ///
     q_tri ///
     q_gau {
 
@@ -211,74 +248,47 @@ foreach variable in ///
 
     bysort program_id: ///
         egen double `q_min' = ///
-            min(`variable')
+            min(`q_variable')
 
     bysort program_id: ///
         egen double `q_max' = ///
-            max(`variable')
+            max(`q_variable')
 
-    assert abs( ///
-        `q_max' - `q_min' ///
-    ) < 1e-10
+    assert ///
+        abs( ///
+            `q_max' - ///
+            `q_min' ///
+        ) < 1e-10
 
     drop ///
         `q_min' ///
         `q_max'
 }
 
-/***********************************************************************
-* 3.1 MARKET x YEAR FIXED-EFFECT IDENTIFIER
-***********************************************************************/
-
-/*
-market_year in the input records the pre-treatment year used to assign
-the fixed market. It is not the market x panel-year identifier needed
-for the regressions below.
-*/
-
-egen long market_year_fe = group( ///
-    market_pre ///
-    ao_proceso ///
-), label
-
-label variable market_year_fe ///
-    "Pre-treatment market x admission year FE"
-
-/*
-Validate that the identifier maps one-to-one into
-pre-treatment market x admission year cells.
-*/
-
-bysort market_year_fe: ///
-assert market_pre == market_pre[1]
-
-bysort market_year_fe: ///
-assert ao_proceso == ao_proceso[1]
-
-egen byte tag_market_year_fe = ///
-    tag(market_year_fe)
-
-quietly count if ///
-    tag_market_year_fe == 1
-
-display ///
-    "Pre-treatment market x year cells = " ///
-    %9.0fc r(N)
-
-if r(N) <= 36 {
-    display as error ///
-        "Invalid market x year FE: too few categories."
-    exit 459
-}
-
-drop tag_market_year_fe
 
 /*******************************************************************************
-4. OUTCOMES AND LOGARITHMIC SIMILARITY
+4. FIXED-EFFECT IDENTIFIERS
+*******************************************************************************/
+
+egen long sim_field_year = ///
+    group( ///
+        field_pre ///
+        ao_proceso ///
+    )
+
+egen long sim_region_year = ///
+    group( ///
+        geo_pre ///
+        ao_proceso ///
+    )
+
+
+/*******************************************************************************
+5. LOG OUTCOME AND ZERO-PRESERVING LOG Q
 *******************************************************************************/
 
 /*
-Log enrollment is defined only for positive enrollment.
+Log outcome.
 */
 
 gen double ln_enrollment = ///
@@ -287,99 +297,107 @@ gen double ln_enrollment = ///
 
 
 /*
-Log similarity is defined only for positive Q.
+Positive-Q indicators.
 */
 
-gen double ln_q_tri = ///
+gen byte D_q_tri = ///
+    q_tri > 0
+
+gen byte D_q_gau = ///
+    q_gau > 0
+
+
+/*
+log_tilde(Q).
+*/
+
+gen double ln_q_tri = 0
+
+replace ln_q_tri = ///
     ln(q_tri) ///
     if q_tri > 0
 
-gen double ln_q_gau = ///
+
+gen double ln_q_gau = 0
+
+replace ln_q_gau = ///
     ln(q_gau) ///
     if q_gau > 0
 
 
+assert ///
+    ln_q_tri == 0 ///
+    if q_tri == 0
+
+assert ///
+    ln_q_gau == 0 ///
+    if q_gau == 0
+
+
 /*******************************************************************************
-5. ESTIMATION SAMPLES
+6. ESTIMATION SAMPLES
 *******************************************************************************/
 
 /*
-The levels sample retains Q = 0.
+Levels retain all observations in exposed markets.
 */
 
 gen byte sample_levels = 1
 
 
 /*
-The log samples require positive enrollment and positive similarity.
-
-They are defined separately, so no common log sample is imposed.
+Logs require positive enrollment, but Q = 0 is retained.
 */
 
-gen byte sample_log_tri = ///
-    N_firstyear_incumbent > 0 & ///
-    q_tri > 0
-
-gen byte sample_log_gau = ///
-    N_firstyear_incumbent > 0 & ///
-    q_gau > 0
+gen byte sample_logs = ///
+    N_firstyear_incumbent > 0
 
 
 /*
-Require pre- and post-2012 support within each log sample.
+Require pre and post support inside the log-outcome sample.
 */
 
-foreach measure in ///
-    tri ///
-    gau {
+bysort program_id: ///
+    egen byte log_has_pre = ///
+        max( ///
+            sample_logs == 1 & ///
+            ao_proceso <= 2011 ///
+        )
 
-    tempvar log_has_pre log_has_post
+bysort program_id: ///
+    egen byte log_has_post = ///
+        max( ///
+            sample_logs == 1 & ///
+            ao_proceso >= 2012 ///
+        )
 
-    bysort program_id: ///
-        egen byte `log_has_pre' = ///
-            max( ///
-                sample_log_`measure' == 1 & ///
-                ao_proceso <= 2011 ///
-            )
+replace sample_logs = 0 ///
+    if ///
+        log_has_pre == 0 | ///
+        log_has_post == 0
 
-    bysort program_id: ///
-        egen byte `log_has_post' = ///
-            max( ///
-                sample_log_`measure' == 1 & ///
-                ao_proceso >= 2012 ///
-            )
-
-    replace sample_log_`measure' = 0 ///
-        if ///
-            `log_has_pre' == 0 | ///
-            `log_has_post' == 0
-}
-
-
+drop ///
+    log_has_pre ///
+    log_has_post
 
 
 /*******************************************************************************
 7. MANUAL YEAR INTERACTIONS
 *
-* 2011 is omitted explicitly.
-*
-* Levels:
-*
-*     10 * Q_p^k x 1{year = t}
-*
-* One unit therefore corresponds to a 0.10 increase in Q.
-*
-* Logs:
-*
-*     log(Q_p^k) x 1{year = t}
+* 2011 explicitly omitted.
 *******************************************************************************/
 
 foreach year in ///
     2007 2008 2009 2010 ///
     2012 2013 2014 2015 2016 {
 
+
     /*
-    Levels.
+    LEVELS
+
+    10 * Q x year
+
+    One unit corresponds to a 0.10 increase in Q.
     */
 
     gen double es_lvl_tri_`year' = ///
@@ -394,7 +412,9 @@ foreach year in ///
 
 
     /*
-    Logs.
+    LOGS
+
+    log_tilde(Q) x year.
     */
 
     gen double es_log_tri_`year' = ///
@@ -404,11 +424,26 @@ foreach year in ///
     gen double es_log_gau_`year' = ///
         ln_q_gau * ///
         (ao_proceso == `year')
+
+
+    /*
+    Positive-Q indicator x year.
+
+    These enter only the log regressions.
+    */
+
+    gen byte D_tri_`year' = ///
+        D_q_tri * ///
+        (ao_proceso == `year')
+
+    gen byte D_gau_`year' = ///
+        D_q_gau * ///
+        (ao_proceso == `year')
 }
 
 
 /*
-Verify that all interactions equal zero outside their corresponding year.
+Checks.
 */
 
 foreach measure in ///
@@ -419,13 +454,17 @@ foreach measure in ///
         2007 2008 2009 2010 ///
         2012 2013 2014 2015 2016 {
 
-        assert es_lvl_`measure'_`year' == 0 ///
+        assert ///
+            es_lvl_`measure'_`year' == 0 ///
             if ao_proceso != `year'
 
-        assert es_log_`measure'_`year' == 0 ///
-            if ///
-                sample_log_`measure' == 1 & ///
-                ao_proceso != `year'
+        assert ///
+            es_log_`measure'_`year' == 0 ///
+            if ao_proceso != `year'
+
+        assert ///
+            D_`measure'_`year' == 0 ///
+            if ao_proceso != `year'
     }
 }
 
@@ -450,7 +489,7 @@ display "============================================================"
 count
 
 display ///
-    "Program-year observations in exposed markets = " ///
+    "Exposed-market observations = " ///
     %9.0fc r(N)
 
 
@@ -458,7 +497,7 @@ count if ///
     tag_program == 1
 
 display ///
-    "Programs in exposed markets                  = " ///
+    "Programs                    = " ///
     %9.0fc r(N)
 
 
@@ -466,22 +505,26 @@ count if ///
     tag_market == 1
 
 display ///
-    "Exposed markets                              = " ///
+    "Exposed markets             = " ///
     %9.0fc r(N)
 
 
-foreach measure in ///
-    tri ///
-    gau {
+count if ///
+    tag_program == 1 & ///
+    q_tri == 0
 
-    count if ///
-        tag_program == 1 & ///
-        q_`measure' > 0
+display ///
+    "Programs with Q_tri = 0     = " ///
+    %9.0fc r(N)
 
-    display ///
-        "Programs with positive Q_`measure'        = " ///
-        %9.0fc r(N)
-}
+
+count if ///
+    tag_program == 1 & ///
+    q_gau == 0
+
+display ///
+    "Programs with Q_gau = 0     = " ///
+    %9.0fc r(N)
 
 
 drop ///
@@ -494,7 +537,6 @@ drop ///
 *******************************************************************************/
 
 tempfile event_results
-
 tempname results_handle
 
 postfile `results_handle' ///
@@ -515,7 +557,7 @@ postfile `results_handle' ///
 
 
 /*******************************************************************************
-10. ESTIMATE THE FOUR EVENT STUDIES
+10. ESTIMATE FOUR EVENT STUDIES
 *
 *     1. Levels, Triangular
 *     2. Levels, Gaussian
@@ -527,12 +569,14 @@ foreach form in ///
     levels ///
     logs {
 
+
     foreach measure in ///
         tri ///
         gau {
 
+
         /***********************************************************************
-        10.1 MODEL-SPECIFIC VARIABLES
+        10.1 MODEL-SPECIFIC SETTINGS
         ***********************************************************************/
 
         if "`form'" == "levels" {
@@ -548,9 +592,6 @@ foreach form in ///
 
             local form_label ///
                 "Levels"
-
-            local interpretation ///
-                "Effect of a 0.10 increase in conditional similarity"
         }
 
 
@@ -560,16 +601,13 @@ foreach form in ///
                 ln_enrollment
 
             local sample ///
-                sample_log_`measure'
+                sample_logs
 
             local interaction ///
                 es_log
 
             local form_label ///
                 "Logs"
-
-            local interpretation ///
-                "Enrollment-similarity elasticity relative to 2011"
         }
 
 
@@ -588,7 +626,7 @@ foreach form in ///
 
 
         /*
-        Construct the list of annual interaction variables.
+        Main annual interactions.
         */
 
         local annual_interactions
@@ -600,6 +638,25 @@ foreach form in ///
             local annual_interactions ///
                 `annual_interactions' ///
                 `interaction'_`measure'_`year'
+        }
+
+
+        /*
+        Positive-Q annual controls for logs.
+        */
+
+        local D_interactions
+
+        if "`form'" == "logs" {
+
+            foreach year in ///
+                2007 2008 2009 2010 ///
+                2012 2013 2014 2015 2016 {
+
+                local D_interactions ///
+                    `D_interactions' ///
+                    D_`measure'_`year'
+            }
         }
 
 
@@ -617,8 +674,14 @@ foreach form in ///
         display ///
             "Omitted year    = 2011"
 
-		display ///
-			"Fixed effects   = Program + pre-treatment market x year"
+        display ///
+            "Fixed effects   = Program + Broad-field x year + region x year"
+
+        if "`form'" == "logs" {
+
+            display ///
+                "Q = 0         = RETAINED"
+        }
 
         display "============================================================"
 
@@ -630,20 +693,18 @@ foreach form in ///
         reghdfe ///
             `outcome' ///
             `annual_interactions' ///
+            `D_interactions' ///
             if `sample' == 1, ///
             absorb( ///
                 program_id ///
-                market_year_fe ///
+                sim_field_year ///
+                sim_region_year ///
             ) ///
             vce(cluster market_pre)
 
 
-        estimates store ///
-            es_`form'_`measure'
-
-
         /*
-        Save the effective estimation sample before subsequent commands.
+        Save estimation sample immediately.
         */
 
         tempvar estimation_sample
@@ -652,40 +713,36 @@ foreach form in ///
             e(sample)
 
 
-        /*
-        Store residual degrees of freedom for clustered confidence intervals.
-        */
-
         local residual_df = ///
             e(df_r)
+
+        local observations = ///
+            e(N)
 
 
         /***********************************************************************
         10.3 EFFECTIVE SAMPLE COUNTS
         ***********************************************************************/
 
-        local observations = ///
-            e(N)
+        tempvar tag_est_program tag_est_market
 
-        tempvar tag_estimation_program tag_estimation_market
-
-        egen byte `tag_estimation_program' = ///
+        egen byte `tag_est_program' = ///
             tag(program_id) ///
             if `estimation_sample' == 1
 
         quietly count if ///
-            `tag_estimation_program' == 1
+            `tag_est_program' == 1
 
         local programs = ///
             r(N)
 
 
-        egen byte `tag_estimation_market' = ///
+        egen byte `tag_est_market' = ///
             tag(market_pre) ///
             if `estimation_sample' == 1
 
         quietly count if ///
-            `tag_estimation_market' == 1
+            `tag_est_market' == 1
 
         local markets = ///
             r(N)
@@ -693,6 +750,11 @@ foreach form in ///
 
         /***********************************************************************
         10.4 JOINT PRETREND TEST
+        *
+        * Test only the plotted Q coefficients.
+        *
+        * For logs, D x year terms are controls and are not included
+        * in the main pretrend test.
         ***********************************************************************/
 
         test ///
@@ -707,10 +769,6 @@ foreach form in ///
         local pretrend_p = ///
             r(p)
 
-
-        /***********************************************************************
-        10.5 CLUSTER-ADJUSTED CRITICAL VALUE
-        ***********************************************************************/
 
         local critical_value = ///
             invttail( ///
@@ -741,10 +799,11 @@ foreach form in ///
 
 
         /***********************************************************************
-        10.6 STORE ANNUAL COEFFICIENTS
+        10.5 STORE ANNUAL COEFFICIENTS
         ***********************************************************************/
 
         forvalues year = 2007/2016 {
+
 
             if `year' == 2011 {
 
@@ -753,6 +812,7 @@ foreach form in ///
                 local lower_bound = 0
                 local upper_bound = 0
             }
+
 
             else {
 
@@ -792,8 +852,8 @@ foreach form in ///
 
         drop ///
             `estimation_sample' ///
-            `tag_estimation_program' ///
-            `tag_estimation_market'
+            `tag_est_program' ///
+            `tag_est_market'
     }
 }
 
@@ -806,6 +866,14 @@ postclose `results_handle'
 *******************************************************************************/
 
 use `event_results', clear
+
+count
+assert r(N) == 40
+
+isid ///
+    form ///
+    measure ///
+    year
 
 
 gen str12 form_label = ""
@@ -869,6 +937,12 @@ format ///
     pretrend_p ///
     %9.4f
 
+format ///
+    observations ///
+    programs ///
+    markets ///
+    %12.0fc
+
 
 /*******************************************************************************
 12. DISPLAY ANNUAL COEFFICIENTS
@@ -922,6 +996,7 @@ preserve
     count
     assert r(N) == 4
 
+
     sort ///
         form_order ///
         measure_order
@@ -954,24 +1029,29 @@ gen double graph_year = ///
     year
 
 replace graph_year = ///
-    year - 0.07 ///
+    year - 0.08 ///
     if measure == "tri"
 
 replace graph_year = ///
-    year + 0.07 ///
+    year + 0.08 ///
     if measure == "gau"
 
 
+gen byte plot_observation = ///
+    year != 2011
+
+
 /*******************************************************************************
-15. CREATE SEPARATE LEVEL AND LOG GRAPHS
+15. CREATE LEVEL AND LOG GRAPHS
 *******************************************************************************/
 
 foreach form in ///
     levels ///
     logs {
 
+
     /***************************************************************************
-    15.1 GRAPH-SPECIFIC LABELS
+    15.1 GRAPH SETTINGS
     ***************************************************************************/
 
     if "`form'" == "levels" {
@@ -980,7 +1060,7 @@ foreach form in ///
             "SUA exposure: similarity within exposed markets"
 
         local graph_subtitle ///
-            "Program FE and Broad-field x region x year FE; 2011 omitted"
+            "Program FE, Broad-field x year FE, and region x year FE; 2011 omitted"
 
         local y_axis_title ///
             "Enrollment coefficient for a 0.10 increase in similarity"
@@ -1002,16 +1082,16 @@ foreach form in ///
             "Log similarity within exposed SUA markets"
 
         local graph_subtitle ///
-            "Program FE and Broad-field x region x year FE; 2011 omitted"
+            "Program FE, Broad-field x year FE, and region x year FE; 2011 omitted"
 
         local y_axis_title ///
-            "Enrollment-similarity elasticity relative to 2011"
+            "Enrollment elasticity with respect to similarity"
 
         local y_axis_format ///
             "%4.2f"
 
         local sample_note ///
-            "Positive enrollment and similarity only; samples differ by measure."
+            "Exposed markets; Q = 0 retained; D x year controls included and not plotted."
 
         local graph_output ///
             "`graph_logs'"
@@ -1029,8 +1109,9 @@ foreach form in ///
             measure == "tri", ///
         meanonly
 
-	local triangular_p : ///
-		display %6.4f r(mean)
+    local triangular_p : ///
+        display %6.4f r(mean)
+
 
     quietly summarize ///
         pretrend_p ///
@@ -1039,8 +1120,8 @@ foreach form in ///
             measure == "gau", ///
         meanonly
 
-	local gaussian_p : ///
-		display %6.4f r(mean)
+    local gaussian_p : ///
+        display %6.4f r(mean)
 
 
     /***************************************************************************
@@ -1070,7 +1151,8 @@ foreach form in ///
 
 
     local graph_span = ///
-        `graph_max' - `graph_min'
+        `graph_max' - ///
+        `graph_min'
 
     if `graph_span' <= 0 {
 
@@ -1088,7 +1170,7 @@ foreach form in ///
 
 
     /***************************************************************************
-    15.4 EVENT-STUDY GRAPH
+    15.4 GRAPH
     ***************************************************************************/
 
     twoway ///
@@ -1097,6 +1179,7 @@ foreach form in ///
             upper_ci ///
             graph_year ///
             if ///
+                plot_observation == 1 & ///
                 form == "`form'" & ///
                 measure == "tri", ///
             lcolor(forest_green%60) ///
@@ -1106,6 +1189,7 @@ foreach form in ///
             upper_ci ///
             graph_year ///
             if ///
+                plot_observation == 1 & ///
                 form == "`form'" & ///
                 measure == "gau", ///
             lcolor(maroon%60) ///
@@ -1114,6 +1198,7 @@ foreach form in ///
             beta ///
             graph_year ///
             if ///
+                plot_observation == 1 & ///
                 form == "`form'" & ///
                 measure == "tri", ///
             mcolor(forest_green) ///
@@ -1124,6 +1209,7 @@ foreach form in ///
             beta ///
             graph_year ///
             if ///
+                plot_observation == 1 & ///
                 form == "`form'" & ///
                 measure == "gau", ///
             mcolor(maroon) ///
