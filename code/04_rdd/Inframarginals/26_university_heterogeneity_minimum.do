@@ -24,7 +24,7 @@
 clear all
 set more off
 
-do "C:/Users/jigodoy/Documents/GitHub/Majors/code/config.do"
+do "code/config.do"
 
 local panel ///
     "$processed/inframarginal_rank_panel_enrollmentthreshold_allapp_2007_2016_min_enroll.dta"

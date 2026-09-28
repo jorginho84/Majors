@@ -6,14 +6,14 @@
 clear all
 set more off
 
-do "C:/Users/jigodoy/Documents/GitHub/Majors/code/config.do"
+do "code/config.do"
 
 
 ****************************************************
 * 0. Paths
 ****************************************************
 
-global oferta_raw "C:/Users/jigodoy/Documents/jose-local/data/DEMRE/Postulacion"
+global oferta_raw "$demre_raw/Postulacion"
 global oferta_clean "$processed"
 
 cap mkdir "$oferta_clean"

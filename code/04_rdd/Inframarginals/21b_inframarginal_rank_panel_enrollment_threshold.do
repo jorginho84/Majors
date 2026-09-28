@@ -43,7 +43,7 @@
 clear all
 set more off
 
-do "C:/Users/jigodoy/Documents/GitHub/Majors/code/config.do"
+do "code/config.do"
 
 local grad_base      "$processed/analysis_sample_with_fields_graduation_8y_enrolledprogram.dta"
 local rank_file      "$processed/admission_rank_inframarginal_2007_2016.dta"

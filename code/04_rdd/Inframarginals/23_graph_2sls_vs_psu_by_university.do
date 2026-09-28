@@ -20,7 +20,7 @@
 clear all
 set more off
 
-do "C:/Users/jigodoy/Documents/GitHub/Majors/code/config.do"
+do "code/config.do"
 
 local het_results ///
     "$processed/university_heterogeneity_enrollmentthreshold_allapp_results.dta"

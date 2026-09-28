@@ -20,6 +20,9 @@
 \usepackage{tabularx}
 \usepackage{appendix}
 
+% significance stars from esttab tables
+\newcommand{\sym}[1]{\ensuremath{^{#1}}}
+
 \title[Admission Cutoffs and HE Outcomes]{Effects of expanding higher education vacancies: effects on marginal and infra-marginal students}
 \subtitle{Preliminary Results}
 \author{}
@@ -3583,6 +3586,155 @@ in 2011. $^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.
 
 \end{table}
 
+\end{frame}
+
+
+%--------------------------------------------------------
+\subsection{Inframarginal Design No. 3}
+%--------------------------------------------------------
+
+\begin{frame}{Design III: sudden vacancy expansions at competing programs}
+\footnotesize
+\textbf{Shock at program $j$}
+\begin{itemize}
+    \item Regular-admission vacancies $V_{jt}$ from DEMRE's \emph{Oferta Acad\'emica} (first-semester vacancies), the seats filled in the centralized process.
+    \item $\Delta\log V_{jt}$ in the top 20\% of positive changes (pooled 2008--2016), and \emph{sudden}:
+    $j$ existed two years before, was not a top-20\% change in $t-1$, and the increase is not reversed in $t+1$.
+    \item Shocks dated 2010--2016; SUA entrants are never shock sources.
+\end{itemize}
+\textbf{Exposure of incumbent $k$}
+\[
+E_{kt} = \sum_{j} s(k\leftarrow j)\,\frac{(V_{jt}-V_{j,t-1})\,\text{shock}_{jt}}{\bar N_{k}^{\,2007\text{--}09}}
+\]
+\textbf{Rank-order-list similarity} (2007--2009 applicant lists, predetermined)
+\[
+s(k\leftarrow j)=\frac{\sum_i \mathbf 1\{j,k\in L_i\}\,/\,|r_{ij}-r_{ik}|}{\#\{i: k\in L_i\}}
+\]
+\scriptsize
+Directed: normalized by $k$'s applicant pool, so a large $j$ can press on a small $k$ without the reverse.
+Variants: adjacent ranks only, both in the top two, plain co-listing; benchmark: same field $\times$ region.
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design III: distribution of vacancy changes}
+\centering
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.52\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../output/vacancy_shocks/figures/vs_dlogV_hist.pdf}
+\end{column}
+\begin{column}{0.46\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../output/vacancy_shocks/figures/vs_shocks_by_year.pdf}
+\end{column}
+\end{columns}
+\vspace{0.1cm}
+\begin{itemize}\scriptsize
+    \item 71\% of program-years have no change in vacancies and 15\% increase. The top-20\% threshold is $\Delta\log V \ge 0.29$ ($=\log 4/3$: vacancies are round numbers, so many increases sit exactly at +33\%).
+    \item Shocks are rare and mostly one-off (next slide). They cluster in 2011, 2014 and 2016.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design III: where are the shocks?}
+\centering
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.62\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/vacancy_shocks/tables/vs_shock_location.tex}}
+\end{column}
+\begin{column}{0.36\textwidth}
+\centering
+\tiny
+\input{../../output/vacancy_shocks/tables/vs_shocks_per_program.tex}
+
+\vspace{0.3cm}
+\begin{itemize}\scriptsize
+    \item Shocks are spread across the selectivity distribution; no strong concentration in selective programs.
+    \item More frequent at state universities and in Humanities and Business; almost absent in Law and Agriculture.
+    \item Before 2012 only CRUCH universities were in DEMRE, so all incumbents are CRUCH.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design III: shock definitions}
+\centering
+\scriptsize
+\input{../../output/vacancy_shocks/tables/vs_shock_definitions.tex}
+
+\vspace{0.2cm}
+\begin{itemize}\scriptsize
+    \item The ``sudden'' conditions remove about a fifth of top-20\% increases.
+    \item INDICES vacancies yield fewer shocks because only part of the programs link through SIES codes; regular admissions (status 24) as the vacancy measure yield more.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design III: TWFE on cumulative ROL exposure}
+\centering
+\tiny
+\resizebox{\textwidth}{!}{\input{../../output/vacancy_shocks/tables/vs_twfe_main.tex}}
+
+\vspace{0.15cm}
+\begin{itemize}\scriptsize
+    \item $y_{kt}=\beta\,\mathrm{cumE}_{kt}+\delta\,\mathrm{own\ shocks}_{kt}+\mu_k+\alpha_{f(k)t}+\gamma_{r(k)t}+\varepsilon_{kt}$; exposure standardized; SE clustered by program.
+    \item No effect on enrollment once field- and region-year shocks are absorbed. Entrant PSU falls with exposure (significant at 10\%).
+    \item Own vacancy shocks move own enrollment strongly, so they are controlled for.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design III: robustness of the TWFE estimate}
+\centering
+\scriptsize
+\textbf{Shock definitions} (log enrollment)
+
+\resizebox{\textwidth}{!}{\input{../../output/vacancy_shocks/tables/vs_twfe_shockdefs.tex}}
+
+\vspace{0.3cm}
+\textbf{Similarity measures} (log enrollment)
+
+\resizebox{0.85\textwidth}{!}{\input{../../output/vacancy_shocks/tables/vs_twfe_similarity.tex}}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design III: event study, log enrollment}
+\centering
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.49\textwidth}
+\centering
+\textbf{\scriptsize Exposure above p75}
+
+\includegraphics[width=\linewidth]{../../output/vacancy_shocks/figures/vs_es_lnN_main.pdf}
+\end{column}
+\begin{column}{0.49\textwidth}
+\centering
+\textbf{\scriptsize Shock at a top-5 ROL neighbor}
+
+\includegraphics[width=\linewidth]{../../output/vacancy_shocks/figures/vs_es_lnN_nbr5.pdf}
+\end{column}
+\end{columns}
+\begin{itemize}\scriptsize
+    \item Treatment: first year of high exposure; never-treated programs as controls.
+    \item Callaway \& Sant'Anna uses not-yet-treated controls on the balanced panel and cannot absorb field- or region-year effects.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design III: pre-trend tests}
+\centering
+\scriptsize
+\input{../../output/vacancy_shocks/tables/vs_es_pretrends.tex}
+
+\vspace{0.2cm}
+\begin{itemize}\scriptsize
+    \item Joint test of leads $\le -5$ to $-2$. TWFE does not reject for log enrollment, but Callaway \& Sant'Anna
+    rejects in every specification, and TWFE rejects for the cutoff.
+    \item As specified, Design III is not identified: programs exposed to competitor expansions were already on different paths.
+\end{itemize}
 \end{frame}
 
 

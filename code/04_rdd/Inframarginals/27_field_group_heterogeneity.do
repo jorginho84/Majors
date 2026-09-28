@@ -42,7 +42,7 @@
 clear all
 set more off
 
-do "C:/Users/jigodoy/Documents/GitHub/Majors/code/config.do"
+do "code/config.do"
 
 local master_base ///
     "$processed/analysis_inframarginal_enrollmentthreshold_allapp_2007_2016.dta"
