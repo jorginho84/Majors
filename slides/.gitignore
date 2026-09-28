@@ -12,3 +12,4 @@
 # Built deck — regenerate with `latexmk -pdf main.tex`.
 # Remove this line if coauthors should get the compiled PDF from git.
 *.pdf
+!RDDs-Inframarginal/main.pdf
