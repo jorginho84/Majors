@@ -1,0 +1,14 @@
+# LaTeX build artifacts
+*.aux
+*.fdb_latexmk
+*.fls
+*.nav
+*.out
+*.snm
+*.synctex.gz
+*.toc
+*.vrb
+
+# Built deck — regenerate with `latexmk -pdf main.tex`.
+# Remove this line if coauthors should get the compiled PDF from git.
+*.pdf
