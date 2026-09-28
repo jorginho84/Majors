@@ -1,17 +1,16 @@
-\begin{tabular}{llcc}
+\begin{tabular}{llccc}
 \toprule
-Treatment & Outcome & TWFE \(p\) & Callaway--Sant'Anna \(p\) \\
+ & & & \multicolumn{2}{c}{Callaway--Sant'Anna} \\
+\cmidrule(lr){4-5}
+Treatment & Outcome & TWFE & Never treated & Not yet treated \\
 \midrule
-Exposure \(>\) p75 & Log enrollment & 0.206 & 0.023 \\
- & Entrant PSU & 0.129 & 0.029 \\
- & Cutoff & 0.002 & 0.000 \\
+Market shock & Enrollment & 0.348 & 0.080 & 0.081 \\
+ & Log enrollment & 0.124 & 0.011 & 0.012 \\
 \addlinespace
-Exposure \(>\) p90 & Log enrollment & 0.974 & 0.000 \\
- & Entrant PSU & 0.652 & 0.009 \\
- & Cutoff & 0.004 & 0.000 \\
+Close-competitor shock & Enrollment & 0.539 & 0.000 & 0.000 \\
+ & Log enrollment & 0.240 & 0.000 & 0.000 \\
 \addlinespace
-Top-5 neighbor shock & Log enrollment & 0.053 & 0.000 \\
- & Entrant PSU & 0.061 & 0.000 \\
- & Cutoff & 0.156 & 0.000 \\
+Top-5 cosine shock & Enrollment & 0.293 & 0.021 & 0.021 \\
+ & Log enrollment & 0.150 & 0.068 & 0.069 \\
 \bottomrule
 \end{tabular}

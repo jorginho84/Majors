@@ -94,6 +94,14 @@ merge m:1 mrun ao_proceso using `psu', keep(master match) nogen
 
 harmonize_code codigo_carrera, generate(code_h)
 
+* student-level first-year entrants, for the cosine PSU-bin vectors
+preserve
+keep if !missing(psu_lm)
+keep mrun code_h ao_proceso psu_lm
+compress
+save "$processed/vs_first_year_students.dta", replace
+restore
+
 collapse (count) N_first = mrun ///
          (mean) psu_first = psu_lm ///
          (firstnm) sigla_universidad, ///
@@ -210,17 +218,17 @@ save `ind', replace
 * 5. Program attributes: field, region, university status
 **********************************************************************/
 
-use codigo_demre ao_proceso area_conocimiento area_carrera_generica ///
+use codigo_demre ao_proceso area_conocimiento cine_f_97_subarea area_carrera_generica ///
     id_region_2018 sigla_universidad entrant_2012 sua_incumbent ///
     using "$processed/sies_program_year_geo_2007_2016.dta", clear
 drop if missing(codigo_demre)
 harmonize_code codigo_demre, generate(code_h)
 * one attribute row per program: modal / first non-missing across years
 bys code_h (ao_proceso): keep if _n == 1
-keep code_h area_conocimiento area_carrera_generica id_region_2018 ///
+keep code_h area_conocimiento cine_f_97_subarea area_carrera_generica id_region_2018 ///
     entrant_2012 sua_incumbent
-rename (area_conocimiento area_carrera_generica id_region_2018) ///
-       (field generic_field region)
+rename (area_conocimiento cine_f_97_subarea area_carrera_generica id_region_2018) ///
+       (field isced_field generic_field region)
 save `attrs'
 
 
@@ -262,6 +270,17 @@ foreach v in N_first psu_first {
 }
 label var N_first_pre   "Mean first-year enrollment, 2007-2009"
 label var psu_first_pre "Mean entrant PSU, 2007-2009"
+
+* Selectivity S used in the similarity kernels: 2007-2009 mean for programs
+* that existed then; otherwise the mean over the program's first three years
+* with entrants (programs created after 2009 can still be shock sources).
+bys pid (ao_proceso): gen int _ord = sum(N_first > 0 & !missing(psu_first))
+bys pid: egen double psu_S = mean(cond(inrange(_ord, 1, 3) & N_first > 0, psu_first, .))
+replace psu_S = psu_first_pre if !missing(psu_first_pre)
+bys pid: egen int first_year_S = min(cond(N_first > 0 & !missing(psu_first), ao_proceso, .))
+drop _ord
+label var psu_S "Selectivity for similarity: entrant PSU, 2007-09 or first 3 years"
+label var first_year_S "First year with entrants"
 
 compress
 order pid code_h sigla_universidad ao_proceso
