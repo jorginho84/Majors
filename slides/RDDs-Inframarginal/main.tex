@@ -4148,7 +4148,64 @@ delivers a significant effect.}
     shock and, at 5\%, for log enrollment after a market shock and enrollment after a cosine shock.
     \item After a close-competitor or market shock, CS shows enrollment \emph{rising} by 2--4 students; TWFE, which
     absorbs field- and region-year shocks, is flat. After a shock at a top-5 cosine program, both point to declines of 1--3 students, imprecisely estimated.
+    \item These event studies use a binary first-shock indicator and discard the dose. The next two slides keep it.
 \end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design III: event studies with the treatment dose}
+\scriptsize
+Distributed-lag event study with binned endpoints (Schmidheiny \& Siegloch 2023) on the yearly exposure flow $E_{kt}$ (10 pp):
+\[
+\resizebox{0.95\textwidth}{!}{$
+y_{kt} = \beta_{\le -5}\sum_{s\ge t+5}E_{ks} + \sum_{l=-4}^{-2}\beta_l E_{k,t-l} + \sum_{l=0}^{3}\beta_l E_{k,t-l}
++ \beta_{\ge 4}\sum_{s\le t-4}E_{ks} + \delta\,\text{Own}_{kt} + \mu_k + \alpha_{f(k),t} + \gamma_{r(k),t} + \varepsilon_{kt}
+$}
+\]
+$E_{k,t+1}$ is omitted, so $\beta_l$ is the cumulative effect at event time $l$ of 10 pp of exposure received at $l=0$, relative to $l=-1$.
+
+\vspace{0.1cm}
+\centering
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.49\textwidth}
+\centering \tiny First-year enrollment
+
+\includegraphics[width=\linewidth]{../../output/vacancy_shocks/figures/vs_esd_N_first_fr.pdf}
+\end{column}
+\begin{column}{0.49\textwidth}
+\centering \tiny Log first-year enrollment
+
+\includegraphics[width=\linewidth]{../../output/vacancy_shocks/figures/vs_esd_lnN_fr.pdf}
+\end{column}
+\end{columns}
+
+\vspace{0.05cm}
+\parbox{0.96\textwidth}{\tiny
+\textit{Notes:} Broad field $\times$ region market; program, field $\times$ year and region $\times$ year FE, own shocks; SE clustered by market.
+Leads beyond 2016 set to zero, as in the binary event studies.}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design III: dose event studies, average post-exposure effect}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.4\textwidth}
+\centering
+\resizebox{\linewidth}{!}{\input{../../output/vacancy_shocks/tables/vs_esd_summary.tex}}
+\end{column}
+\begin{column}{0.57\textwidth}
+\tiny
+\textit{Notes:} Coefficient: average of $\beta_0,\dots,\beta_3$ per 10 pp of exposure (SE in parentheses);
+$p$-value of the joint test $\beta_{\le -5}=\beta_{-4}=\beta_{-3}=\beta_{-2}=0$ in brackets.
+Panel B keeps years up to 2012, where every interior lead is observed. Program FE, field $\times$ year FE, own shocks;
+SE clustered by market.
+
+\vspace{0.2cm}
+\begin{itemize}\scriptsize
+    \item Keeping the dose, pre-trends are not rejected at 5\% for any measure in the full sample, unlike the binary CS event studies (which also lack field- and region-year FE). In panel B, one of 16 tests rejects (Triangular KD, $p=0.018$).
+    \item Post-exposure effects are positive and insignificant (0.4--1 students per 10 pp; below 3\% in logs), consistent with the static first stages. No sign of business stealing.
+\end{itemize}
+\end{column}
+\end{columns}
 \end{frame}
 
 
