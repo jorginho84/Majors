@@ -164,6 +164,61 @@ restore
 
 
 /**********************************************************************
+* 3b. Kernel-denominator exposure: moments and distribution
+**********************************************************************/
+
+preserve
+keep if ao_proceso == 2016
+file open T using "$vs_out/tables/vs_exposure_moments_kd.tex", write replace
+file write T "\begin{tabular}{llrrrrrr}" _n "\toprule" _n
+file write T "Field definition & Exposure measure & Mean & Std. dev. & p90 & p99 & Max & Share zero \\" _n "\midrule" _n
+foreach f in broad isced generic {
+    local fl = cond("`f'" == "broad", "Broad", cond("`f'" == "isced", "ISCED-97", "Generic"))
+    foreach w in tot trikd gaukd {
+        local wl = cond("`w'" == "tot", "Total", cond("`w'" == "trikd", "Triangular KD", "Gaussian KD"))
+        quietly summarize cumE_`w'_`f', detail
+        local m = r(mean)
+        local s = r(sd)
+        local p = r(p90)
+        local p99 = r(p99)
+        local mx = r(max)
+        local n = r(N)
+        quietly count if cumE_`w'_`f' == 0
+        local z = 100 * r(N) / `n'
+        local lf = cond("`w'" == "tot", "`fl'", "")
+        file write T "`lf' & `wl' & " %6.2f (`m') " & " %6.2f (`s') " & " %6.2f (`p') ///
+            " & " %6.2f (`p99') " & " %6.2f (`mx') " & " %5.1f (`z') "\% \\" _n
+    }
+    if "`f'" != "generic" file write T "\addlinespace" _n
+}
+file write T "\bottomrule" _n "\end{tabular}" _n
+file close T
+
+local gl
+foreach part in all pos {
+    foreach w in tot trikd gaukd {
+        local wl = cond("`w'" == "tot", "Total", cond("`w'" == "trikd", "Triangular KD", "Gaussian KD"))
+        local ttl = cond("`part'" == "all", "`wl': all programs", "`wl': positive only")
+        quietly summarize cumE_`w'_broad, detail
+        local top = r(p99)
+        local cond = cond("`part'" == "all", "if cumE_`w'_broad <= `top'", ///
+            "if cumE_`w'_broad > 0 & cumE_`w'_broad <= `top'")
+        histogram cumE_`w'_broad `cond', fraction ///
+            fcolor(navy%60) lcolor(navy%80) ///
+            xtitle("Cumulative exposure, 2016 (pp)", size(small)) ytitle("Share of programs", size(small)) ///
+            title("`ttl'", size(medsmall)) ///
+            graphregion(color(white)) plotregion(color(white)) ///
+            name(k_`w'_`part', replace) nodraw
+        local gl `gl' k_`w'_`part'
+    }
+}
+graph combine `gl', rows(2) cols(3) graphregion(color(white)) ///
+    note("Incumbent programs, cumulative exposure in 2016; trimmed at p99. Broad-field markets. KD: kernel-weighted denominator.", size(vsmall))
+graph export "$vs_out/figures/vs_exposure_dist_kd_broad.pdf", replace
+restore
+
+
+/**********************************************************************
 * 4. Conditional similarity Q (broad markets with a shock)
 **********************************************************************/
 

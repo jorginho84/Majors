@@ -3834,6 +3834,76 @@ are excluded. All elasticities are below 0.035 in absolute value.}
 \end{frame}
 
 %--------------------------------------------------------
+\begin{frame}{Design III: kernel-weighted denominator}
+\footnotesize
+\setlength{\abovedisplayskip}{3pt}
+\setlength{\belowdisplayskip}{3pt}
+\[
+E^{w,KD}_{kt}=100\times\frac{\sum_{j\in m(k),\,j\neq k} w(k,j)\,\text{seats}_{jt}}{\sum_{\ell\in m(k)} w(k,\ell)\,\overline{N}^{\mathrm{first}}_{\ell,2007\text{--}2009}},
+\qquad w\in\{\mathrm{Tri},\mathrm{Gau}\},\ \ w(k,k)=1.
+\]
+\vspace{-0.1cm}
+\begin{itemize}
+\scriptsize
+\setlength{\itemsep}{1pt}
+    \item Same numerator as before; the denominator is now the enrollment of programs with similar selectivity to $k$,
+    not total market enrollment. As in the Design II kernel-denominator measure: for a selective $k$, the relevant
+    market is the selective programs in $m(k)$.
+    \item The measure keeps the scale of the shock (unlike $Q$) and lets its relevance depend on $k$'s position in the market.
+\end{itemize}
+
+\vspace{0.05cm}
+\centering
+\tiny
+\textit{Cumulative exposure in 2016, by field definition (pp)}
+
+\vspace{0.02cm}
+\resizebox{0.78\textwidth}{!}{\input{../../output/vacancy_shocks/tables/vs_exposure_moments_kd.tex}}
+
+\vspace{0.04cm}
+\parbox{0.94\textwidth}{\tiny
+\textit{Notes:} Incumbent programs, cumulative exposure in 2016, zeros included. The kernel denominator does not
+generate extreme values: the maximum is below that of Total exposure in the Broad and ISCED-97 definitions.}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design III: results with kernel-weighted denominator}
+\centering
+\tiny
+\textit{Levels: first-year enrollment, 10 pp units}
+
+\vspace{0.02cm}
+\resizebox{0.52\textwidth}{!}{\input{../../output/vacancy_shocks/tables/vs_fs_levels_kd.tex}}
+
+\vspace{0.06cm}
+\textit{Logs: elasticity of first-year enrollment, zero-exposure indicator included}
+
+\vspace{0.02cm}
+\resizebox{0.52\textwidth}{!}{\input{../../output/vacancy_shocks/tables/vs_fs_logs_kd.tex}}
+
+\vspace{0.04cm}
+\parbox{0.96\textwidth}{\tiny
+\textit{Notes:} Program FE, corresponding field $\times$ year FE, own shocks; region $\times$ year FE where indicated.
+SE clustered by market. Total repeated for reference. Unlike Design II, where the kernel denominator turns the
+weighted measures negative and significant, here they stay positive: significant only for ISCED-97 in levels
+(Gaussian KD: 2.36*** and 1.43**), and all elasticities are below 0.04 in absolute value.}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design III: kernel-weighted denominator, influence of the tail}
+\centering
+\scriptsize
+\resizebox{0.66\textwidth}{!}{\input{../../output/vacancy_shocks/tables/vs_fs_kd_trim.tex}}
+
+\vspace{0.2cm}
+\parbox{0.92\textwidth}{\tiny
+\textit{Notes:} Levels, program, field $\times$ year and region $\times$ year FE, own shocks; SE clustered by market.
+Programs are dropped when their cumulative KD exposure in 2016 is above the 99th or 95th percentile. Estimates move
+around with the trimming, and only the Gaussian ISCED-97 estimate is significant in more than one sample; nothing
+points to a negative effect.}
+\end{frame}
+
+%--------------------------------------------------------
 \begin{frame}{Design III: decomposing weighted exposure}
 \scriptsize
 \setlength{\abovedisplayskip}{3pt}
@@ -4042,7 +4112,8 @@ negative and insignificant. The PSU-only measure is negative ($-3.9$, 10\%) with
 \vspace{0.2cm}
 \parbox{0.95\textwidth}{\tiny
 \textit{Notes:} Specification (1), Broad-field markets, with program, field $\times$ year and region $\times$ year FE
-and own shocks; standard errors clustered by market. Exposure rebuilt under each shock definition. No definition
+and own shocks; standard errors clustered by market. Exposure rebuilt under each shock definition; Gaussian KD uses
+the kernel-weighted denominator. No definition
 delivers a significant effect.}
 \end{frame}
 

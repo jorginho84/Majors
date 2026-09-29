@@ -22,6 +22,11 @@
 *     E^{w,f}_kt = 100 * sum_{j in m_f(k), j != k} w(k,j) seats_jt / T_{m_f(k)}
 *     T_m = market first-year enrollment, 2007-2009  -> percentage points
 *
+*   Kernel denominator (KD, as in Design II's 03d), w in {tri, gau}:
+*     E^{wKD,f}_kt = 100 * sum_{j in m_f(k), j != k} w(k,j) seats_jt
+*                    / sum_{l in m_f(k)} w(k,l) Nbar_l,2007-2009   (l includes k)
+*     The relevant market size is enrollment at programs similar to k.
+*
 *   Decomposition (as in Design II): cumE^{w} = cumM * Q^{w},
 *     M = cumE^{tot} (seats added in the market, share of market size)
 *     Q^{w} = cumE^{w} / cumE^{tot}   (seat-weighted similarity, in [0,1])
@@ -171,6 +176,32 @@ rename k code_h
 tempfile pairexp
 save `pairexp'
 
+* kernel-weighted denominators: sum_{l in m(k)} w(k,l) Nbar_l,2007-09,
+* including k itself (w(k,k) = 1), as in Design II's 03d
+use code_h N_first_pre using "$processed/vs_program_year_2007_2016.dta", clear
+bys code_h: keep if _n == 1
+replace N_first_pre = 0 if missing(N_first_pre)
+tempfile npre
+save `npre'
+use k j s_tri_* s_gau_* using "$processed/vs_similarity_pairs.dta", clear
+rename j code_h
+merge m:1 code_h using `npre', keep(match) nogen
+foreach f in broad isced generic {
+    foreach w in tri gau {
+        gen double den_`w'_`f' = s_`w'_`f' * N_first_pre
+    }
+}
+collapse (sum) den_*, by(k)
+rename k code_h
+merge 1:1 code_h using `npre', nogen
+foreach v of varlist den_* {
+    replace `v' = 0 if missing(`v')
+    replace `v' = `v' + N_first_pre
+}
+drop N_first_pre
+tempfile kdden
+save `kdden'
+
 
 /**********************************************************************
 * 3. Exposure of each k
@@ -192,6 +223,19 @@ foreach v of varlist num_tot_* num_tri_* num_gau_* {
     local e = subinstr("`v'", "num_", "E_", 1)
     gen double `e' = 100 * `v' / T_`f' if T_`f' > 0
 }
+* kernel-denominator measures (KD): same numerator, kernel-weighted denominator
+merge m:1 code_h using `kdden', keep(master match) nogen
+foreach f in broad isced generic {
+    foreach w in tri gau {
+        gen double E_`w'kd_`f' = 100 * num_`w'_`f' / den_`w'_`f' if den_`w'_`f' > 0 & !missing(mkt_`f')
+    }
+}
+foreach t of local tags {
+    if "`t'" == "main" continue
+    gen double E_gaukd_broad_`t' = 100 * num_gau_broad_`t' / den_gau_broad if den_gau_broad > 0 & !missing(mkt_broad)
+}
+drop den_*
+
 * cosine: weights sum to one over all main-shock seats
 foreach d in psu psuR psuRF psu_pR psu_pRF {
     gen double E_cos_`d' = num_cos_`d' / `seats_total'

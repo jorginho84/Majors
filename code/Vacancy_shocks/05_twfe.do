@@ -18,7 +18,10 @@
 *   vs_fs_q.tex           conditional similarity Q, levels and logs
 *   vs_fs_selectivity.tex heterogeneity by incumbent PSU
 *   vs_fs_cosine.tex      cosine measures x FE x sample
-*   vs_fs_shockdefs.tex   Total and Gaussian (Broad) across shock definitions
+*   vs_fs_levels_kd.tex   kernel-denominator (KD) measures, levels
+*   vs_fs_logs_kd.tex     KD measures, logs
+*   vs_fs_kd_trim.tex     KD, excluding the top 1% / 5% of exposure
+*   vs_fs_shockdefs.tex   Total, Gaussian and Gaussian KD (Broad) across shock definitions
 *
 * Input: $processed/vs_panel_exposure.dta
 **********************************************************************/
@@ -60,8 +63,15 @@ foreach d in psu psuR psuRF psu_pR psu_pRF {
     quietly summarize cumE_cos_`d' if min10
     replace z_cos_`d'_m10 = cumE_cos_`d' / r(sd) if min10
 }
+foreach f in broad isced generic {
+    foreach w in trikd gaukd {
+        gen double x_`w'_`f' = cumE_`w'_`f' / 10
+        gen double lx_`w'_`f' = cond(cumE_`w'_`f' > 0, ln(cumE_`w'_`f'), 0) if !missing(cumE_`w'_`f')
+        gen byte   dx_`w'_`f' = cumE_`w'_`f' > 0 if !missing(cumE_`w'_`f')
+    }
+}
 foreach t in p90 p75 within nosud lev ind adm {
-    foreach w in tot gau {
+    foreach w in tot gau gaukd {
         gen double x_`w'_broad_`t' = cumE_`w'_broad_`t' / 10
     }
 }
@@ -200,6 +210,120 @@ foreach s in N np {
         }
     }
     file write T " \\" _n
+}
+file write T "\bottomrule" _n "\end{tabular}" _n
+file close T
+
+
+/**********************************************************************
+* 2b. Kernel-denominator (KD) exposure: levels and logs
+**********************************************************************/
+
+foreach spec in lev log {
+    foreach fe in f fr {
+        foreach f in broad isced generic {
+            local abs = cond("`fe'" == "f", "pid fy_`f'", "pid fy_`f' ry")
+            foreach w in tot trikd gaukd {
+                if "`spec'" == "lev" fsreg N_first x_`w'_`f' own_cumshock, x(x_`w'_`f') ///
+                    absorb(`abs') cluster(mkt_`f') prefix(`w'_`fe'_`f'_)
+                else fsreg lnN lx_`w'_`f' dx_`w'_`f' own_cumshock, x(lx_`w'_`f') ///
+                    absorb(`abs') cluster(mkt_`f') prefix(`w'_`fe'_`f'_)
+            }
+        }
+    }
+
+    file open T using "$vs_out/tables/vs_fs_`=cond("`spec'"=="lev","levels","logs")'_kd.tex", write replace
+    file write T "\begin{tabular}{lcccccc}" _n "\toprule" _n
+    file write T " & \multicolumn{3}{c}{Field \(\times\) year FE} & \multicolumn{3}{c}{\(+\) Region \(\times\) year FE} \\" _n
+    file write T "\cmidrule(lr){2-4}\cmidrule(lr){5-7}" _n
+    file write T "Exposure measure & Broad & ISCED-97 & Generic & Broad & ISCED-97 & Generic \\" _n "\midrule" _n
+    foreach w in tot trikd gaukd {
+        local wl = cond("`w'" == "tot", "Total", cond("`w'" == "trikd", "Triangular KD", "Gaussian KD"))
+        file write T "\textit{`wl'}"
+        foreach fe in f fr {
+            foreach f in broad isced generic {
+                stars ``w'_`fe'_`f'_p' st
+                file write T " & " %6.3f (``w'_`fe'_`f'_b') "`st'"
+            }
+        }
+        file write T " \\" _n
+        foreach fe in f fr {
+            foreach f in broad isced generic {
+                file write T " & (" %5.3f (``w'_`fe'_`f'_se') ")"
+            }
+        }
+        file write T " \\" _n "\quad Wald \(F\)"
+        foreach fe in f fr {
+            foreach f in broad isced generic {
+                file write T " & " %5.2f (``w'_`fe'_`f'_F')
+            }
+        }
+        file write T " \\" _n
+        if "`w'" != "gaukd" file write T "\addlinespace" _n
+    }
+    file write T "\midrule" _n
+    foreach s in N np nc {
+        local sl = cond("`s'" == "N", "Observations", cond("`s'" == "np", "Programs", "Markets"))
+        file write T "`sl'"
+        foreach fe in f fr {
+            foreach f in broad isced generic {
+                file write T " & " %9.0fc (`gaukd_`fe'_`f'_`s'')
+            }
+        }
+        file write T " \\" _n
+    }
+    file write T "Region \(\times\) year FE & No & No & No & Yes & Yes & Yes \\" _n
+    file write T "\bottomrule" _n "\end{tabular}" _n
+    file close T
+}
+
+* tails: drop programs whose 2016 KD exposure is above p95 / p99 (Broad, ISCED)
+foreach f in broad isced {
+    foreach w in trikd gaukd {
+        tempvar e16
+        bys pid: egen double `e16' = max(cond(ao_proceso == 2016, cumE_`w'_`f', .))
+        foreach q in 99 95 {
+            quietly _pctile `e16' if ao_proceso == 2016, p(`q')
+            local c`q' = r(r1)
+        }
+        fsreg N_first x_`w'_`f' own_cumshock, x(x_`w'_`f') absorb(pid fy_`f' ry) ///
+            cluster(mkt_`f') prefix(t0`w'`f'_)
+        fsreg N_first x_`w'_`f' own_cumshock if `e16' <= `c99' | missing(`e16'), x(x_`w'_`f') ///
+            absorb(pid fy_`f' ry) cluster(mkt_`f') prefix(t1`w'`f'_)
+        fsreg N_first x_`w'_`f' own_cumshock if `e16' <= `c95' | missing(`e16'), x(x_`w'_`f') ///
+            absorb(pid fy_`f' ry) cluster(mkt_`f') prefix(t2`w'`f'_)
+        drop `e16'
+    }
+}
+
+file open T using "$vs_out/tables/vs_fs_kd_trim.tex", write replace
+file write T "\begin{tabular}{lcccc}" _n "\toprule" _n
+file write T " & \multicolumn{2}{c}{Broad} & \multicolumn{2}{c}{ISCED-97} \\" _n
+file write T "\cmidrule(lr){2-3}\cmidrule(lr){4-5}" _n
+file write T "Sample & Triangular KD & Gaussian KD & Triangular KD & Gaussian KD \\" _n "\midrule" _n
+forvalues r = 0/2 {
+    local rl = cond(`r' == 0, "All programs", cond(`r' == 1, "Excluding top 1\% of exposure", "Excluding top 5\% of exposure"))
+    file write T "`rl'"
+    foreach f in broad isced {
+        foreach w in trikd gaukd {
+            stars `t`r'`w'`f'_p' st
+            file write T " & " %6.3f (`t`r'`w'`f'_b') "`st'"
+        }
+    }
+    file write T " \\" _n
+    foreach f in broad isced {
+        foreach w in trikd gaukd {
+            file write T " & (" %5.3f (`t`r'`w'`f'_se') ")"
+        }
+    }
+    file write T " \\" _n " \quad Observations"
+    foreach f in broad isced {
+        foreach w in trikd gaukd {
+            file write T " & " %9.0fc (`t`r'`w'`f'_N')
+        }
+    }
+    file write T " \\" _n
+    if `r' < 2 file write T "\addlinespace" _n
 }
 file write T "\bottomrule" _n "\end{tabular}" _n
 file close T
@@ -389,7 +513,7 @@ file close T
 
 foreach t in main p90 p75 within nosud lev ind adm {
     local sfx = cond("`t'" == "main", "", "_`t'")
-    foreach w in tot gau {
+    foreach w in tot gau gaukd {
         fsreg N_first x_`w'_broad`sfx' own_cumshock, x(x_`w'_broad`sfx') ///
             absorb(pid fy_broad ry) cluster(mkt_broad) prefix(r`t'`w'_)
     }
@@ -398,8 +522,8 @@ foreach t in main p90 p75 within nosud lev ind adm {
 file open T using "$vs_out/tables/vs_fs_shockdefs.tex", write replace
 file write T "\begin{tabular}{l*{8}{c}}" _n "\toprule" _n
 file write T " & Main & Top 10\% & Top 25\% & Within-year & No sudden & Levels & INDICES & Admissions \\" _n "\midrule" _n
-foreach w in tot gau {
-    local wl = cond("`w'" == "tot", "Total", "Gaussian")
+foreach w in tot gau gaukd {
+    local wl = cond("`w'" == "tot", "Total", cond("`w'" == "gau", "Gaussian", "Gaussian KD"))
     file write T "\textit{`wl'}"
     foreach t in main p90 p75 within nosud lev ind adm {
         stars `r`t'`w'_p' st
@@ -410,7 +534,7 @@ foreach w in tot gau {
         file write T " & (" %5.3f (`r`t'`w'_se') ")"
     }
     file write T " \\" _n
-    if "`w'" == "tot" file write T "\addlinespace" _n
+    if "`w'" != "gaukd" file write T "\addlinespace" _n
 }
 file write T "\midrule" _n "Observations"
 foreach t in main p90 p75 within nosud lev ind adm {
