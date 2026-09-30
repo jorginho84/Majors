@@ -1,0 +1,30 @@
+\begin{tabular}{lcccccc}
+\toprule
+ & \multicolumn{3}{c}{Field \(\times\) year FE} & \multicolumn{3}{c}{\(+\) Region \(\times\) year FE} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+Exposure measure & Broad & ISCED-97 & Generic & Broad & ISCED-97 & Generic \\
+\midrule
+\textit{Total} &  0.133\sym{***} &  0.109\sym{***} &  0.059\sym{*} &  0.025 &  0.012 &  0.006 \\
+ & (0.039) & (0.035) & (0.031) & (0.086) & (0.041) & (0.031) \\
+\quad Wald \(F\) & 11.66 &  9.63 &  3.51 &  0.09 &  0.09 &  0.04 \\
+\quad Programs with zero exposure &        10 &        60 &       256 &        10 &        60 &       256 \\
+\addlinespace
+\textit{Triangular} & -0.015 &  0.006 &  0.029 & -0.052\sym{***} & -0.023 &  0.005 \\
+ & (0.017) & (0.018) & (0.022) & (0.018) & (0.017) & (0.018) \\
+\quad Wald \(F\) &  0.77 &  0.10 &  1.70 &  8.22 &  1.84 &  0.09 \\
+\quad Programs with zero exposure &        96 &       192 &       416 &        96 &       192 &       416 \\
+\addlinespace
+\textit{Gaussian} & -0.024 & -0.009 &  0.019 & -0.117\sym{***} & -0.075\sym{**} & -0.021 \\
+ & (0.036) & (0.034) & (0.019) & (0.034) & (0.031) & (0.017) \\
+\quad Wald \(F\) &  0.44 &  0.06 &  0.96 & 11.57 &  5.83 &  1.46 \\
+\quad Programs with zero exposure &        10 &        60 &       267 &        10 &        60 &       267 \\
+\midrule
+Observations &     5,090 &     5,080 &     4,781 &     5,090 &     5,080 &     4,781 \\
+Programs &       601 &       601 &       571 &       601 &       601 &       571 \\
+Markets &        40 &        80 &       303 &        40 &        80 &       303 \\
+Regions &         4 &         4 &         4 &         4 &         4 &         4 \\
+Program FE & Yes & Yes & Yes & Yes & Yes & Yes \\
+Field \(\times\) year FE & Yes & Yes & Yes & Yes & Yes & Yes \\
+Region \(\times\) year FE & No & No & No & Yes & Yes & Yes \\
+\bottomrule
+\end{tabular}

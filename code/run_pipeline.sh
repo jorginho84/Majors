@@ -99,13 +99,23 @@ SCRIPTS=(
   "code/Sua/04d_selectivity_groups_diagnostics.do"
   "code/Sua/04e_sua_similarity_log_test.do"
   "code/Sua/04f_sua_Exposure_Q_Selectivity_FirstStages.do"
+  "code/Sua/04g_sua_first_stages_restricted_samples.do"
   "code/Sua/05_event_studies_exposure_comparison.do"
+  "code/Sua/05_event_studies_exposure_comparison.do|entrant"
+  "code/Sua/05_event_studies_exposure_comparison.do|positive"
   "code/Sua/05a_sua_log_event_studies.do"
+  "code/Sua/05a_sua_log_event_studies.do|entrant"
+  "code/Sua/05a_sua_log_event_studies.do|positive"
   "code/Sua/05b_sua_similarity_event_studies.do"
   "code/Sua/Sua kernel weights/04g_sua_kernelden_first_stages.do"
   "code/Sua/Sua kernel weights/04h_sua_kernelden_log_first_stages.do"
   "code/Sua/Sua kernel weights/05c_sua_kernelden_event_studies.do"
   "code/Sua/Sua kernel weights/05d_sua_kernelden_log_event_studies.do"
+  "code/Sua/Sua kernel weights/04i_sua_kernelden_first_stage_tables.do"
+  "code/Sua/05_event_studies_exposure_comparison.do|kd"
+  "code/Sua/05a_sua_log_event_studies.do|kd"
+  "code/Sua/04j_sua_similarity_selectivity_trends.do"
+  "code/Sua/04k_sua_exposure_selectivity_trends.do"
   # 6. SUA cosine exposure
   "code/Sua/Cosine/01_cosine_build_inputs_2011.do"
   "code/Sua/Cosine/02_cosine_build_exposure_measures.do"
@@ -115,6 +125,8 @@ SCRIPTS=(
   "code/Sua/Cosine/04_cosine_estimate_event_studies.do"
 )
 
+# An entry "path.do|arg" runs the script with an argument (do "path.do" arg).
+
 # Optional: start from script number N (1-based) to resume after a fix.
 START=${1:-1}
 
@@ -123,9 +135,12 @@ n=0
 for s in "${SCRIPTS[@]}"; do
   n=$((n + 1))
   [ "$n" -lt "$START" ] && continue
-  name=$(printf '%02d_%s' "$n" "$(basename "$s" .do | tr ' ' '_')")
+  path=${s%%|*}
+  arg=""
+  [ "$path" != "$s" ] && arg=${s#*|}
+  name=$(printf '%02d_%s' "$n" "$(basename "$path" .do | tr ' ' '_')${arg:+_$arg}")
   wrapper="$LOGDIR/$name.do"
-  printf 'do "%s"\n' "$s" > "$wrapper"
+  printf 'do "%s" %s\n' "$path" "$arg" > "$wrapper"
   t0=$(date +%s)
   "$STATA" -b do "$wrapper" > /dev/null 2>&1
   # Stata writes <wrapper basename>.log to the working directory

@@ -40,7 +40,28 @@ IMPORTANT
 
 Each exposure is estimated separately. The construction and scaling of the
 existing SUA non-cosine exposure variables are preserved.
+
+OPTIONAL SAMPLE ARGUMENT
+
+    do code/Sua/05_event_studies_exposure_comparison.do [entrant|positive]
+
+    (none)    full sample (default)
+    entrant   regions with entrant programs in 2009-2011 only
+    positive  programs with positive exposure only, for each measure
+    kd        full sample; Triangular and Gaussian exposure use the
+              kernel-weighted denominator (03d). Total is unchanged.
+
+Other options write their outputs with the suffix _entrant, _positive or _kd.
 *******************************************************************************/
+
+args sample
+
+if !inlist("`sample'", "", "entrant", "positive", "kd") {
+    display as error "Unknown sample: `sample'"
+    exit 198
+}
+
+local sfx = cond("`sample'" == "", "", "_`sample'")
 
 clear all
 set more off
@@ -56,17 +77,22 @@ do "code/config.do"
 local sua_panel ///
     "$processed/sua_incumbent_panel_w_broad_area_region_2007_2016.dta"
 
+if "`sample'" == "kd" {
+    local sua_panel ///
+        "$processed/sua_incumbent_panel_kd_broad_area_region_2007_2016.dta"
+}
+
 local results_dta ///
-    "$processed/sua_event_study_exposure_comparison.dta"
+    "$processed/sua_event_study_exposure_comparison`sfx'.dta"
 
 local results_xlsx ///
-    "$output/sua_event_study_exposure_comparison.xlsx"
+    "$output/sua_event_study_exposure_comparison`sfx'.xlsx"
 
 local figure_baseline ///
-    "$output/sua_event_study_exposure_comparison_baseline"
+    "$output/sua_event_study_exposure_comparison_baseline`sfx'"
 
 local figure_regionyear ///
-    "$output/sua_event_study_exposure_comparison_regionyear"
+    "$output/sua_event_study_exposure_comparison_regionyear`sfx'"
 
 
 /*******************************************************************************
@@ -74,6 +100,11 @@ local figure_regionyear ///
 *******************************************************************************/
 
 use "`sua_panel'", clear
+
+if "`sample'" == "kd" {
+    replace exp_tri50 = exp_tri50kd
+    replace exp_gau50 = exp_gau50kd
+}
 
 
 /*
@@ -114,6 +145,42 @@ keep if ///
 drop ///
     has_pre ///
     has_post
+
+
+/*
+Optional sample restriction.
+
+entrant:  keep the pre-treatment regions with entrant programs in 2009-2011.
+positive: applied in each regression, since the set of programs with positive
+          exposure differs across measures.
+*/
+
+if "`sample'" == "entrant" {
+
+    bysort geo_pre: ///
+        egen byte entrant_region = ///
+            max(has_entrant)
+
+    keep if ///
+        entrant_region == 1
+
+    levelsof geo_pre, local(kept_regions)
+    assert "`kept_regions'" == "5 8 9 13"
+}
+
+local sample_note ""
+
+if "`sample'" == "entrant" {
+    local sample_note "; entrant regions only"
+}
+
+if "`sample'" == "positive" {
+    local sample_note "; positive exposure only"
+}
+
+if "`sample'" == "kd" {
+    local sample_note "; kernel-weighted denominator"
+}
 
 
 /*******************************************************************************
@@ -328,10 +395,18 @@ foreach specification in baseline regionyear {
         }
 
 
+        local sample_condition ""
+
+        if "`sample'" == "positive" {
+            local sample_condition "if exp_`e'10 > 0"
+        }
+
+
         display ""
         display "============================================================"
         display "`specification_title'"
         display "`exposure_title'"
+        display "Sample: `sample'"
         display "============================================================"
 
 
@@ -349,7 +424,8 @@ foreach specification in baseline regionyear {
             es_`e'_2013 ///
             es_`e'_2014 ///
             es_`e'_2015 ///
-            es_`e'_2016, ///
+            es_`e'_2016 ///
+            `sample_condition', ///
             absorb( ///
                 `absorbed_fe' ///
             ) ///
@@ -803,7 +879,7 @@ foreach specification in baseline regionyear {
             color(black) ///
         ) ///
         subtitle( ///
-            "`figure_subtitle'; 2011 omitted", ///
+            "`figure_subtitle'; 2011 omitted`sample_note'", ///
             size(small) ///
             color(gs6) ///
         ) ///

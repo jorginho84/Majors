@@ -33,6 +33,12 @@ the four orphan files in `output/tables/` (committed in a91f9e5 with no generati
 | 1604 | Heterogeneity by univ. selectivity | — | **no producer** (uses UNAB, not in any script) |
 | 1922, 1971 | SUA samples and exposure | `Sua/03c_...:228-270, 486, 662` | log only |
 | 2156 | SUA levels first stage | `Sua/04_sua_levels_first_stages.do:109-722` | log only |
+| appendix (`sua-fs-{lvl,log}-{entrant,positive}`) | SUA levels and log first stages, entrant regions only / positive exposure only | `Sua/04g_sua_first_stages_restricted_samples.do` | `output/tables/sua_fs_{lvl,log}_{entrant,positive}.tex` (`\input`) |
+| appendix (`sua-es-{lvl,log}-{entrant,positive}`) | SUA levels and log event studies, same samples | `Sua/05_...do entrant\|positive`, `Sua/05a_...do entrant\|positive` | `output/sua_{event_study_exposure_comparison,log_event_study}_{baseline,regionyear}_{entrant,positive}.png`; pretrend p-values typed in the frame notes |
+| `sua-kd-first-stage`, `sua-kd-log-first-stage` | SUA first stages with kernel-weighted denominator (levels, logs) | `Sua/Sua kernel weights/04i_sua_kernelden_first_stage_tables.do` (needs `03d`) | `output/tables/sua_fs_{lvl,log}_kd.tex` (`\input`) |
+| appendix (`sua-kd-event-studies`, `sua-kd-log-event-studies`) | KD event studies | `Sua/05_...do kd`, `Sua/05a_...do kd` | `output/sua_{event_study_exposure_comparison,log_event_study}_{baseline,regionyear}_kd.png`; pretrend p-values typed in the frame notes |
+| appendix (`sua-q-selectivity-trends`, `sua-q-selectivity-es`) | Conditional similarity with selectivity-decile x year FE | `Sua/04j_sua_similarity_selectivity_trends.do` | `output/tables/sua_q_selectivity_trends.tex`, `output/sua_q_event_study_selectivity_trends.png`; decile/R2 facts typed in the frame |
+| appendix (`sua-exposure-selectivity-trends`, `sua-exposure-selectivity-es`) | SUA exposure (incl. KD) with selectivity-decile x year FE | `Sua/04k_sua_exposure_selectivity_trends.do` (needs `03d`) | `output/tables/sua_fs_selectivity_trends.tex`, `output/sua_es_selectivity_trends.png`; pretrend p-values typed in the frame notes |
 | 2393 | SUA log first stage | `Sua/04b_sua_log_first_stages.do` | log only |
 | 2770 | SUA similarity first stage | logs: `Sua/04e_...:495-675` | **levels columns: no producer** |
 | 2883 | SUA selectivity heterogeneity | `Sua/04f_...:310-732` | log only |

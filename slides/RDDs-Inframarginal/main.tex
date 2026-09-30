@@ -20,6 +20,31 @@
 \usepackage{tabularx}
 \usepackage{appendix}
 
+% section and subsection divider pages (not counted in frame numbers)
+\AtBeginSection[]{
+  \begin{frame}[plain,noframenumbering]
+    \vfill
+    \centering
+    \begin{beamercolorbox}[sep=12pt,center,rounded=true,shadow=true]{palette tertiary}
+      \usebeamerfont{title}\insertsectionhead\par
+    \end{beamercolorbox}
+    \vfill
+  \end{frame}
+}
+
+\AtBeginSubsection[]{
+  \begin{frame}[plain,noframenumbering]
+    \vfill
+    \centering
+    {\usebeamerfont{subtitle}\usebeamercolor[fg]{title}\insertsectionhead\par}
+    \vspace{0.4cm}
+    \begin{beamercolorbox}[sep=10pt,center,rounded=true,shadow=true]{palette tertiary}
+      \usebeamerfont{title}\insertsubsectionhead\par
+    \end{beamercolorbox}
+    \vfill
+  \end{frame}
+}
+
 % significance stars from esttab tables
 \newcommand{\sym}[1]{\ensuremath{^{#1}}}
 
@@ -91,8 +116,7 @@ Graduates HE (8y) & Grad. sample & 838,307 & 0.423 \\
 
 
 
-\section{RDD: Threshold crossing effects
-}
+\section{RDD: Threshold crossing effects}
 
 \begin{frame}{RDD around admission cutoffs}
 
@@ -1808,15 +1832,18 @@ with different levels of exposure to the future entrants.
 
 \begin{frame}{Construction of the exposure measures}
 
-\footnotesize
+\scriptsize
 \setlength{\abovedisplayskip}{3pt}
 \setlength{\belowdisplayskip}{3pt}
 
 %------------------------------------------------
-\textbf{1. Pre-reform enrollment stocks in market $m$}
+\begin{columns}[T,onlytextwidth]
+
+\begin{column}{0.49\textwidth}
+\textbf{1. Pre-reform enrollment in market $m$}
 
 \begin{center}
-\resizebox{0.58\textwidth}{!}{
+\resizebox{0.92\linewidth}{!}{
 $\displaystyle
 A_m
 =
@@ -1826,56 +1853,66 @@ A_m
 T_m
 =
 \sum_{\substack{q\\ m(q)=m}}
-\overline{N}^{\mathrm{first}}_{q,2009\text{--}2011}.
+\overline{N}^{\mathrm{first}}_{q,2009\text{--}2011}
 $
 }
 \end{center}
 
-\vspace{-0.08cm}
+\vspace{-0.1cm}
 
 \begin{itemize}
-\scriptsize
+\tiny
 \setlength{\itemsep}{0pt}
 
 \item $\mathcal E$ is the set of entrant programs and $m(q)$ is program
 $q$'s pre-treatment region $\times$ field market.
 
 \item $\overline{N}^{\mathrm{first}}_{q,2009\text{--}2011}$ is average
-first-year enrollment; hence $A_m$ is entrant enrollment and $T_m$ total
-enrollment in market $m$.
+first-year enrollment: $A_m$ is entrant and $T_m$ total enrollment in $m$.
 
 \end{itemize}
+\end{column}
 
-\vspace{0.02cm}
-
-%------------------------------------------------
-\textbf{2. Total exposure of incumbent program $p$}
+\begin{column}{0.49\textwidth}
+\textbf{2. Total exposure}
 
 \begin{center}
-\resizebox{0.15\textwidth}{!}{
+\resizebox{0.26\linewidth}{!}{
 $\displaystyle
 E_p
 =
-\frac{A_{m(p)}}{T_{m(p)}}.
+\frac{A_{m(p)}}{T_{m(p)}}
 $
 }
 \end{center}
 
+\vspace{-0.1cm}
 
-\vspace{-0.05cm}
+\begin{itemize}
+\tiny
+\setlength{\itemsep}{0pt}
 
-\scriptsize
-Total exposure is the entrant share of pre-reform first-year enrollment in
-the market of incumbent program $p$. Thus, incumbents in the same
-pre-treatment region $\times$ field market share the same $E_p$.
+\item Entrant share of pre-reform first-year enrollment in the market of
+incumbent program $p$.
 
-\vspace{0.10cm}
+\item Incumbents in the same region $\times$ field market share the
+same $E_p$.
+
+\end{itemize}
+\end{column}
+
+\end{columns}
+
+\vspace{0.35cm}
 
 %------------------------------------------------
-\textbf{3. Selectivity-weighted exposure of incumbent program $p$}
+\begin{columns}[T,onlytextwidth]
+
+\begin{column}{0.49\textwidth}
+\textbf{3. Selectivity-weighted exposure}
 
 \begin{center}
-\resizebox{0.58\textwidth}{!}{
+\resizebox{0.92\linewidth}{!}{
 $\displaystyle
 E_p^{k}
 =
@@ -1885,26 +1922,64 @@ k\!\left(|S_p-S_q|\right)
 \overline{N}^{\mathrm{first}}_{q,2009\text{--}2011}
 }{
 T_{m(p)}
-},
-\qquad
-k\in\{\mathrm{Triangular},\mathrm{Gaussian}\}.
+}
 $
 }
 \end{center}
 
-\vspace{-0.06cm}
+\vspace{-0.1cm}
 
 \begin{itemize}
-\scriptsize
+\tiny
 \setlength{\itemsep}{0pt}
 
-\item $S_p$ and $S_q$ are pre-reform mean PSU scores of incumbent $p$ and
+\item $S_p$, $S_q$: pre-reform mean PSU scores of incumbent $p$ and
 entrant $q$; $|S_p-S_q|$ is their selectivity distance.
 
-\item $k(\cdot)$ gives greater weight to closer entrants, so $E_p^k$ can
-vary across incumbent programs within the same market.
+\item $k\in\{\mathrm{Triangular},\mathrm{Gaussian}\}$ gives greater weight
+to closer entrants, so $E_p^k$ varies within a market.
 
 \end{itemize}
+\end{column}
+
+\begin{column}{0.49\textwidth}
+\textbf{4. Kernel-weighted denominator}
+
+\begin{center}
+\resizebox{0.92\linewidth}{!}{
+$\displaystyle
+E_p^{k,\mathrm{KD}}
+=
+\frac{
+\sum_{\substack{q\in\mathcal E\\ m(q)=m(p)}}
+k\!\left(|S_p-S_q|\right)
+\overline{N}^{\mathrm{first}}_{q,2009\text{--}2011}
+}{
+\sum_{\substack{\ell\\ m(\ell)=m(p)}}
+k\!\left(|S_p-S_\ell|\right)
+\overline{N}^{\mathrm{first}}_{\ell,2009\text{--}2011}
+}
+$
+}
+\end{center}
+
+\vspace{-0.1cm}
+
+\begin{itemize}
+\tiny
+\setlength{\itemsep}{0pt}
+
+\item Same numerator as in 3; the denominator weights every program $\ell$
+in the market (incumbents, including $p$, and entrants) by its
+selectivity distance to $p$.
+
+\item $E_p^{k,\mathrm{KD}}\in[0,1]$ is the entrant share of the enrollment
+that is close to $p$ in selectivity.
+
+\end{itemize}
+\end{column}
+
+\end{columns}
 
 \end{frame}
 
@@ -2329,6 +2404,10 @@ errors are clustered by the corresponding pre-treatment market and reported
 in parentheses. Wald $F$ statistics test the exposure coefficient. Sample
 differences reflect singleton removal by \texttt{reghdfe}.
 $^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.
+Robustness: \hyperlink{sua-fs-lvl-entrant}{\color{blue}regions with entrant
+universities only $\rightarrow$} \quad
+\hyperlink{sua-fs-lvl-positive}{\color{blue}positive exposure only $\rightarrow$} \quad
+\hyperlink{sua-exposure-selectivity-trends}{\color{blue}selectivity trends $\rightarrow$}
 }
 
 \end{frame}
@@ -2496,378 +2575,110 @@ pre-treatment region $\times$ year fixed effects. Standard errors are clustered
 at the pre-treatment market level. Observations with zero first-year enrollment
 are excluded because the dependent variable is in logs.
 $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
+Robustness: \hyperlink{sua-fs-log-entrant}{\color{blue}regions with entrant
+universities only $\rightarrow$} \quad
+\hyperlink{sua-fs-log-positive}{\color{blue}positive exposure only $\rightarrow$} \quad
+\hyperlink{sua-exposure-selectivity-trends}{\color{blue}selectivity trends $\rightarrow$}
 }
 
 \end{frame}
-%---------------------------------------------------------
-\begin{frame}{Decomposing weighted exposure}
-
-\scriptsize
-\setlength{\abovedisplayskip}{3pt}
-\setlength{\belowdisplayskip}{3pt}
 
 %---------------------------------------------------------
-% ORIGINAL EXPOSURE AND EXACT DECOMPOSITION
-%---------------------------------------------------------
-\begin{center}
-\resizebox{0.75\textwidth}{!}{
-$
-\displaystyle
-\underbrace{
-E_p^k
-=
-\frac{
-\sum_{q\in\mathcal E_{m(p)}}
-k\!\left(|S_p-S_q|\right)N_q
-}{
-\sum_{\ell\in m(p)}N_\ell
-}
-}_{\substack{
-\text{Direct construction}\\
-\text{of weighted exposure}
-}}
-\quad\equiv\quad
-\begin{gathered}
-E_p^k
-=
-\left[
-\frac{
-\sum_{q\in\mathcal E_{m(p)}}N_q
-}{
-\sum_{\ell\in m(p)}N_\ell
-}
-\right]
-\left[
-\frac{
-\sum_{q\in\mathcal E_{m(p)}}
-k\!\left(|S_p-S_q|\right)N_q
-}{
-\sum_{q\in\mathcal E_{m(p)}}N_q
-}
-\right]
-\\[0.18cm]
-E_p^k
-=
-\underbrace{
-M_{m(p)}
-}_{\substack{
-\text{entrant}\\
-\text{market share}
-}}
-\;\times\;
-\underbrace{
-Q_p^k
-}_{\substack{
-\text{similarity}\\
-\text{with entrants}
-}}
-\end{gathered}
-$
-}
-\end{center}
-
-\vspace{0.05cm}
-
-%---------------------------------------------------------
-% COMPONENTS OF THE DECOMPOSITION
-%---------------------------------------------------------
-
-\begin{columns}[T,onlytextwidth]
-
-\begin{column}{0.47\textwidth}
-
-\textbf{Entrant presence}
-
-\tiny
-\[
-M_m
-=
-\frac{
-\sum_{q\in\mathcal E_m}N_q
-}{
-\sum_{\ell\in m}N_\ell
-}.
-\]
-
-\tiny
-\(M_m\) is the entrant share of total market enrollment. It captures the
-\textbf{size of entrant presence} and is common to all incumbent programs
-in market \(m\).
-
-\end{column}
-
-\begin{column}{0.50\textwidth}
-
-\textbf{Conditional similarity}
-
-\tiny
-\[
-Q_p^k
-=
-\frac{
-\sum_{q\in\mathcal E_m}
-k\!\left(|S_p-S_q|\right)N_q
-}{
-\sum_{q\in\mathcal E_m}N_q
-}.
-\]
-
-\tiny
-\(Q_p^k\) is the entrant-enrollment-weighted PSU similarity between incumbent
-\(p\) and the entrant programs in its market. It is higher when larger
-entrants have PSU profiles closer to that of \(p\).
-Conditional on entrant presence, it captures \textbf{competitive proximity}
-rather than the overall size of entry.
-
-\end{column}
-
-\end{columns}
-
-\vspace{0.06cm}
-
-%---------------------------------------------------------
-% FIRST STAGE USING Q
-%---------------------------------------------------------
-
-\textbf{Using similarity as the independent variable}
-
-\tiny
-\[
-N^{\mathrm{first}}_{pt}
-=
-\beta_k
-\left[
-Q_p^k\times Post_t
-\right]
-+\mu_p+\alpha_{f(p),t}+\gamma_{r(p),t}
-+\varepsilon_{pt},
-\qquad M_{m(p)}>0.
-\]
-
-\tiny
-The sample is restricted to markets with positive entrant presence.
-Program fixed effects absorb time-invariant differences across incumbents,
-while Broad-field \(\times\) year and pre-treatment region \(\times\) year
-fixed effects absorb common field-specific and regional shocks over time.
-The model therefore asks whether, among incumbents in exposed markets,
-programs whose pre-treatment PSU profiles are more similar to the entrants
-experience different post-2012 enrollment changes.
-Unlike \(E_p^k\), which combines entrant market share and similarity,
-\(Q_p^k\) isolates the \textbf{similarity component} of exposure.
-The coefficient \(\beta_k\) measures the differential post-2012 enrollment
-change associated with a 0.10 increase in entrant-enrollment-weighted PSU
-similarity.
-
-\end{frame}
-
-%---------------------------------------------------------
-%---------------------------------------------------------
-\begin{frame}[label=sua-q-main]
-
-\frametitle{Distribution of conditional similarity measures}
-
-\centering
-
-\includegraphics[ width=0.84\textwidth, height=0.64\textheight, keepaspectratio ]{../../output/sua_q_distributions_combined.png}
-
-\vspace{-0.10cm}
-
-
-\begin{itemize}
-\tiny  
-\setlength{\itemsep}{2pt}
-
-\item Each incumbent program appears once. The horizontal axis reports
-conditional similarity $Q$ in percentage points and the vertical axis
-the share of programs.
-
-\item The upper row includes all exposed programs, while the lower row
-excludes zeros and shows the distribution conditional on positive $Q$.
-
-\item Triangular similarity is concentrated at relatively low values and
-contains a relevant mass near zero. Gaussian similarity is more
-dispersed and shifted toward higher values, indicating a less restrictive
-measure of similarity across exposed markets.
-
-\end{itemize}
-
-\end{frame}
-
-
-%---------------------------------------------------------
-\begin{frame}[label=sua-similarity-first-stage]
+\begin{frame}[label=sua-kd-first-stage]
 
 \frametitle{
-Similarity within exposed markets
-\hfill
-\hyperlink{sua-similarity-event-studies}{
-\scriptsize\color{blue}
-Event studies $\rightarrow$
-}
+    First stage: kernel-weighted denominator
+    \hfill
+    \hyperlink{sua-kd-event-studies}{\scriptsize\color{blue}Event studies $\rightarrow$}
 }
 
-\scriptsize
-\setlength{\abovedisplayskip}{3pt}
-\setlength{\belowdisplayskip}{3pt}
-
-\textbf{Common fixed-effects specification}
-
-
-\begin{center}
-\resizebox{1\textwidth}{!}{
-$
-\begin{gathered}
-\begin{aligned}
-N^{\mathrm{first}}_{pt}
-&=
-\beta_k
-\left[
-Q_p^k\times Post_t
-\right]
-+\mu_p+\alpha_{f(p),t}
-+\gamma_{r(p),t}
-+\varepsilon_{pt},
-\end{aligned}
-\qquad
-\begin{aligned}
-\log N^{\mathrm{first}}_{pt}
-&=
-\delta_k
-\left[
-\widetilde{\log Q_p^k}\times Post_t
-\right]
-+
-\theta_k
-\left[
-D_p^k\times Post_t
-\right]
-+\mu_p+\alpha_{f(p),t}
-+\gamma_{r(p),t}
-+\varepsilon_{pt},
-\end{aligned}
-\\[-0.02cm]
-\widetilde{\log Q_p^k}
-=
-\begin{cases}
-\log(Q_p^k), & Q_p^k>0,\\
-0, & Q_p^k=0,
-\end{cases}
-\qquad
-D_p^k=\mathbf{1}\{Q_p^k>0\},
-\qquad
-M_m>0.
-\end{gathered}
-$
-}
-\end{center}
-
-\vspace{0.06cm}
-
-\begin{table}
 \centering
-\tiny
-\setlength{\tabcolsep}{5pt}
-\renewcommand{\arraystretch}{1.05}
 
-\resizebox{0.70\textwidth}{!}{
-\begin{tabular}{lcccc}
-\toprule
-&
-\multicolumn{2}{c}{Levels}
-&
-\multicolumn{2}{c}{Logs}
-\\
-\cmidrule(lr){2-3}
-\cmidrule(lr){4-5}
-
-&
-Triangular
-&
-Gaussian
-&
-Triangular
-&
-Gaussian
-\\
-\midrule
-
-Similarity term $\times$ Post
-& $-2.381^{***}$
-& $-2.241^{***}$
-& $-0.067^{***}$
-& $-0.142^{***}$
-\\
-
-&
-$(0.491)$
-&
-$(0.487)$
-&
-$(0.020)$
-&
-$(0.035)$
-\\
-
-Wald $F$
-& 23.50
-& 21.18
-& 11.37
-& 16.29
-\\
-
-Observations
-& 5,009
-& 5,009
-& 5,009
-& 5,009
-\\
-
-Programs
-& 591
-& 591
-& 591
-& 591
-\\
-
-Markets
-& 36
-& 36
-& 36
-& 36
-\\
-
-\bottomrule
-\end{tabular}
+{\small
+\begin{equation*}
+N^{\mathrm{first}}_{pt}
+=
+\pi
+\left(
+E^{k,\mathrm{KD}}_{p}\times Post_t
+\right)
++\mu_p
++\alpha_{f_m(p),t}
++\gamma_{r(p),t}
++\nu_{pt}.
+\end{equation*}
 }
+
+\vspace{-0.2cm}
+
+\resizebox{0.66\textwidth}{!}{\input{../../output/tables/sua_fs_lvl_kd.tex}}
 
 \vspace{0.08cm}
 
-\parbox{0.94\textwidth}{
+\parbox{0.97\textwidth}{%
 \tiny
 \textit{Notes:}
-In levels, a 0.10 increase in conditional similarity is associated with
-approximately 2.2--2.4 fewer first-year students after 2012.
-In logs, a 10\% increase in similarity is associated with approximately
-0.67\% lower enrollment under the triangular measure and 1.42\% lower
-enrollment under the Gaussian measure.
-The sample is restricted to markets with positive entrant presence,
-$M_m>0$. Levels retain economically meaningful observations with $Q_p^k=0$.
-In logs, zero-similarity observations are also retained by setting
-$\widetilde{\log Q_p^k}=0$ when $Q_p^k=0$ and including
-$D_p^k\times Post_t$ separately. The coefficient on this indicator is not
-reported. Gaussian similarity is strictly positive in the exposed-market
-sample, so the corresponding indicator is absorbed by the fixed effects.
-All regressions absorb program, Broad-field $\times$ year, and
-pre-treatment region $\times$ year fixed effects.
-Standard errors clustered by pre-treatment market are in parentheses.
-Event studies reject the absence of differential pre-treatment trends,
-so estimates are interpreted as descriptive rather than causal.
-$^{***}p<0.01$.
+Exposure uses the kernel-weighted denominator (point 4 of the exposure construction): the denominator weights every program in the market by its selectivity distance to $p$, with the same 50-point Triangular and Gaussian kernels as the numerator. Sample and fixed effects as in the main first stage; SE clustered by pre-treatment market.
+Exposure in 10 percentage-point units. As in the
+\hyperlink{sua-first-stage}{\color{blue}main first stage}, coefficients are
+positive with field $\times$ year FE and negative with region $\times$ year FE.
+Magnitudes are smaller because KD exposure takes larger values (Broad, 2011
+mean: 0.11 for Triangular KD vs.\ 0.03 for Triangular). Robustness to selectivity trends:
+\hyperlink{sua-exposure-selectivity-trends}{\color{blue}appendix $\rightarrow$}.
+$^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.
 }
 
-\end{table}
+\end{frame}
+
+%---------------------------------------------------------
+\begin{frame}[label=sua-kd-log-first-stage]
+
+\frametitle{
+    Log first stage: kernel-weighted denominator
+    \hfill
+    \hyperlink{sua-kd-log-event-studies}{\scriptsize\color{blue}Event studies $\rightarrow$}
+}
+
+\centering
+
+\vspace{0.2cm}
+
+\resizebox{0.85\textwidth}{!}{%
+$\log N^{\mathrm{first}}_{pt}
+=
+\beta_k\left[\widetilde{\log E_p^{k,\mathrm{KD}}}\times Post_t\right]
++\theta_k\left[D_p^k\times Post_t\right]
++\mu_p+\alpha_{f(p),t}+\gamma_{r(p),t}+\varepsilon_{pt}.$}
+
+\vspace{0.3cm}
+
+\vspace{-0.2cm}
+
+\resizebox{0.66\textwidth}{!}{\input{../../output/tables/sua_fs_log_kd.tex}}
+
+\vspace{0.08cm}
+
+\parbox{0.97\textwidth}{%
+\tiny
+\textit{Notes:}
+Exposure uses the kernel-weighted denominator (point 4 of the exposure construction): the denominator weights every program in the market by its selectivity distance to $p$, with the same 50-point Triangular and Gaussian kernels as the numerator. Sample and fixed effects as in the main first stage; SE clustered by pre-treatment market.
+$\widetilde{\log E}=\log E$ if $E>0$ and 0 otherwise; $D_p^k=\mathbf{1}\{E_p^{k,\mathrm{KD}}>0\}$.
+Observations with zero first-year enrollment are excluded. Compare with the
+\hyperlink{sua-log-first-stage}{\color{blue}main log first stage}.
+$^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.
+}
 
 \end{frame}
+%---------------------------------------------------------
+
+
+%---------------------------------------------------------
+%---------------------------------------------------------
+
+
+
+%---------------------------------------------------------
+
 
 
 %---------------------------------------------------------
@@ -2940,49 +2751,6 @@ Clusters
 & \multicolumn{2}{c}{100}
 & \multicolumn{2}{c}{25} \\
 
-\midrule
-
-\multicolumn{7}{l}{\textit{Conditional similarity $Q$}} \\[2pt]
-
-Coefficient
-& $-1.95^{*}$
-& $-3.26$
-& $-2.20^{***}$
-& $-2.17^{***}$
-& $-5.70$
-& $-3.48$ \\
-
-& $(0.93)$
-& $(1.96)$
-& $(0.48)$
-& $(0.37)$
-& $(4.24)$
-& $(3.15)$ \\
-
-$F$-statistic
-& 4.40
-& 2.77
-& 21.27
-& 34.14
-& 1.80
-& 1.22 \\
-
-
-Observations
-& \multicolumn{2}{c}{836}
-& \multicolumn{2}{c}{2,932}
-& \multicolumn{2}{c}{1,038} \\
-
-Programs
-& \multicolumn{2}{c}{104}
-& \multicolumn{2}{c}{339}
-& \multicolumn{2}{c}{128} \\
-
-Clusters
-& \multicolumn{2}{c}{15}
-& \multicolumn{2}{c}{28}
-& \multicolumn{2}{c}{16} \\
-
 \bottomrule
 \end{tabular}
 \end{table}
@@ -2994,9 +2762,10 @@ Clusters
 \tiny
 \textit{Notes:}
 Standard errors clustered by pre-treatment market in parentheses.
-Panel A includes program, Broad-field$\times$year, and region$\times$year FE.
-Panel B includes program and market$\times$year FE and is restricted to exposed markets.
-Coefficients correspond to a 10 percentage-point increase in exposure or a 0.10 increase in conditional similarity.
+All regressions include program, Broad-field$\times$year, and region$\times$year FE.
+Coefficients correspond to a 10 percentage-point increase in exposure.
+The same split for conditional similarity is in the
+\hyperlink{sua-q-heterogeneity}{\color{blue}appendix}.
 $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
 }
 
@@ -4300,6 +4069,344 @@ zero-exposure programs, particularly under the Generic-field definition.
 \end{frame}
 
 %---------------------------------------------------------
+\begin{frame}[label=sua-fs-lvl-entrant]
+
+\frametitle{
+    First stage: regions with entrant universities only
+    \hfill
+    \hyperlink{sua-first-stage}{\scriptsize\color{blue}$\leftarrow$ Main}
+    \hyperlink{sua-es-lvl-entrant}{\scriptsize\color{blue}ES $\rightarrow$}
+}
+
+\centering
+
+\vspace{-0.2cm}
+
+{\small
+\begin{equation*}
+N^{\mathrm{first}}_{pt}
+=
+\pi
+\left(
+E^{k,m}_{p}\times Post_t
+\right)
++\mu_p
++\alpha_{f_m(p),t}
++\gamma_{r(p),t}
++\nu_{pt}.
+\end{equation*}
+}
+
+\vspace{-0.3cm}
+
+\resizebox{0.62\textwidth}{!}{\input{../../output/tables/sua_fs_lvl_entrant.tex}}
+
+\vspace{0.05cm}
+
+\parbox{0.97\textwidth}{%
+\tiny
+\textit{Notes:}
+Sample restricted to incumbent programs in the four pre-treatment regions with entrant programs in 2009--2011 (Valpara\'iso, Biob\'io, La Araucan\'ia, Metropolitana); outside them exposure is zero by construction.
+Same specification as the main first stage. Exposure in 10 percentage-point units; SE clustered by pre-treatment market.
+$^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.
+}
+
+\end{frame}
+
+%---------------------------------------------------------
+\begin{frame}[label=sua-es-lvl-entrant]
+
+\frametitle{
+    Event studies: regions with entrant universities only
+    \hfill
+    \hyperlink{sua-fs-lvl-entrant}{\scriptsize\color{blue}$\leftarrow$ First stage}
+}
+
+\vspace{-0.12cm}
+
+\begin{columns}[T,onlytextwidth]
+    \begin{column}{0.495\textwidth}
+        \centering
+        \textbf{\scriptsize Field $\times$ year FE}
+
+        \includegraphics[width=\linewidth, height=0.66\textheight, keepaspectratio]{../../output/sua_event_study_exposure_comparison_baseline_entrant.png}
+    \end{column}
+    \begin{column}{0.495\textwidth}
+        \centering
+        \textbf{\scriptsize $+$ Region $\times$ year FE}
+
+        \includegraphics[width=\linewidth, height=0.66\textheight, keepaspectratio]{../../output/sua_event_study_exposure_comparison_regionyear_entrant.png}
+    \end{column}
+\end{columns}
+
+\vspace{0.04cm}
+
+\begin{center}
+\begin{minipage}{0.96\textwidth}
+\tiny
+\textit{Notes:}
+Sample restricted to incumbent programs in the four pre-treatment regions with entrant programs in 2009--2011 (Valpara\'iso, Biob\'io, La Araucan\'ia, Metropolitana); outside them exposure is zero by construction.
+Broad-field markets; separate event studies for Total, Triangular and Gaussian
+exposure. Coefficients measure the enrollment difference associated with a 10 percentage-point increase in exposure in each year relative to 2011. 95\% confidence intervals; SE clustered by pre-treatment market.
+Joint pretrend $p$-values (2007--2010) for Total, Triangular and Gaussian are
+0.046, 0.068 and 0.010 in the left panel, and 0.151, 0.302 and 0.209 in the right panel.
+\end{minipage}
+\end{center}
+
+\end{frame}
+
+%---------------------------------------------------------
+\begin{frame}[label=sua-fs-lvl-positive]
+
+\frametitle{
+    First stage: positive exposure only
+    \hfill
+    \hyperlink{sua-first-stage}{\scriptsize\color{blue}$\leftarrow$ Main}
+    \hyperlink{sua-es-lvl-positive}{\scriptsize\color{blue}ES $\rightarrow$}
+}
+
+\centering
+
+\vspace{-0.2cm}
+
+{\small
+\begin{equation*}
+N^{\mathrm{first}}_{pt}
+=
+\pi
+\left(
+E^{k,m}_{p}\times Post_t
+\right)
++\mu_p
++\alpha_{f_m(p),t}
++\gamma_{r(p),t}
++\nu_{pt}.
+\end{equation*}
+}
+
+\vspace{-0.3cm}
+
+\resizebox{0.62\textwidth}{!}{\input{../../output/tables/sua_fs_lvl_positive.tex}}
+
+\vspace{0.05cm}
+
+\parbox{0.97\textwidth}{%
+\tiny
+\textit{Notes:}
+Sample restricted to programs with positive exposure, defined separately for each measure (Triangular exposure can be zero where Total and Gaussian are positive). All such programs lie in the four regions with entrant programs, so the only difference with the entrant-region sample is that zero-exposure programs within those regions are dropped.
+Same specification as the main first stage. Exposure in 10 percentage-point units; SE clustered by pre-treatment market.
+$^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.
+}
+
+\end{frame}
+
+%---------------------------------------------------------
+\begin{frame}[label=sua-es-lvl-positive]
+
+\frametitle{
+    Event studies: positive exposure only
+    \hfill
+    \hyperlink{sua-fs-lvl-positive}{\scriptsize\color{blue}$\leftarrow$ First stage}
+}
+
+\vspace{-0.12cm}
+
+\begin{columns}[T,onlytextwidth]
+    \begin{column}{0.495\textwidth}
+        \centering
+        \textbf{\scriptsize Field $\times$ year FE}
+
+        \includegraphics[width=\linewidth, height=0.66\textheight, keepaspectratio]{../../output/sua_event_study_exposure_comparison_baseline_positive.png}
+    \end{column}
+    \begin{column}{0.495\textwidth}
+        \centering
+        \textbf{\scriptsize $+$ Region $\times$ year FE}
+
+        \includegraphics[width=\linewidth, height=0.66\textheight, keepaspectratio]{../../output/sua_event_study_exposure_comparison_regionyear_positive.png}
+    \end{column}
+\end{columns}
+
+\vspace{0.04cm}
+
+\begin{center}
+\begin{minipage}{0.96\textwidth}
+\tiny
+\textit{Notes:}
+Sample restricted to programs with positive exposure, defined separately for each measure (Triangular exposure can be zero where Total and Gaussian are positive). All such programs lie in the four regions with entrant programs, so the only difference with the entrant-region sample is that zero-exposure programs within those regions are dropped.
+Broad-field markets; separate event studies for Total, Triangular and Gaussian
+exposure. Coefficients measure the enrollment difference associated with a 10 percentage-point increase in exposure in each year relative to 2011. 95\% confidence intervals; SE clustered by pre-treatment market.
+Joint pretrend $p$-values (2007--2010) for Total, Triangular and Gaussian are
+0.072, 0.055 and 0.012 in the left panel, and 0.132, 0.348 and 0.207 in the right panel.
+\end{minipage}
+\end{center}
+
+\end{frame}
+
+%---------------------------------------------------------
+\begin{frame}[label=sua-fs-log-entrant]
+
+\frametitle{
+    Log first stage: regions with entrant universities only
+    \hfill
+    \hyperlink{sua-log-first-stage}{\scriptsize\color{blue}$\leftarrow$ Main}
+    \hyperlink{sua-es-log-entrant}{\scriptsize\color{blue}ES $\rightarrow$}
+}
+
+\centering
+
+\vspace{-0.2cm}
+
+{\small
+\begin{equation*}
+\log N^{\mathrm{first}}_{pt}
+=
+\beta_k\left[\widetilde{\log E_p^k}\times Post_t\right]
++\theta_k\left[D_p^k\times Post_t\right]
++\mu_p+\alpha_{f(p),t}+\gamma_{r(p),t}+\varepsilon_{pt}.
+\end{equation*}
+}
+
+\vspace{-0.3cm}
+
+\resizebox{0.62\textwidth}{!}{\input{../../output/tables/sua_fs_log_entrant.tex}}
+
+\vspace{0.05cm}
+
+\parbox{0.97\textwidth}{%
+\tiny
+\textit{Notes:}
+Sample restricted to incumbent programs in the four pre-treatment regions with entrant programs in 2009--2011 (Valpara\'iso, Biob\'io, La Araucan\'ia, Metropolitana); outside them exposure is zero by construction.
+Same specification as the main log first stage: $\widetilde{\log E_p^k}=\log E_p^k$ if $E_p^k>0$ and 0 otherwise, $D_p^k=\mathbf{1}\{E_p^k>0\}$. Observations with zero first-year enrollment are excluded. SE clustered by pre-treatment market.
+$^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.
+}
+
+\end{frame}
+
+%---------------------------------------------------------
+\begin{frame}[label=sua-es-log-entrant]
+
+\frametitle{
+    Log event studies: regions with entrant universities only
+    \hfill
+    \hyperlink{sua-fs-log-entrant}{\scriptsize\color{blue}$\leftarrow$ First stage}
+}
+
+\vspace{-0.12cm}
+
+\begin{columns}[T,onlytextwidth]
+    \begin{column}{0.495\textwidth}
+        \centering
+        \textbf{\scriptsize Field $\times$ year FE}
+
+        \includegraphics[width=\linewidth, height=0.66\textheight, keepaspectratio]{../../output/sua_log_event_study_baseline_entrant.png}
+    \end{column}
+    \begin{column}{0.495\textwidth}
+        \centering
+        \textbf{\scriptsize $+$ Region $\times$ year FE}
+
+        \includegraphics[width=\linewidth, height=0.66\textheight, keepaspectratio]{../../output/sua_log_event_study_regionyear_entrant.png}
+    \end{column}
+\end{columns}
+
+\vspace{0.04cm}
+
+\begin{center}
+\begin{minipage}{0.96\textwidth}
+\tiny
+\textit{Notes:}
+Sample restricted to incumbent programs in the four pre-treatment regions with entrant programs in 2009--2011 (Valpara\'iso, Biob\'io, La Araucan\'ia, Metropolitana); outside them exposure is zero by construction.
+Broad-field markets; separate event studies for Total, Triangular and Gaussian
+exposure. Plotted coefficients are those on the log-exposure $\times$ year terms, relative to 2011. 95\% confidence intervals; SE clustered by pre-treatment market.
+Joint pretrend $p$-values (2007--2010) for Total, Triangular and Gaussian are
+0.000, 0.018 and 0.021 in the left panel, and 0.015, 0.051 and 0.000 in the right panel.
+\end{minipage}
+\end{center}
+
+\end{frame}
+
+%---------------------------------------------------------
+\begin{frame}[label=sua-fs-log-positive]
+
+\frametitle{
+    Log first stage: positive exposure only
+    \hfill
+    \hyperlink{sua-log-first-stage}{\scriptsize\color{blue}$\leftarrow$ Main}
+    \hyperlink{sua-es-log-positive}{\scriptsize\color{blue}ES $\rightarrow$}
+}
+
+\centering
+
+\vspace{-0.2cm}
+
+{\small
+\begin{equation*}
+\log N^{\mathrm{first}}_{pt}
+=
+\beta_k\left[\log E_p^k\times Post_t\right]
++\mu_p+\alpha_{f(p),t}+\gamma_{r(p),t}+\varepsilon_{pt},
+\qquad E_p^k>0.
+\end{equation*}
+}
+
+\vspace{-0.3cm}
+
+\resizebox{0.62\textwidth}{!}{\input{../../output/tables/sua_fs_log_positive.tex}}
+
+\vspace{0.05cm}
+
+\parbox{0.97\textwidth}{%
+\tiny
+\textit{Notes:}
+Sample restricted to programs with positive exposure, defined separately for each measure (Triangular exposure can be zero where Total and Gaussian are positive). All such programs lie in the four regions with entrant programs, so the only difference with the entrant-region sample is that zero-exposure programs within those regions are dropped.
+Log first stage without zero-exposure programs, so $D_p^k\times Post_t$ equals $Post_t$ and is absorbed by the fixed effects. Observations with zero first-year enrollment are excluded. SE clustered by pre-treatment market.
+$^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.
+}
+
+\end{frame}
+
+%---------------------------------------------------------
+\begin{frame}[label=sua-es-log-positive]
+
+\frametitle{
+    Log event studies: positive exposure only
+    \hfill
+    \hyperlink{sua-fs-log-positive}{\scriptsize\color{blue}$\leftarrow$ First stage}
+}
+
+\vspace{-0.12cm}
+
+\begin{columns}[T,onlytextwidth]
+    \begin{column}{0.495\textwidth}
+        \centering
+        \textbf{\scriptsize Field $\times$ year FE}
+
+        \includegraphics[width=\linewidth, height=0.66\textheight, keepaspectratio]{../../output/sua_log_event_study_baseline_positive.png}
+    \end{column}
+    \begin{column}{0.495\textwidth}
+        \centering
+        \textbf{\scriptsize $+$ Region $\times$ year FE}
+
+        \includegraphics[width=\linewidth, height=0.66\textheight, keepaspectratio]{../../output/sua_log_event_study_regionyear_positive.png}
+    \end{column}
+\end{columns}
+
+\vspace{0.04cm}
+
+\begin{center}
+\begin{minipage}{0.96\textwidth}
+\tiny
+\textit{Notes:}
+Sample restricted to programs with positive exposure, defined separately for each measure (Triangular exposure can be zero where Total and Gaussian are positive). All such programs lie in the four regions with entrant programs, so the only difference with the entrant-region sample is that zero-exposure programs within those regions are dropped.
+Broad-field markets; separate event studies for Total, Triangular and Gaussian
+exposure. Plotted coefficients are those on the log-exposure $\times$ year terms, relative to 2011. 95\% confidence intervals; SE clustered by pre-treatment market.
+Joint pretrend $p$-values (2007--2010) for Total, Triangular and Gaussian are
+0.000, 0.029 and 0.022 in the left panel, and 0.009, 0.039 and 0.000 in the right panel.
+\end{minipage}
+\end{center}
+
+\end{frame}
+
+%---------------------------------------------------------
 \begin{frame}[label=sua-event-studies]
 
 \frametitle{
@@ -4425,6 +4532,683 @@ respectively, in the right panel.
 \end{frame}
 
 %---------------------------------------------------------
+\begin{frame}[label=sua-kd-event-studies]
+
+\frametitle{
+    Event studies: kernel-weighted denominator
+    \hfill
+    \hyperlink{sua-kd-first-stage}{\scriptsize\color{blue}$\leftarrow$ First stage}
+}
+
+\vspace{-0.12cm}
+
+\begin{columns}[T,onlytextwidth]
+    \begin{column}{0.495\textwidth}
+        \centering
+        \textbf{\scriptsize Field $\times$ year FE}
+
+        \includegraphics[width=\linewidth, height=0.66\textheight, keepaspectratio]{../../output/sua_event_study_exposure_comparison_baseline_kd.png}
+    \end{column}
+    \begin{column}{0.495\textwidth}
+        \centering
+        \textbf{\scriptsize $+$ Region $\times$ year FE}
+
+        \includegraphics[width=\linewidth, height=0.66\textheight, keepaspectratio]{../../output/sua_event_study_exposure_comparison_regionyear_kd.png}
+    \end{column}
+\end{columns}
+
+\vspace{0.04cm}
+
+\begin{center}
+\begin{minipage}{0.96\textwidth}
+\tiny
+\textit{Notes:}
+Triangular and Gaussian exposure use the kernel-weighted denominator; Total
+exposure is unchanged and shown for reference. Broad-field markets; separate
+event studies for each measure. Coefficients measure the enrollment difference associated with a 10 percentage-point increase in exposure in each year relative to 2011. 95\% confidence intervals; SE clustered
+by pre-treatment market. Joint pretrend $p$-values (2007--2010) for Total,
+Triangular KD and Gaussian KD are 0.024, 0.170 and 0.022 in the left panel, and
+0.285, 0.146 and 0.177 in the right panel.
+\end{minipage}
+\end{center}
+
+\end{frame}
+
+%---------------------------------------------------------
+\begin{frame}[label=sua-kd-log-event-studies]
+
+\frametitle{
+    Log event studies: kernel-weighted denominator
+    \hfill
+    \hyperlink{sua-kd-log-first-stage}{\scriptsize\color{blue}$\leftarrow$ Log first stage}
+}
+
+\vspace{-0.12cm}
+
+\begin{columns}[T,onlytextwidth]
+    \begin{column}{0.495\textwidth}
+        \centering
+        \textbf{\scriptsize Field $\times$ year FE}
+
+        \includegraphics[width=\linewidth, height=0.66\textheight, keepaspectratio]{../../output/sua_log_event_study_baseline_kd.png}
+    \end{column}
+    \begin{column}{0.495\textwidth}
+        \centering
+        \textbf{\scriptsize $+$ Region $\times$ year FE}
+
+        \includegraphics[width=\linewidth, height=0.66\textheight, keepaspectratio]{../../output/sua_log_event_study_regionyear_kd.png}
+    \end{column}
+\end{columns}
+
+\vspace{0.04cm}
+
+\begin{center}
+\begin{minipage}{0.96\textwidth}
+\tiny
+\textit{Notes:}
+Triangular and Gaussian exposure use the kernel-weighted denominator; Total
+exposure is unchanged and shown for reference. Broad-field markets; separate
+event studies for each measure. Plotted coefficients are those on the log-exposure $\times$ year terms, relative to 2011; $\mathbf{1}\{E>0\}\times$ year controls included. 95\% confidence intervals; SE clustered
+by pre-treatment market. Joint pretrend $p$-values (2007--2010) for Total,
+Triangular KD and Gaussian KD are 0.034, 0.171 and 0.133 in the left panel, and
+0.857, 0.056 and 0.0001 in the right panel.
+\end{minipage}
+\end{center}
+
+\end{frame}
+
+%---------------------------------------------------------
+\begin{frame}[label=sua-exposure-selectivity-trends]
+
+\frametitle{
+    SUA exposure and selectivity trends
+    \hfill
+    \hyperlink{sua-exposure-selectivity-es}{\scriptsize\color{blue}Event studies $\rightarrow$}
+}
+
+\centering
+
+\resizebox{0.6\textwidth}{!}{\input{../../output/tables/sua_fs_selectivity_trends.tex}}
+
+\vspace{0.05cm}
+
+\parbox{0.97\textwidth}{%
+\tiny
+\textit{Notes:}
+Panel A reproduces the region $\times$ year columns of the main
+(\hyperlink{sua-first-stage}{\color{blue}levels},
+\hyperlink{sua-log-first-stage}{\color{blue}logs}) and
+\hyperlink{sua-kd-first-stage}{\color{blue}kernel-denominator} first stages.
+Panel B adds fixed effects for deciles of the incumbent's 2009--2011 mean PSU
+score interacted with year. Weighted exposure is entrant share times
+conditional similarity, which falls with incumbent selectivity
+(\hyperlink{sua-q-selectivity-trends}{\color{blue}appendix}). Levels in 10
+percentage-point units; logs as in the main log first stage. SE clustered by
+pre-treatment market. $^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.
+}
+
+\end{frame}
+
+%---------------------------------------------------------
+\begin{frame}[label=sua-exposure-selectivity-es]
+
+\frametitle{
+    SUA exposure and selectivity trends: event studies
+    \hfill
+    \hyperlink{sua-exposure-selectivity-trends}{\scriptsize\color{blue}$\leftarrow$ Table}
+}
+
+\centering
+
+\vspace{-0.2cm}
+
+\includegraphics[width=0.92\textwidth]{../../output/sua_es_selectivity_trends.png}
+
+\vspace{0.02cm}
+
+\parbox{0.97\textwidth}{%
+\tiny
+\textit{Notes:}
+Broad-field levels event studies of first-year enrollment on
+$10\times E_p\times\mathbf{1}\{t=s\}$, 2011 omitted. Blue circles: program,
+field $\times$ year and region $\times$ year fixed effects. Red diamonds: adding
+selectivity-decile $\times$ year fixed effects. 95\% confidence intervals; SE
+clustered by pre-treatment market. Joint 2007--2010 pretrend $p$-values
+(blue / red): Total 0.285 / 0.385; Triangular 0.385 / 0.836; Gaussian
+0.368 / 0.592; Triangular KD 0.146 / 0.219; Gaussian KD 0.177 / 0.055.
+Mean 2012--16 coefficient (blue / red): Triangular $-3.34$ / $-0.19$;
+Gaussian $-1.70$ / $0.19$.
+}
+
+\end{frame}
+
+%---------------------------------------------------------
+\begin{frame}{Decomposing weighted exposure}
+
+\scriptsize
+\setlength{\abovedisplayskip}{3pt}
+\setlength{\belowdisplayskip}{3pt}
+
+%---------------------------------------------------------
+% ORIGINAL EXPOSURE AND EXACT DECOMPOSITION
+%---------------------------------------------------------
+\begin{center}
+\resizebox{0.75\textwidth}{!}{
+$
+\displaystyle
+\underbrace{
+E_p^k
+=
+\frac{
+\sum_{q\in\mathcal E_{m(p)}}
+k\!\left(|S_p-S_q|\right)N_q
+}{
+\sum_{\ell\in m(p)}N_\ell
+}
+}_{\substack{
+\text{Direct construction}\\
+\text{of weighted exposure}
+}}
+\quad\equiv\quad
+\begin{gathered}
+E_p^k
+=
+\left[
+\frac{
+\sum_{q\in\mathcal E_{m(p)}}N_q
+}{
+\sum_{\ell\in m(p)}N_\ell
+}
+\right]
+\left[
+\frac{
+\sum_{q\in\mathcal E_{m(p)}}
+k\!\left(|S_p-S_q|\right)N_q
+}{
+\sum_{q\in\mathcal E_{m(p)}}N_q
+}
+\right]
+\\[0.18cm]
+E_p^k
+=
+\underbrace{
+M_{m(p)}
+}_{\substack{
+\text{entrant}\\
+\text{market share}
+}}
+\;\times\;
+\underbrace{
+Q_p^k
+}_{\substack{
+\text{similarity}\\
+\text{with entrants}
+}}
+\end{gathered}
+$
+}
+\end{center}
+
+\vspace{0.05cm}
+
+%---------------------------------------------------------
+% COMPONENTS OF THE DECOMPOSITION
+%---------------------------------------------------------
+
+\begin{columns}[T,onlytextwidth]
+
+\begin{column}{0.47\textwidth}
+
+\textbf{Entrant presence}
+
+\tiny
+\[
+M_m
+=
+\frac{
+\sum_{q\in\mathcal E_m}N_q
+}{
+\sum_{\ell\in m}N_\ell
+}.
+\]
+
+\tiny
+\(M_m\) is the entrant share of total market enrollment. It captures the
+\textbf{size of entrant presence} and is common to all incumbent programs
+in market \(m\).
+
+\end{column}
+
+\begin{column}{0.50\textwidth}
+
+\textbf{Conditional similarity}
+
+\tiny
+\[
+Q_p^k
+=
+\frac{
+\sum_{q\in\mathcal E_m}
+k\!\left(|S_p-S_q|\right)N_q
+}{
+\sum_{q\in\mathcal E_m}N_q
+}.
+\]
+
+\tiny
+\(Q_p^k\) is the entrant-enrollment-weighted PSU similarity between incumbent
+\(p\) and the entrant programs in its market. It is higher when larger
+entrants have PSU profiles closer to that of \(p\).
+Conditional on entrant presence, it captures \textbf{competitive proximity}
+rather than the overall size of entry.
+
+\end{column}
+
+\end{columns}
+
+\vspace{0.06cm}
+
+%---------------------------------------------------------
+% FIRST STAGE USING Q
+%---------------------------------------------------------
+
+\textbf{Using similarity as the independent variable}
+
+\tiny
+\[
+N^{\mathrm{first}}_{pt}
+=
+\beta_k
+\left[
+Q_p^k\times Post_t
+\right]
++\mu_p+\alpha_{f(p),t}+\gamma_{r(p),t}
++\varepsilon_{pt},
+\qquad M_{m(p)}>0.
+\]
+
+\tiny
+The sample is restricted to markets with positive entrant presence.
+Program fixed effects absorb time-invariant differences across incumbents,
+while Broad-field \(\times\) year and pre-treatment region \(\times\) year
+fixed effects absorb common field-specific and regional shocks over time.
+The model therefore asks whether, among incumbents in exposed markets,
+programs whose pre-treatment PSU profiles are more similar to the entrants
+experience different post-2012 enrollment changes.
+Unlike \(E_p^k\), which combines entrant market share and similarity,
+\(Q_p^k\) isolates the \textbf{similarity component} of exposure.
+The coefficient \(\beta_k\) measures the differential post-2012 enrollment
+change associated with a 0.10 increase in entrant-enrollment-weighted PSU
+similarity.
+
+\end{frame}
+
+%---------------------------------------------------------
+\begin{frame}[label=sua-q-main]
+
+\frametitle{Distribution of conditional similarity measures}
+
+\centering
+
+\includegraphics[ width=0.84\textwidth, height=0.64\textheight, keepaspectratio ]{../../output/sua_q_distributions_combined.png}
+
+\vspace{-0.10cm}
+
+
+\begin{itemize}
+\tiny  
+\setlength{\itemsep}{2pt}
+
+\item Each incumbent program appears once. The horizontal axis reports
+conditional similarity $Q$ in percentage points and the vertical axis
+the share of programs.
+
+\item The upper row includes all exposed programs, while the lower row
+excludes zeros and shows the distribution conditional on positive $Q$.
+
+\item Triangular similarity is concentrated at relatively low values and
+contains a relevant mass near zero. Gaussian similarity is more
+dispersed and shifted toward higher values, indicating a less restrictive
+measure of similarity across exposed markets.
+
+\end{itemize}
+
+\end{frame}
+
+%---------------------------------------------------------
+\begin{frame}[label=sua-similarity-first-stage]
+
+\frametitle{
+Similarity within exposed markets
+\hfill
+\hyperlink{sua-similarity-event-studies}{
+\scriptsize\color{blue}
+Event studies $\rightarrow$
+}
+}
+
+\scriptsize
+\setlength{\abovedisplayskip}{3pt}
+\setlength{\belowdisplayskip}{3pt}
+
+\textbf{Common fixed-effects specification}
+
+
+\begin{center}
+\resizebox{1\textwidth}{!}{
+$
+\begin{gathered}
+\begin{aligned}
+N^{\mathrm{first}}_{pt}
+&=
+\beta_k
+\left[
+Q_p^k\times Post_t
+\right]
++\mu_p+\alpha_{f(p),t}
++\gamma_{r(p),t}
++\varepsilon_{pt},
+\end{aligned}
+\qquad
+\begin{aligned}
+\log N^{\mathrm{first}}_{pt}
+&=
+\delta_k
+\left[
+\widetilde{\log Q_p^k}\times Post_t
+\right]
++
+\theta_k
+\left[
+D_p^k\times Post_t
+\right]
++\mu_p+\alpha_{f(p),t}
++\gamma_{r(p),t}
++\varepsilon_{pt},
+\end{aligned}
+\\[-0.02cm]
+\widetilde{\log Q_p^k}
+=
+\begin{cases}
+\log(Q_p^k), & Q_p^k>0,\\
+0, & Q_p^k=0,
+\end{cases}
+\qquad
+D_p^k=\mathbf{1}\{Q_p^k>0\},
+\qquad
+M_m>0.
+\end{gathered}
+$
+}
+\end{center}
+
+\vspace{0.06cm}
+
+\begin{table}
+\centering
+\tiny
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.05}
+
+\resizebox{0.70\textwidth}{!}{
+\begin{tabular}{lcccc}
+\toprule
+&
+\multicolumn{2}{c}{Levels}
+&
+\multicolumn{2}{c}{Logs}
+\\
+\cmidrule(lr){2-3}
+\cmidrule(lr){4-5}
+
+&
+Triangular
+&
+Gaussian
+&
+Triangular
+&
+Gaussian
+\\
+\midrule
+
+Similarity term $\times$ Post
+& $-2.381^{***}$
+& $-2.241^{***}$
+& $-0.067^{***}$
+& $-0.142^{***}$
+\\
+
+&
+$(0.491)$
+&
+$(0.487)$
+&
+$(0.020)$
+&
+$(0.035)$
+\\
+
+Wald $F$
+& 23.50
+& 21.18
+& 11.37
+& 16.29
+\\
+
+Observations
+& 5,009
+& 5,009
+& 5,009
+& 5,009
+\\
+
+Programs
+& 591
+& 591
+& 591
+& 591
+\\
+
+Markets
+& 36
+& 36
+& 36
+& 36
+\\
+
+\bottomrule
+\end{tabular}
+}
+
+\vspace{0.08cm}
+
+\parbox{0.94\textwidth}{
+\tiny
+\textit{Notes:}
+In levels, a 0.10 increase in conditional similarity is associated with
+approximately 2.2--2.4 fewer first-year students after 2012.
+In logs, a 10\% increase in similarity is associated with approximately
+0.67\% lower enrollment under the triangular measure and 1.42\% lower
+enrollment under the Gaussian measure.
+The sample is restricted to markets with positive entrant presence,
+$M_m>0$. Levels retain economically meaningful observations with $Q_p^k=0$.
+In logs, zero-similarity observations are also retained by setting
+$\widetilde{\log Q_p^k}=0$ when $Q_p^k=0$ and including
+$D_p^k\times Post_t$ separately. The coefficient on this indicator is not
+reported. Gaussian similarity is strictly positive in the exposed-market
+sample, so the corresponding indicator is absorbed by the fixed effects.
+All regressions absorb program, Broad-field $\times$ year, and
+pre-treatment region $\times$ year fixed effects.
+Standard errors clustered by pre-treatment market are in parentheses.
+Event studies reject the absence of differential pre-treatment trends,
+so estimates are interpreted as descriptive rather than causal.
+$^{***}p<0.01$.
+}
+
+\end{table}
+
+\end{frame}
+
+%---------------------------------------------------------
+\begin{frame}[label=sua-q-selectivity-trends]
+
+\frametitle{
+    Conditional similarity and selectivity trends
+    \hfill
+    \hyperlink{sua-q-selectivity-es}{\scriptsize\color{blue}Event studies $\rightarrow$}
+}
+
+\scriptsize
+
+Within a market, entrants sit in a given PSU range, so $Q_p^k$ is largely a
+function of the incumbent's own selectivity $S_p$: it falls monotonically from
+the lowest to the highest $S_p$ decile (Triangular 0.35 to 0.04; Gaussian 0.68
+to 0.17). $S_p$ and $S_p^2$ explain 25\% (Triangular) and 47\% (Gaussian) of
+its variance, and 59\% and 77\% with market fixed effects.
+
+\vspace{0.1cm}
+
+\centering
+\resizebox{0.92\textwidth}{!}{\input{../../output/tables/sua_q_selectivity_trends.tex}}
+
+\vspace{0.08cm}
+
+\parbox{0.97\textwidth}{%
+\tiny
+\textit{Notes:}
+Broad-field markets with entrant presence ($M_m>0$); 591 programs, 36 markets.
+All regressions include program fixed effects. The first row reproduces the
+\hyperlink{sua-similarity-first-stage}{\color{blue}main similarity table}.
+Selectivity deciles are deciles of $S_p$, the incumbent's 2009--2011 mean PSU score, across programs.
+Levels: effect of a 0.10 increase in $Q$; logs: $\widetilde{\log Q}\times Post$
+with $\mathbf{1}\{Q>0\}\times Post$. Event-study columns report the joint
+2007--2010 pretrend $p$-value of the levels event study. SE clustered by
+pre-treatment market. $^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.
+}
+
+\end{frame}
+
+%---------------------------------------------------------
+\begin{frame}[label=sua-q-selectivity-es]
+
+\frametitle{
+    Conditional similarity: event studies with selectivity trends
+    \hfill
+    \hyperlink{sua-q-selectivity-trends}{\scriptsize\color{blue}$\leftarrow$ Table}
+}
+
+\centering
+
+\includegraphics[width=\textwidth]{../../output/sua_q_event_study_selectivity_trends.png}
+
+\vspace{0.1cm}
+
+\parbox{0.97\textwidth}{%
+\tiny
+\textit{Notes:}
+Levels event studies of first-year enrollment on $10\times Q_p^k\times\mathbf{1}\{t=s\}$,
+2011 omitted, with program, Broad-field $\times$ year and region $\times$ year
+fixed effects (blue), and additionally selectivity-decile $\times$ year fixed
+effects (red). 95\% confidence intervals; SE clustered by pre-treatment market.
+Under the base specification the coefficient declines steadily from 2007, so
+the post-2012 gap continues a pre-existing trend. Once selectivity trends are
+absorbed the path is flat before and after 2012 (pretrend $p$ = 0.785 and
+0.631).
+}
+
+\end{frame}
+
+%---------------------------------------------------------
+\begin{frame}[label=sua-q-heterogeneity]
+
+\frametitle{Conditional similarity: heterogeneity by incumbent selectivity}
+
+\centering
+
+\begin{table}
+\centering
+\tiny
+\setlength{\tabcolsep}{4.5pt}
+\renewcommand{\arraystretch}{0.95}
+
+\begin{tabular}{lcccccc}
+\toprule
+& \multicolumn{2}{c}{PSU $<550$}
+& \multicolumn{2}{c}{PSU $550$--$649$}
+& \multicolumn{2}{c}{PSU $\geq650$} \\
+\cmidrule(lr){2-3}
+\cmidrule(lr){4-5}
+\cmidrule(lr){6-7}
+& Tri.
+& Gau.
+& Tri.
+& Gau.
+& Tri.
+& Gau. \\
+\midrule
+
+\multicolumn{7}{l}{\textit{Conditional similarity $Q$}} \\[2pt]
+
+Coefficient
+& $-1.95^{*}$
+& $-3.26$
+& $-2.20^{***}$
+& $-2.17^{***}$
+& $-5.70$
+& $-3.48$ \\
+
+& $(0.93)$
+& $(1.96)$
+& $(0.48)$
+& $(0.37)$
+& $(4.24)$
+& $(3.15)$ \\
+
+$F$-statistic
+& 4.40
+& 2.77
+& 21.27
+& 34.14
+& 1.80
+& 1.22 \\
+
+
+Observations
+& \multicolumn{2}{c}{836}
+& \multicolumn{2}{c}{2,932}
+& \multicolumn{2}{c}{1,038} \\
+
+Programs
+& \multicolumn{2}{c}{104}
+& \multicolumn{2}{c}{339}
+& \multicolumn{2}{c}{128} \\
+
+Clusters
+& \multicolumn{2}{c}{15}
+& \multicolumn{2}{c}{28}
+& \multicolumn{2}{c}{16} \\
+
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{-0.05cm}
+
+\parbox{0.95\textwidth}{
+\tiny
+\textit{Notes:}
+Standard errors clustered by pre-treatment market in parentheses.
+All regressions include program and market$\times$year FE and are restricted
+to exposed markets. Coefficients correspond to a 0.10 increase in conditional
+similarity. The same split for SUA exposure is in the
+\hyperlink{sua-selectivity-heterogeneity}{\color{blue}main text}.
+$^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
+}
+
+\end{frame}
+
+%---------------------------------------------------------
 \begin{frame}[label=sua-similarity-event-studies]
 
 \frametitle{
@@ -4488,6 +5272,9 @@ associations rather than causal effects.
 }
 
 \end{frame}
+
+%---------------------------------------------------------
+
 
 %---------------------------------------------------------
 % COSINE EXPOSURE DISTRIBUTIONS: POSITIVE ONLY

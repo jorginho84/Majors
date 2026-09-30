@@ -75,7 +75,31 @@ OUTPUTS
     2. Region-year event-study figure in PNG and PDF.
 
 No permanent event-study results dataset or Excel file is created.
+
+
+OPTIONAL SAMPLE ARGUMENT
+
+    do code/Sua/05a_sua_log_event_studies.do [entrant|positive]
+
+    (none)    full sample (default)
+    entrant   regions with entrant programs in 2009-2011 only
+    positive  programs with positive exposure only, for each measure
+    kd        full sample; Triangular and Gaussian exposure use the
+              kernel-weighted denominator (03d). Total is unchanged.
+
+Other options write their figures with the suffix _entrant, _positive or _kd.
+With positive exposure only, the 1(E>0) x year controls equal the year
+dummies and are absorbed by the fixed effects.
 *******************************************************************************/
+
+args sample
+
+if !inlist("`sample'", "", "entrant", "positive", "kd") {
+    display as error "Unknown sample: `sample'"
+    exit 198
+}
+
+local sfx = cond("`sample'" == "", "", "_`sample'")
 
 clear all
 set more off
@@ -109,11 +133,16 @@ if _rc {
 local input_panel ///
     "$processed/sua_incumbent_panel_w_broad_area_region_2007_2016.dta"
 
+if "`sample'" == "kd" {
+    local input_panel ///
+        "$processed/sua_incumbent_panel_kd_broad_area_region_2007_2016.dta"
+}
+
 local graph_baseline ///
-    "$output/sua_log_event_study_baseline"
+    "$output/sua_log_event_study_baseline`sfx'"
 
 local graph_regionyear ///
-    "$output/sua_log_event_study_regionyear"
+    "$output/sua_log_event_study_regionyear`sfx'"
 
 
 /*******************************************************************************
@@ -121,6 +150,11 @@ local graph_regionyear ///
 *******************************************************************************/
 
 use "`input_panel'", clear
+
+if "`sample'" == "kd" {
+    replace exp_tri50 = exp_tri50kd
+    replace exp_gau50 = exp_gau50kd
+}
 
 keep if ///
     inrange(ao_proceso, 2007, 2016)
@@ -176,6 +210,48 @@ drop ///
     has_post
 
 assert _N > 0
+
+
+/*
+Optional sample restriction.
+
+entrant:  keep the pre-treatment regions with entrant programs in 2009-2011.
+positive: applied in each regression, since the set of programs with positive
+          exposure differs across measures.
+*/
+
+if "`sample'" == "entrant" {
+
+    bysort geo_pre: ///
+        egen byte entrant_region = ///
+            max(has_entrant)
+
+    keep if ///
+        entrant_region == 1
+
+    levelsof geo_pre, local(kept_regions)
+    assert "`kept_regions'" == "5 8 9 13"
+}
+
+local sample_note ""
+
+local note_zero "Zero exposure retained; D x year controls included and not plotted."
+
+if "`sample'" == "positive" {
+    local note_zero "Zero-exposure programs excluded; D x year controls absorbed by the fixed effects."
+}
+
+if "`sample'" == "entrant" {
+    local sample_note "; entrant regions only"
+}
+
+if "`sample'" == "positive" {
+    local sample_note "; positive exposure only"
+}
+
+if "`sample'" == "kd" {
+    local sample_note "; kernel-weighted denominator"
+}
 
 
 /*******************************************************************************
@@ -554,6 +630,12 @@ foreach specification in ///
         11.3 EVENT-STUDY REGRESSION
         ***********************************************************************/
 
+        local sample_condition ""
+
+        if "`sample'" == "positive" {
+            local sample_condition "if positive_`exposure_measure' == 1"
+        }
+
         reghdfe ///
             ln_enrollment ///
             es_`exposure_measure'_2007 ///
@@ -573,7 +655,8 @@ foreach specification in ///
             D_`exposure_measure'_2013 ///
             D_`exposure_measure'_2014 ///
             D_`exposure_measure'_2015 ///
-            D_`exposure_measure'_2016, ///
+            D_`exposure_measure'_2016 ///
+            `sample_condition', ///
             absorb( ///
                 `absorbed_effects' ///
             ) ///
@@ -1184,7 +1267,7 @@ foreach specification in ///
             color(black) ///
         ) ///
         subtitle( ///
-            "`figure_subtitle'", ///
+            "`figure_subtitle'`sample_note'", ///
             size(small) ///
             color(gs6) ///
         ) ///
@@ -1203,7 +1286,7 @@ foreach specification in ///
             size(small) ///
         ) ///
         note( ///
-            "Zero exposure retained; D x year controls included and not plotted." ///
+            "`note_zero'" ///
             "95% confidence intervals; standard errors clustered by pre-treatment market." ///
             "Joint pretrend p-values: Total = `total_p'; Triangular = `triangular_p'; Gaussian = `gaussian_p'.", ///
             size(vsmall) ///
