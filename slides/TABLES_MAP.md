@@ -6,6 +6,10 @@ replacing hardcoded tables with generated `.tex` fragments under `output/`.
 
 Line numbers refer to the deck before the Design III frames were added.
 
+**Design numbering (2026-10-05, issue #3):** the deck now runs I (inframarginal) → II (own
+sudden expansions, new) → III (SUA, formerly II) → IV (competitor vacancy shocks, formerly III).
+Rows below written before that date use the old names.
+
 **Emission today:** no SUA, cosine or inframarginal script writes `.tex`. SUA and cosine
 scripts only `list` results to the log; inframarginal scripts `postfile` to csv/dta in
 `$processed`. The RDD-by-field scripts (`04_rdd/03`, `07`) already write `.tex`, and so do
@@ -46,7 +50,15 @@ the four orphan files in `output/tables/` (committed in a91f9e5 with no generati
 | 3374 | Cosine first stage | `Sua/Cosine/03_cosine_estimate_first_stages.do:517-700` | log only |
 | 3598 | Non-harmonized fields | `02_build/05_build_field.do:403-418` | log only; Years column and 0.095% done by hand |
 
+| Design II frames | Own sudden expansions: thresholds, TWFE/CS, composition, threshold robustness | `Own_expansion/02_own_expansion.do` (needs `01`, `Vacancy_shocks/03`) | `output/own_expansion/tables/oe_{thresholds,twfe_enroll,twfe_comp,threshold_sens}.tex` (`\input`); figures `oe_dV_hist_sel`, `oe_es_*_sel` |
+| Design IV, selective vs selective | Exposure moments, levels/log first stages, composition, event study | `Own_expansion/03_selective_competitors.do` (needs `02`) | `output/own_expansion/tables/oe_sel_{exposure_moments,fs_N_first,fs_lnN,composition}.tex` (`\input`); figure `oe_sel_es_N_first` |
+| Composition Effects section | Designs I, III, IV with entrant composition outcomes | `Own_expansion/04_composition_designs.do` (needs `01`, `02`) | `output/own_expansion/tables/oe_comp_{design1,sua,vs}.tex` (`\input`); figures `oe_comp_sua_es_c_psu_mean`, `oe_comp_vs_es_c_psu_mean` |
+
 ## Blocking inputs
+
+- `admission_rank_inframarginal_2007_2016.dta` — input to `Inframarginals/21b` and `21c`; **no
+  producer in the repo** and not on the server. Blocks the inframarginal outcome of Design II
+  (issue #3).
 
 - **Oferta Académica** Excel files (`$demre_raw/Postulacion/OfertaAcadémica_Admisión<year>.xlsx`)
   — feed `13_build_program_year_vacancies.do` → inframarginal design I (21b, 21c, 28b).

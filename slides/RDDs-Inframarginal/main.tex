@@ -1737,6 +1737,150 @@ UBB
 
 \subsection{Inframarginal Design No. 2}
 %=========================================================
+% DESIGN II: OWN SUDDEN VACANCY EXPANSIONS (issue #3)
+%=========================================================
+\begin{frame}{Design II: what happens when a selective program expands its seats?}
+\scriptsize
+\textbf{Research question}
+
+When a selective program suddenly increases its regular-admission vacancies, what happens to
+(a) its own first-year enrollment, (b) the composition of its entering cohort, and
+(c) the outcomes of its inframarginal students?
+
+\vspace{0.10cm}
+\textbf{Approach}
+\begin{itemize}
+    \item A simple DiD built on Design I, but with a \emph{binary} treatment: a large, sudden own expansion.
+    \item Design I uses every year-to-year change in vacancies, most of which are small and routine.
+    Here, identification comes from discrete capacity decisions, and the event study makes pre-trends testable.
+    \item The shock is the program's own decision, so it is not exogenous to its demand. Leads in the event study are the main diagnostic.
+\end{itemize}
+
+\vspace{0.06cm}
+\textbf{Sample}
+\begin{itemize}
+    \item Incumbent program $\times$ admission-year panel, 2007--2016 (programs with 2007--2009 entrants; SUA entrants excluded): 796 programs.
+    \item \textbf{Selective programs}: top 20\% of 2007--2009 mean entrant PSU (predetermined; cutoff 633.6 points). 169 programs.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design II: distribution of vacancy changes, selective programs}
+\centering
+\includegraphics[width=0.85\textwidth, height=0.36\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_dV_hist_sel.pdf}
+
+\vspace{0.05cm}
+\tiny
+\resizebox{0.78\textwidth}{!}{\input{../../output/own_expansion/tables/oe_thresholds.tex}}
+
+\vspace{0.05cm}
+\begin{itemize}\scriptsize
+    \setlength{\itemsep}{0pt}
+    \item \textbf{Large change} = Design IV shock: top 20\% of positive $\Delta\log V$ ($\ge +33\%$; many increases sit exactly there) and sudden.
+    \item Only 20 selective programs are ever treated. The top 25\% and top 10\% thresholds serve as robustness checks.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design II: construction of variables and models}
+\scriptsize
+\setlength{\abovedisplayskip}{2pt}
+\setlength{\belowdisplayskip}{2pt}
+\textbf{Treatment}
+\begin{itemize}
+    \item $\text{shock}_{pt}=1$ if $\Delta\log V_{pt}$ is in the top 20\% of positive changes, $V_{p,t-2}$ is observed, $p$ was not shocked in $t-1$,
+    and the increase is not reversed in $t+1$. Shocks are dated 2010--2016 (identical to Design IV's source shocks).
+    \item $g_p$: first shock year (staggered). $\text{Post}_{pt}=\mathbf 1\{t\ge g_p\}$, absorbing.
+\end{itemize}
+
+\textbf{Outcomes}: regular vacancies $V_{pt}$ (mechanical check), first-year enrollment $N_{pt}$ (Formulario D), and composition of entrants.
+
+\vspace{0.08cm}
+\textbf{(1) TWFE}
+\[
+y_{pt}=\beta\,\text{Post}_{pt}+\mu_p+\alpha_{f(p),t}+\gamma_{r(p),t}+\varepsilon_{pt}
+\]
+\textbf{(2) Event study}
+\[
+y_{pt}=\sum_{\ell\neq-1}b_\ell\,\mathbf 1\{t-g_p=\ell\}+\mu_p+\alpha_{f(p),t}+\gamma_{r(p),t}+e_{pt},\qquad \ell\in\{\le-5,\dots,\ge4\}
+\]
+\textbf{(3) Callaway \& Sant'Anna}: never treated only, and not yet treated plus never treated. Balanced panel.
+
+\vspace{0.05cm}
+\begin{itemize}
+    \item SE clustered by program. Specification (1) in the tables also includes a version with program and year FE only.
+    \item Inframarginal outcome (graduation of inframarginal students): \textbf{pending}. The Design I rank file
+    (\texttt{admission\_rank\_inframarginal\_2007\_2016.dta}) has no builder in the repository.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design II: results, own enrollment}
+\centering
+\tiny
+\resizebox{0.80\textwidth}{!}{\input{../../output/own_expansion/tables/oe_twfe_enroll.tex}}
+
+\vspace{0.05cm}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.48\textwidth}
+\centering
+\includegraphics[width=\linewidth, height=0.36\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_es_N_first_sel.pdf}
+\end{column}
+\begin{column}{0.48\textwidth}
+\centering
+\includegraphics[width=\linewidth, height=0.36\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_es_lnN_sel.pdf}
+\end{column}
+\end{columns}
+
+\parbox{0.97\textwidth}{\tiny
+\textit{Notes:} TWFE (1): program and year FE. TWFE (2): program, field $\times$ year and region $\times$ year FE.
+CS: Callaway--Sant'Anna simple ATT. SE clustered by program. Event studies: selective programs.
+\sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$.
+After a sudden expansion, selective programs add about 21 seats and 18 entrants (pass-through $\approx 0.87$, $+34$ log points),
+with flat leads (TWFE joint-leads $p=0.74$).}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design II: composition of the entering cohort}
+\centering
+\tiny
+\resizebox{0.90\textwidth}{!}{\input{../../output/own_expansion/tables/oe_twfe_comp.tex}}
+
+\vspace{0.05cm}
+\parbox{0.97\textwidth}{\tiny
+\textit{Notes:} As in the previous table. Shares are in percentage points. Last admitted = lowest application score among regular admits.
+Income is not available in the data (Formulario A has no income; the socioeconomic questionnaire is not in \texttt{data/}),
+so school dependency is the SES proxy.}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design II: composition event studies and threshold robustness}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.50\textwidth}
+\centering
+\includegraphics[width=\linewidth, height=0.40\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_es_c_psu_mean_sel.pdf}
+
+\includegraphics[width=\linewidth, height=0.40\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_es_c_psu_last_sel.pdf}
+\end{column}
+\begin{column}{0.48\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/own_expansion/tables/oe_threshold_sens.tex}}
+
+\vspace{0.2cm}
+\begin{itemize}\scriptsize
+    \setlength{\itemsep}{2pt}
+    \item Mean entrant PSU falls by 6--9 points (about 0.15 SD of program-year means), with flat leads.
+    \item The PSU of the last admitted shows no significant change, but the estimate is imprecise (SE $\approx 6$ points), so a fall of the size of the mean effect cannot be ruled out.
+    \item Results are robust to the top 25\% and top 10\% shock definitions.
+    \item The table uses full FE (program, field $\times$ year, region $\times$ year).
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+\subsection{Inframarginal Design No. 3}
+%=========================================================
 % SUA: ENTRY OF PRIVATE UNIVERSITIES
 %========================================================
 %---------------------------------------------------------
@@ -3359,9 +3503,9 @@ in 2011. $^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.
 
 
 %--------------------------------------------------------
-\subsection{Inframarginal Design No. 3}
+\subsection{Inframarginal Design No. 4}
 %--------------------------------------------------------
-\begin{frame}{Design III: sudden vacancy expansions at competing programs}
+\begin{frame}{Design IV: sudden vacancy expansions at competing programs}
 \scriptsize
 \textbf{Research question}
 
@@ -3388,14 +3532,14 @@ when those programs are closer competitors of $k$?
 \vspace{0.06cm}
 \textbf{Exposure design}
 \begin{itemize}
-    \item Same similarity measures as Design II: region $\times$ field markets (Broad, ISCED-97, Generic),
+    \item Same similarity measures as Design III: region $\times$ field markets (Broad, ISCED-97, Generic),
     Total, Triangular and Gaussian PSU kernels, and cosine similarity of PSU distributions.
-    \item Unlike Design II, exposure varies over time: it accumulates the seats added by competitor shocks since 2010.
+    \item Unlike Design III, exposure varies over time: it accumulates the seats added by competitor shocks since 2010.
 \end{itemize}
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Design III: distribution of vacancy changes}
+\begin{frame}{Design IV: distribution of vacancy changes}
 \centering
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.52\textwidth}
@@ -3416,7 +3560,7 @@ when those programs are closer competitors of $k$?
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Design III: where are the shocks?}
+\begin{frame}{Design IV: where are the shocks?}
 \centering
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.62\textwidth}
@@ -3440,7 +3584,7 @@ when those programs are closer competitors of $k$?
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Design III: construction of the exposure measures}
+\begin{frame}{Design IV: construction of the exposure measures}
 \footnotesize
 \setlength{\abovedisplayskip}{3pt}
 \setlength{\belowdisplayskip}{3pt}
@@ -3463,7 +3607,7 @@ E^{w}_{kt}=100\times\frac{\sum_{j\in m(k),\,j\neq k} w(k,j)\,\text{seats}_{jt}}{
 \]
 
 \vspace{-0.05cm}
-\textbf{3. Weights, as in Design II ($S$ = mean entrant PSU, 2007--2009; $h=50$)}
+\textbf{3. Weights, as in Design III ($S$ = mean entrant PSU, 2007--2009; $h=50$)}
 \[
 w^{\mathrm{Total}}=1,
 \qquad
@@ -3477,12 +3621,12 @@ w^{\mathrm{Gau}}=\exp\!\left[-\tfrac12\left(\tfrac{|S_k-S_j|}{h}\right)^2\right]
 \setlength{\itemsep}{0pt}
     \item Total exposure: competitor seats added in $k$'s market, in percentage points of the market's pre-period enrollment.
     \item Kernels give more weight to shocks at programs with similar selectivity, so exposure varies within a market.
-    \item $\text{cum}E_{kt}$ is the time-varying analogue of $E_p\times Post_t$ in Design II. For programs created after 2009, $S_j$ uses their first three cohorts.
+    \item $\text{cum}E_{kt}$ is the time-varying analogue of $E_p\times Post_t$ in Design III. For programs created after 2009, $S_j$ uses their first three cohorts.
 \end{itemize}
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Design III: samples and descriptive statistics}
+\begin{frame}{Design IV: samples and descriptive statistics}
 \centering
 \tiny
 \textit{Panel A: Analytical samples}
@@ -3505,7 +3649,7 @@ enrollment, including zero-exposure programs. Kernels use a 50-point PSU bandwid
 
 %--------------------------------------------------------
 \begin{frame}[label=vs-exposure-main]
-\frametitle{Design III: distribution of exposure measures
+\frametitle{Design IV: distribution of exposure measures
 \hfill
 \hyperlink{vs-exposure-appendix}{\scriptsize\color{blue}Alternative fields $\rightarrow$}}
 \centering
@@ -3522,12 +3666,12 @@ enrollment, including zero-exposure programs. Kernels use a 50-point PSU bandwid
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Design III: models to estimate}
+\begin{frame}{Design IV: models to estimate}
 \scriptsize
 \setlength{\abovedisplayskip}{1pt}
 \setlength{\belowdisplayskip}{1pt}
 
-\textbf{(1) TWFE, levels} (mirror of the Design II first stage)
+\textbf{(1) TWFE, levels} (mirror of the Design III first stage)
 
 \centerline{\resizebox{0.72\textwidth}{!}{$N^{\mathrm{first}}_{kt}=\pi_w\,\text{cum}E^{w}_{kt}+\delta\,\text{Own}_{kt}+\mu_k+\alpha_{f(k),t}+\gamma_{r(k),t}+\nu_{kt}$}}
 
@@ -3559,7 +3703,7 @@ enrollment, including zero-exposure programs. Kernels use a 50-point PSU bandwid
 
 %--------------------------------------------------------
 \begin{frame}[label=vs-first-stage]
-\frametitle{Design III: exposure to competitor vacancy shocks
+\frametitle{Design IV: exposure to competitor vacancy shocks
 \hfill
 \hyperlink{vs-event-studies-mkt}{\scriptsize\color{blue}Event studies $\rightarrow$}}
 \centering
@@ -3581,7 +3725,7 @@ Coefficients are positive and mostly insignificant: no evidence that competitor 
 
 %--------------------------------------------------------
 \begin{frame}[label=vs-log-first-stage]
-\frametitle{Design III: log-log specification
+\frametitle{Design IV: log-log specification
 \hfill
 \hyperlink{vs-event-studies-mkt}{\scriptsize\color{blue}Event studies $\rightarrow$}}
 \centering
@@ -3603,7 +3747,7 @@ are excluded. All elasticities are below 0.035 in absolute value.}
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Design III: kernel-weighted denominator}
+\begin{frame}{Design IV: kernel-weighted denominator}
 \footnotesize
 \setlength{\abovedisplayskip}{3pt}
 \setlength{\belowdisplayskip}{3pt}
@@ -3616,7 +3760,7 @@ E^{w,KD}_{kt}=100\times\frac{\sum_{j\in m(k),\,j\neq k} w(k,j)\,\text{seats}_{jt
 \scriptsize
 \setlength{\itemsep}{1pt}
     \item Same numerator as before; the denominator is now the enrollment of programs with similar selectivity to $k$,
-    not total market enrollment. As in the Design II kernel-denominator measure: for a selective $k$, the relevant
+    not total market enrollment. As in the Design III kernel-denominator measure: for a selective $k$, the relevant
     market is the selective programs in $m(k)$.
     \item The measure keeps the scale of the shock (unlike $Q$) and lets its relevance depend on $k$'s position in the market.
 \end{itemize}
@@ -3636,7 +3780,7 @@ generate extreme values: the maximum is below that of Total exposure in the Broa
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Design III: results with kernel-weighted denominator}
+\begin{frame}{Design IV: results with kernel-weighted denominator}
 \centering
 \tiny
 \textit{Levels: first-year enrollment, 10 pp units}
@@ -3653,13 +3797,13 @@ generate extreme values: the maximum is below that of Total exposure in the Broa
 \vspace{0.04cm}
 \parbox{0.96\textwidth}{\tiny
 \textit{Notes:} Program FE, corresponding field $\times$ year FE, own shocks; region $\times$ year FE where indicated.
-SE clustered by market. Total repeated for reference. Unlike Design II, where the kernel denominator turns the
+SE clustered by market. Total repeated for reference. Unlike Design III, where the kernel denominator turns the
 weighted measures negative and significant, here they stay positive: significant only for ISCED-97 in levels
 (Gaussian KD: 2.36*** and 1.43**), and all elasticities are below 0.04 in absolute value.}
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Design III: kernel-weighted denominator, influence of the tail}
+\begin{frame}{Design IV: kernel-weighted denominator, influence of the tail}
 \centering
 \scriptsize
 \resizebox{0.66\textwidth}{!}{\input{../../output/vacancy_shocks/tables/vs_fs_kd_trim.tex}}
@@ -3673,7 +3817,7 @@ points to a negative effect.}
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Design III: decomposing weighted exposure}
+\begin{frame}{Design IV: decomposing weighted exposure}
 \scriptsize
 \setlength{\abovedisplayskip}{3pt}
 \setlength{\belowdisplayskip}{3pt}
@@ -3715,7 +3859,7 @@ associated with a 0.10 increase in similarity with the programs that expanded.
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Design III: distribution of conditional similarity}
+\begin{frame}{Design IV: distribution of conditional similarity}
 \centering
 \includegraphics[width=0.74\textwidth, height=0.64\textheight, keepaspectratio]{../../output/vacancy_shocks/figures/vs_q_dist.pdf}
 
@@ -3724,13 +3868,13 @@ associated with a 0.10 increase in similarity with the programs that expanded.
 \scriptsize
 \setlength{\itemsep}{2pt}
     \item Incumbent programs in Broad-field markets with at least one shock by 2016; $Q$ in 2016, in percentage points.
-    \item As in Design II, the triangular measure piles up near zero and the Gaussian measure is more dispersed.
+    \item As in Design III, the triangular measure piles up near zero and the Gaussian measure is more dispersed.
 \end{itemize}
 \end{frame}
 
 %--------------------------------------------------------
 \begin{frame}[label=vs-similarity-first-stage]
-\frametitle{Design III: similarity within exposed markets
+\frametitle{Design IV: similarity within exposed markets
 \hfill
 \hyperlink{vs-event-studies-close}{\scriptsize\color{blue}Event studies $\rightarrow$}}
 \scriptsize
@@ -3749,11 +3893,11 @@ $}
 \textit{Notes:} Broad-field markets with at least one shock by 2016. Levels: coefficient per 0.10 increase in $Q$.
 Logs: elasticity with respect to $Q$, with zero-$Q$ observations kept through the indicator. All regressions control
 for own shocks and absorb program, Broad-field $\times$ year and region $\times$ year fixed effects. Standard errors
-clustered by market. The sign matches Design II (closer competitors, lower enrollment), but no estimate is significant.}
+clustered by market. The sign matches Design III (closer competitors, lower enrollment), but no estimate is significant.}
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Design III: heterogeneity by incumbent selectivity}
+\begin{frame}{Design IV: heterogeneity by incumbent selectivity}
 \centering
 \tiny
 \input{../../output/vacancy_shocks/tables/vs_fs_selectivity.tex}
@@ -3768,13 +3912,13 @@ low-PSU programs is significant (10\%); estimates for PSU $\geq650$ are very imp
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Design III: cosine exposure}
+\begin{frame}{Design IV: cosine exposure}
 \scriptsize
 \setlength{\abovedisplayskip}{2pt}
 \setlength{\belowdisplayskip}{2pt}
 \tiny
 Each program is represented by the distribution of its first-year students across 25-point PSU bins
-(2007--2009 entrants; first three cohorts for later programs), as in Design II.
+(2007--2009 entrants; first three cohorts for later programs), as in Design III.
 
 \vspace{0.06cm}
 \textbf{1. Similarity between incumbent $k$ and source $j$}
@@ -3803,11 +3947,11 @@ w_{jt}=\frac{\text{seats}_{jt}}{\sum_{s=2010}^{2016}\sum_{\ell}\text{seats}_{\el
 \text{cum}E^{d}_{kt}=\sum_{s=2010}^{t}E^{d}_{ks}.
 \]
 The weights sum to one over all 3,307 seats added by shocks in 2010--2016, as entrant enrollment weights sum to one
-in Design II. In 2016, $\text{cum}E^{d}_{k}$ is $k$'s seat-weighted similarity with every program that expanded.
+in Design III. In 2016, $\text{cum}E^{d}_{k}$ is $k$'s seat-weighted similarity with every program that expanded.
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Design III: cosine exposure, samples and descriptive statistics}
+\begin{frame}{Design IV: cosine exposure, samples and descriptive statistics}
 \centering
 \tiny
 \textit{Panel A: Analytical samples}
@@ -3831,7 +3975,7 @@ give equal weight to PSU similarity, campus-region coincidence and, where applic
 
 %--------------------------------------------------------
 \begin{frame}[label=vs-cosine-main]
-\frametitle{Design III: distribution of cosine exposure
+\frametitle{Design IV: distribution of cosine exposure
 \hfill
 \hyperlink{vs-cosine-positive}{\scriptsize\color{blue}Positive exposure only $\rightarrow$}}
 \centering
@@ -3842,13 +3986,13 @@ give equal weight to PSU similarity, campus-region coincidence and, where applic
 \scriptsize
 \setlength{\itemsep}{2pt}
     \item Each incumbent program appears once, at its cumulative cosine exposure in 2016, in percentage points.
-    \item As in Design II, the multiplicative PSU $\times$ region $\times$ field measure has the most mass at zero and the smallest support.
+    \item As in Design III, the multiplicative PSU $\times$ region $\times$ field measure has the most mass at zero and the smallest support.
 \end{itemize}
 \end{frame}
 
 %--------------------------------------------------------
 \begin{frame}[label=vs-cosine-first-stage]
-\frametitle{Design III: cosine exposure results
+\frametitle{Design IV: cosine exposure results
 \hfill
 \hyperlink{vs-event-studies-cos}{\scriptsize\color{blue}Event studies $\rightarrow$}}
 \centering
@@ -3864,13 +4008,13 @@ $}
 \parbox{0.97\textwidth}{\tiny
 \textit{Notes:} Exposure in SD units; program-clustered standard errors. Columns (1) and (4): program and year FE;
 (2) and (5): Broad-field $\times$ year FE; (3) and (6): add campus-region $\times$ year FE. Columns (4)--(6) exclude
-programs with fewer than 10 first-year students per year in 2007--2009. The pattern replicates Design II: measures
+programs with fewer than 10 first-year students per year in 2007--2009. The pattern replicates Design III: measures
 that include region are positive and strongly significant until region $\times$ year FE are added, and then turn
 negative and insignificant. The PSU-only measure is negative ($-3.9$, 10\%) without region $\times$ year FE.}
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Design III: robustness to the shock definition}
+\begin{frame}{Design IV: robustness to the shock definition}
 \centering
 \scriptsize
 \resizebox{\textwidth}{!}{\input{../../output/vacancy_shocks/tables/vs_fs_shockdefs.tex}}
@@ -3887,7 +4031,7 @@ delivers a significant effect.}
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Design III: event studies, cohorts and pre-trend tests}
+\begin{frame}{Design IV: event studies, cohorts and pre-trend tests}
 \centering
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.46\textwidth}
@@ -3922,7 +4066,7 @@ delivers a significant effect.}
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Design III: event studies with the treatment dose}
+\begin{frame}{Design IV: event studies with the treatment dose}
 \scriptsize
 Distributed-lag event study with binned endpoints (Schmidheiny \& Siegloch 2023) on the yearly exposure flow $E_{kt}$ (10 pp):
 \[
@@ -3955,7 +4099,7 @@ Leads beyond 2016 set to zero, as in the binary event studies.}
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Design III: dose event studies, average post-exposure effect}
+\begin{frame}{Design IV: dose event studies, average post-exposure effect}
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.4\textwidth}
 \centering
@@ -3976,6 +4120,178 @@ SE clustered by market.
 \end{column}
 \end{columns}
 \end{frame}
+
+%--------------------------------------------------------
+% DESIGN IV: SELECTIVE VS SELECTIVE (issue #3)
+%--------------------------------------------------------
+\begin{frame}{Design IV, selective vs selective: question and construction}
+\scriptsize
+\setlength{\abovedisplayskip}{2pt}
+\setlength{\belowdisplayskip}{2pt}
+\textbf{Research question}
+
+When a \emph{selective} program suddenly expands its seats, what happens to its \emph{selective} competitors?
+
+\vspace{0.08cm}
+\textbf{Construction}: Design IV objects, restricted on both sides
+\begin{itemize}
+    \item Incumbents $k$: the 169 selective incumbents (top 20\% of 2007--2009 entrant PSU, as in Design II).
+    \item Sources $j$: selective programs only (same cutoff on $S_j$). There are 35 main shocks at selective programs.
+    \item Denominator: pre-period enrollment of the \emph{selective} programs in $k$'s market,
+\end{itemize}
+\[
+E^{w,sel}_{kt}=100\times\frac{\sum_{j\in m(k),\,j\neq k,\,j\ \text{sel.}} w(k,j)\,\text{seats}_{jt}}{\sum_{\ell\in m(k),\,\ell\ \text{sel.}}\overline{N}^{\mathrm{first}}_{\ell,2007\text{--}2009}},
+\qquad \text{cum}E^{w,sel}_{kt}=\sum_{s=2010}^{t}E^{w,sel}_{ks}.
+\]
+\textbf{Model}: Design IV model (1) and event study around the first selective-competitor shock in $k$'s broad market.
+
+\vspace{0.05cm}
+\centering
+\tiny
+\resizebox{0.62\textwidth}{!}{\input{../../output/own_expansion/tables/oe_sel_exposure_moments.tex}}
+
+\vspace{0.03cm}
+\parbox{0.9\textwidth}{\tiny Cumulative exposure in 2016, selective incumbents, pp of selective-market enrollment. 89 of 169 selective incumbents are exposed by 2016 (broad market).}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design IV, selective vs selective: results}
+\centering
+\resizebox{0.62\textwidth}{!}{$N^{\mathrm{first}}_{kt}=\pi_w\,\text{cum}E^{w,sel}_{kt}+\delta\,\text{Own}_{kt}+\mu_k+\alpha_{f(k),t}+\gamma_{r(k),t}+\nu_{kt}$}
+
+\vspace{0.05cm}
+\tiny
+\textit{Panel A: First-year enrollment}
+
+\resizebox{0.66\textwidth}{!}{\input{../../output/own_expansion/tables/oe_sel_fs_N_first.tex}}
+
+\vspace{0.04cm}
+\textit{Panel B: Log first-year enrollment}
+
+\resizebox{0.66\textwidth}{!}{\input{../../output/own_expansion/tables/oe_sel_fs_lnN.tex}}
+
+\vspace{0.04cm}
+\parbox{0.97\textwidth}{\tiny
+\textit{Notes:} Exposure in 10 pp units. All regressions control for own shocks. SE clustered by market.
+\sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$.
+In levels, the kernel measures are negative and significant: closer selective competitors expanding lowers $k$'s enrollment by about
+12 entrants per 10 pp (triangular). The log specification is null, and there are only about 30 broad markets.}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design IV, selective vs selective: event study and composition}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.50\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../output/own_expansion/figures/oe_sel_es_N_first.pdf}
+\end{column}
+\begin{column}{0.48\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/own_expansion/tables/oe_sel_composition.tex}}
+\end{column}
+\end{columns}
+
+\vspace{0.1cm}
+\begin{itemize}\scriptsize
+    \setlength{\itemsep}{2pt}
+    \item The event study does not support the negative level effect. Callaway--Sant'Anna gives a \emph{positive} ATT
+    ($+8.7$, SE 2.5, never treated; pre-period average $p=0.32$), and the TWFE leads reject ($p=0.001$).
+    \item Composition (broad market, Total and Gaussian): mean entrant PSU rises by about 3 points with field $\times$ year FE, and the effect disappears with region $\times$ year FE.
+    \item Taken together, there is no robust evidence that selective expansions take students away from selective competitors.
+\end{itemize}
+\end{frame}
+
+%====================================================
+\section{Composition Effects}
+%====================================================
+\begin{frame}{Composition effects: who enters when capacity changes?}
+\scriptsize
+\begin{itemize}
+    \item Designs I--IV ask whether capacity changes move \emph{how many} students enter a program. Here we ask whether they change \emph{who} enters.
+    \item The dependent variable is the mean characteristic of the entering cohort (Formulario D entrants, program $\times$ year), not enrollment:
+    \begin{itemize}
+        \item Mean and SD of LM PSU, mean NEM.
+        \item LM PSU of the \textbf{last admitted} (lowest application score among regular admits, status 24).
+        \item Share female; shares from private-paid and municipal schools (SES proxy).
+    \end{itemize}
+    \item \textbf{Income is not available}: Formulario A has no income and the DEMRE socioeconomic questionnaire is not in the data.
+    Income of the last admitted is replaced by the school type of the last admitted.
+    \item Each design keeps its own specification, with only the outcome replaced.
+    Design II and the selective-vs-selective variant of Design IV are reported in their own sections.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Composition effects: Design I (FD-IV with $\Delta$ cupos)}
+\centering
+\resizebox{0.55\textwidth}{!}{$\Delta y^{comp}_{pt}=\beta\,\widehat{\Delta N}_{pt}+\alpha_t+\varepsilon_{pt},\qquad \Delta N_{pt}=\pi\,\Delta Z_{pt}+\alpha_t+\nu_{pt}$}
+
+\vspace{0.08cm}
+\tiny
+\resizebox{0.78\textwidth}{!}{\input{../../output/own_expansion/tables/oe_comp_design1.tex}}
+
+\vspace{0.06cm}
+\parbox{0.95\textwidth}{\tiny
+\textit{Notes:} $N$: enrollees with \texttt{enrolls\_target}$=1$; $Z$: total cupos. Both are in tens, so 2SLS is the effect of 10 more entrants.
+Year FE, SE clustered by program. The first stage differs from the Design I frame (0.82 / 0.54) because the
+sample is not restricted to cohorts with graduation outcomes.
+Ten more entrants lower mean entrant PSU by 1.3--2.5 points and the last admitted's PSU by 2.5--4.7 points:
+programs that expand reach further down the score distribution.}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Composition effects: Design III (SUA entry)}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.56\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/own_expansion/tables/oe_comp_sua.tex}}
+
+\vspace{0.05cm}
+\parbox{\linewidth}{\tiny
+\textit{Notes:} Levels first stage of Design III ($10\times E_p\times\text{Post}_t$), broad area $\times$ region markets, SE clustered by market.
+The enrollment row reproduces the Design III estimate ($\pi=1.97$).}
+\end{column}
+\begin{column}{0.42\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../output/own_expansion/figures/oe_comp_sua_es_c_psu_mean.pdf}
+
+\begin{itemize}\tiny
+    \item With field $\times$ year FE, mean and last-admitted PSU fall in exposed incumbents.
+    \item The decline starts \textbf{before} 2012 (pre-2011 joint test $p=0.002$), and it disappears with region $\times$ year FE.
+    \item This mirrors the pre-trend problem of the SUA first stage: the result is not identified off 2012 entry.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Composition effects: Design IV (competitor vacancy shocks)}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.56\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/own_expansion/tables/oe_comp_vs.tex}}
+
+\vspace{0.05cm}
+\parbox{\linewidth}{\tiny
+\textit{Notes:} Design IV model (1), broad markets, exposure in 10 pp units, own-shock control, SE clustered by market.}
+\end{column}
+\begin{column}{0.42\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../output/own_expansion/figures/oe_comp_vs_es_c_psu_mean.pdf}
+
+\begin{itemize}\tiny
+    \item Enrollment does not respond (as in Design IV). Under triangular weighting, mean entrant PSU falls by about 4--5 points per 10 pp.
+    This is consistent with close-competitor expansions drawing away stronger applicants without changing the number of entrants.
+    \item Total and Gaussian measures are mostly insignificant. The share from municipal schools rises by about 0.6--0.7 pp (Total).
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+
 
 
 \appendix
@@ -5348,7 +5664,7 @@ conditioning on positive exposure.
 
 %---------------------------------------------------------
 \begin{frame}[label=vs-exposure-appendix]
-\frametitle{Design III exposure: alternative field definitions
+\frametitle{Design IV exposure: alternative field definitions
 \hfill
 \hyperlink{vs-exposure-main}{\scriptsize\color{blue}$\leftarrow$ Broad field}}
 \begin{columns}[T,onlytextwidth]
@@ -5373,7 +5689,7 @@ Narrower field definitions generate more markets and more zero-exposure programs
 
 %---------------------------------------------------------
 \begin{frame}[label=vs-event-studies-mkt]
-\frametitle{Design III event studies: first shock in the market
+\frametitle{Design IV event studies: first shock in the market
 \hfill
 \hyperlink{vs-first-stage}{\scriptsize\color{blue}$\leftarrow$ Levels}\;
 \hyperlink{vs-log-first-stage}{\scriptsize\color{blue}$\leftarrow$ Logs}}
@@ -5401,7 +5717,7 @@ never-treated controls (green). 95\% confidence intervals.}
 
 %---------------------------------------------------------
 \begin{frame}[label=vs-event-studies-close]
-\frametitle{Design III event studies: first close-competitor shock
+\frametitle{Design IV event studies: first close-competitor shock
 \hfill
 \hyperlink{vs-similarity-first-stage}{\scriptsize\color{blue}$\leftarrow$ Back to table}}
 \begin{columns}[T,onlytextwidth]
@@ -5426,7 +5742,7 @@ never-treated controls (green). 95\% confidence intervals.}
 
 %---------------------------------------------------------
 \begin{frame}[label=vs-cosine-positive]
-\frametitle{Design III cosine exposure, positive exposure only
+\frametitle{Design IV cosine exposure, positive exposure only
 \hfill
 \hyperlink{vs-cosine-main}{\scriptsize\color{blue}$\leftarrow$ Back}}
 \centering
@@ -5435,7 +5751,7 @@ never-treated controls (green). 95\% confidence intervals.}
 
 %---------------------------------------------------------
 \begin{frame}[label=vs-event-studies-cos]
-\frametitle{Design III event studies: top-5 cosine shock
+\frametitle{Design IV event studies: top-5 cosine shock
 \hfill
 \hyperlink{vs-cosine-first-stage}{\scriptsize\color{blue}$\leftarrow$ Cosine results}}
 \begin{columns}[T,onlytextwidth]
