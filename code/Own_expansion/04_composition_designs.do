@@ -19,8 +19,8 @@
 * Design III SUA first stage in levels (Sua/04): y_pt = b 10 E_p Post_t
 *            + mu_p + a_{f,t} [+ g_{r,t}], broad-area x region markets,
 *            Total / Triangular / Gaussian. SE clustered by market.
-*            Event study: 10 E_p x 1{year = t}, base 2011, program,
-*            field-year and region-year FE.
+*            Event study: 10 E^w_p x 1{year = t}, base 2011, w in
+*            {Triangular, Gaussian}, program, field-year and region-year FE.
 * Design IV  Vacancy_shocks/05 model (1): y_kt = pi cumE^w_kt / 10
 *            + d Own_kt + mu_k + a_{f,t} [+ g_{r,t}], broad markets.
 *            SE clustered by market. Event study around g_mkt.
@@ -160,34 +160,52 @@ foreach y in N `cvars' {
     }
 }
 
-* event study, Total exposure: 10 E_p x year, base 2011
-forvalues t = 2007/2016 {
-    gen double ez_`t' = 10 * exp_unw * (ao_proceso == `t')
-}
-drop ez_2011
-foreach y in N c_psu_mean c_psu_last {
-    quietly reghdfe `y' ez_*, absorb(program_id fy ry) cluster(market_pre)
-    quietly test ez_2007 ez_2008 ez_2009 ez_2010
-    local ptr = string(r(p), "%5.3f")
-    preserve
-    clear
-    set obs 10
-    gen int year = 2006 + _n
-    gen double b = 0
-    gen double lo = .
-    gen double hi = .
+* event studies, PSU-similarity-weighted exposures (Triangular, Gaussian):
+* 10 E^w_p x 1{year = t}, base 2011; one regression per kernel, both
+* plotted in the same figure
+foreach e in tri50 gau50 {
     forvalues t = 2007/2016 {
-        if `t' == 2011 continue
-        replace b  = _b[ez_`t'] if year == `t'
-        replace lo = _b[ez_`t'] - 1.96 * _se[ez_`t'] if year == `t'
-        replace hi = _b[ez_`t'] + 1.96 * _se[ez_`t'] if year == `t'
+        gen double ez_`e'_`t' = 10 * exp_`e' * (ao_proceso == `t')
     }
+    drop ez_`e'_2011
+}
+foreach y in N c_psu_mean c_psu_last {
+    tempfile es_tri50 es_gau50
+    foreach e in tri50 gau50 {
+        quietly reghdfe `y' ez_`e'_*, absorb(program_id fy ry) cluster(market_pre)
+        quietly test ez_`e'_2007 ez_`e'_2008 ez_`e'_2009 ez_`e'_2010
+        local ptr_`e' = string(r(p), "%5.3f")
+        preserve
+        clear
+        set obs 10
+        gen int year = 2006 + _n
+        gen double b = 0
+        gen double lo = .
+        gen double hi = .
+        forvalues t = 2007/2016 {
+            if `t' == 2011 continue
+            replace b  = _b[ez_`e'_`t'] if year == `t'
+            replace lo = _b[ez_`e'_`t'] - 1.96 * _se[ez_`e'_`t'] if year == `t'
+            replace hi = _b[ez_`e'_`t'] + 1.96 * _se[ez_`e'_`t'] if year == `t'
+        }
+        gen str5 k = "`e'"
+        save `es_`e''
+        restore
+    }
+    preserve
+    use `es_tri50', clear
+    append using `es_gau50'
+    gen double x = year + cond(k == "tri50", -0.12, 0.12)
     local ylab = cond("`y'" == "N", "`lab_N'", "`lab_`y''")
-    twoway (rcap lo hi year, lcolor(navy)) (scatter b year, mcolor(navy)), ///
+    twoway (rcap lo hi x if k == "tri50", lcolor(navy)) ///
+           (scatter b x if k == "tri50", mcolor(navy) msymbol(O)) ///
+           (rcap lo hi x if k == "gau50", lcolor(dkorange)) ///
+           (scatter b x if k == "gau50", mcolor(dkorange) msymbol(D)), ///
         yline(0, lcolor(gs10)) xline(2011.5, lcolor(cranberry) lpattern(dash)) ///
-        xlabel(2007(1)2016) xtitle("Admission year") ytitle("`ylab'") legend(off) ///
-        note("Coefficient on 10 x Total SUA exposure x year (2011 omitted); program, field-year and region-year FE." ///
-             "Pre-2011 joint test p = `ptr'. SE clustered by market.", size(vsmall)) ///
+        xlabel(2007(1)2016) xtitle("Admission year") ytitle("`ylab'") ///
+        legend(order(2 "Triangular" 4 "Gaussian") rows(1) size(small)) ///
+        note("Coefficient on 10 x PSU-similarity-weighted SUA exposure x year (2011 omitted); program, field-year and region-year FE." ///
+             "Pre-2011 joint test p: Triangular `ptr_tri50', Gaussian `ptr_gau50'. SE clustered by market.", size(vsmall)) ///
         graphregion(color(white)) plotregion(color(white))
     graph export "$oe_out/figures/oe_comp_sua_es_`y'.pdf", replace
     restore
