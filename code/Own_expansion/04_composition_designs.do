@@ -10,11 +10,12 @@
 *   c_nem_mean c_female c_priv c_mun. First-year enrollment is repeated
 *   as the reference row.
 *
-* Design I   FD-IV: d y_pt = b d N_pt + a_t + e, d N instrumented by
-*            d Z_pt (total cupos, program_year_vacancies). N = distinct
-*            enrollees with enrolls_target == 1, as in Design I. N and Z
-*            in tens, so 2SLS = effect of 10 more entrants. Periods
-*            2007-2012 and 2013-2016, as in the deck. SE clustered by program.
+* Design I   Composition on vacancy changes (no 2SLS):
+*            d y_pt = b d Z_pt + a_t + e, Z = total cupos
+*            (program_year_vacancies), in tens, so b = effect of 10 more
+*            seats. Reference row: d N (enrolls_target enrollees).
+*            Periods 2007-2012 and 2013-2016, as in the deck. SE clustered
+*            by program.
 * Design III SUA first stage in levels (Sua/04): y_pt = b 10 E_p Post_t
 *            + mu_p + a_{f,t} [+ g_{r,t}], broad-area x region markets,
 *            Total / Triangular / Gaussian. SE clustered by market.
@@ -61,7 +62,7 @@ local lab_N "First-year enrollment"
 
 
 /**********************************************************************
-* Design I: FD-IV with d Z
+* Design I: composition on d Z
 **********************************************************************/
 
 use t_codigo_carrera ao_proceso Z_total_cupos ///
@@ -85,8 +86,7 @@ merge 1:1 code_h ao_proceso using "$processed/oe_composition_program_year.dta", 
     keep(master match) nogen
 egen long pid = group(code_h)
 xtset pid ao_proceso
-* units: N and Z in tens of students / seats, so 2SLS = effect of 10 entrants
-replace N = N / 10
+* units: Z in tens of seats, so every coefficient is the effect of 10 seats
 replace Z_total_cupos = Z_total_cupos / 10
 foreach v in N Z_total_cupos `cvars' {
     gen double D_`v' = D.`v'
@@ -94,53 +94,32 @@ foreach v in N Z_total_cupos `cvars' {
 
 foreach per in a b {
     local cond = cond("`per'" == "a", "inrange(ao_proceso, 2008, 2012)", "inrange(ao_proceso, 2013, 2016)")
-    quietly reghdfe D_N D_Z_total_cupos if `cond', absorb(ao_proceso) cluster(pid)
-    oe_coef D_Z_total_cupos fs_`per'_
-    local fsF_`per' = (_b[D_Z_total_cupos] / _se[D_Z_total_cupos])^2
     foreach y in N `cvars' {
-        if "`y'" != "N" {
-            quietly reghdfe D_`y' D_Z_total_cupos if `cond', absorb(ao_proceso) cluster(pid)
-            oe_coef D_Z_total_cupos rf_`per'_`y'_
-            quietly ivreghdfe D_`y' (D_N = D_Z_total_cupos) if `cond', absorb(ao_proceso) cluster(pid)
-            oe_coef D_N iv_`per'_`y'_
-        }
+        quietly reghdfe D_`y' D_Z_total_cupos if `cond', absorb(ao_proceso) cluster(pid)
+        oe_coef D_Z_total_cupos rf_`per'_`y'_
     }
 }
 
 file open T using "$oe_out/tables/oe_comp_design1.tex", write replace
-file write T "\begin{tabular}{lcccc}" _n "\toprule" _n
-file write T " & \multicolumn{2}{c}{2007--2012} & \multicolumn{2}{c}{2013--2016} \\" _n
-file write T "\cmidrule(lr){2-3}\cmidrule(lr){4-5}" _n
-file write T "Outcome (\(\Delta\)) & Reduced form & 2SLS & Reduced form & 2SLS \\" _n "\midrule" _n
-file write T "First stage: \(\Delta N\) on \(\Delta Z\)"
-foreach per in a b {
-    oe_stars `fs_`per'_p'
-    file write T " & " %6.3f (`fs_`per'_b') "`r(stars)'" " & "
-}
-file write T " \\" _n
-foreach per in a b {
-    file write T " & (" %5.3f (`fs_`per'_se') ") & "
-}
-file write T " \\" _n "\addlinespace" _n
-foreach y of local cvars {
-    file write T "`lab_`y''"
+file write T "\begin{tabular}{lcc}" _n "\toprule" _n
+file write T "Outcome (\(\Delta\)) & 2007--2012 & 2013--2016 \\" _n "\midrule" _n
+foreach y in N `cvars' {
+    local ylab = cond("`y'" == "N", "`lab_N'", "`lab_`y''")
+    file write T "`ylab'"
     foreach per in a b {
-        foreach e in rf iv {
-            oe_stars ``e'_`per'_`y'_p'
-            file write T " & " %7.3f (``e'_`per'_`y'_b') "`r(stars)'"
-        }
+        oe_stars `rf_`per'_`y'_p'
+        file write T " & " %7.3f (`rf_`per'_`y'_b') "`r(stars)'"
     }
     file write T " \\" _n
     foreach per in a b {
-        foreach e in rf iv {
-            file write T " & (" %6.3f (``e'_`per'_`y'_se') ")"
-        }
+        file write T " & (" %6.3f (`rf_`per'_`y'_se') ")"
     }
     file write T " \\" _n
+    if "`y'" == "N" file write T "\addlinespace" _n
 }
 file write T "\midrule" _n "Observations (FD)"
 foreach per in a b {
-    file write T " & \multicolumn{2}{c}{" %6.0fc (`iv_`per'_c_psu_mean_N') "}"
+    file write T " & " %6.0fc (`rf_`per'_c_psu_mean_N')
 }
 file write T " \\" _n "\bottomrule" _n "\end{tabular}" _n
 file close T

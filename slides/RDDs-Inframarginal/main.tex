@@ -4220,21 +4220,20 @@ In levels, the kernel measures are negative and significant: closer selective co
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Composition effects: Design I (FD-IV with $\Delta$ cupos)}
+\begin{frame}{Composition effects: Design I ($\Delta$ cupos)}
 \centering
-\resizebox{0.55\textwidth}{!}{$\Delta y^{comp}_{pt}=\beta\,\widehat{\Delta N}_{pt}+\alpha_t+\varepsilon_{pt},\qquad \Delta N_{pt}=\pi\,\Delta Z_{pt}+\alpha_t+\nu_{pt}$}
+\resizebox{0.40\textwidth}{!}{$\Delta y^{comp}_{pt}=\pi\,\Delta Z_{pt}+\alpha_t+\varepsilon_{pt}$}
 
 \vspace{0.08cm}
 \tiny
-\resizebox{0.78\textwidth}{!}{\input{../../output/own_expansion/tables/oe_comp_design1.tex}}
+\resizebox{0.52\textwidth}{!}{\input{../../output/own_expansion/tables/oe_comp_design1.tex}}
 
 \vspace{0.06cm}
 \parbox{0.95\textwidth}{\tiny
-\textit{Notes:} $N$: enrollees with \texttt{enrolls\_target}$=1$; $Z$: total cupos. Both are in tens, so 2SLS is the effect of 10 more entrants.
-Year FE, SE clustered by program. The first stage differs from the Design I frame (0.82 / 0.54) because the
-sample is not restricted to cohorts with graduation outcomes.
-Ten more entrants lower mean entrant PSU by 1.3--2.5 points and the last admitted's PSU by 2.5--4.7 points:
-programs that expand reach further down the score distribution.}
+\textit{Notes:} $Z$: total cupos, in tens, so each coefficient is the effect of 10 more seats. First differences, year FE,
+SE clustered by program. The first row (first-year enrollment, \texttt{enrolls\_target}) is shown for reference.
+Ten more seats bring in about 7 more entrants and lower mean entrant PSU by 0.8--1.7 points and the last admitted's PSU
+by 1.6--3.3 points: programs that expand reach further down the score distribution.}
 \end{frame}
 
 %--------------------------------------------------------
