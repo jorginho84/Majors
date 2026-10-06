@@ -1736,6 +1736,44 @@ UBB
 
 
 %--------------------------------------------------------
+\begin{frame}{Design I: heterogeneity by predetermined program selectivity}
+\centering
+\tiny
+\resizebox{0.64\textwidth}{!}{\input{../../output/inframarginal/tables/im_sel_Q_first.tex}}
+
+\vspace{0.04cm}
+\parbox{0.97\textwidth}{\tiny
+\textit{Notes:} Quartiles of 2007--2009 entrant PSU (predetermined). First differences, year FE, First Cohort, SE clustered by program.
+FS, RF and 2SLS share one weight. Coefficients $\times 100$ (pp per seat or student). Holm and equality tests come from one joint model.
+\sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$.}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design I: selectivity heterogeneity, robustness and placebo}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.47\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_sel_robust_first.tex}}
+\end{column}
+\begin{column}{0.51\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_sel_placebo_first.tex}}
+\end{column}
+\end{columns}
+
+\vspace{0.12cm}
+\begin{itemize}\scriptsize
+    \setlength{\itemsep}{1pt}
+    \item The first stage rises monotonically with selectivity (0.41 to 0.89). Seats bind in selective programs, and added seats go partly unfilled elsewhere.
+    \item Graduation effects are small and imprecise in every quartile, and equality is not rejected. Effects become more negative with selectivity
+    ($\Delta N\times\tilde S$: $-0.029^{*}$), and Q4 turns significant with university $\times$ year FE ($-0.034^{**}$, $-0.34$ pp per 10 students).
+    \item The placebo leads reject in Q1 and Q4, so the signal in the extreme quartiles is fragile.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
 \begin{frame}{Composition effects: who enters when capacity changes?}
 \scriptsize
 \begin{itemize}
@@ -4283,6 +4321,106 @@ In levels, the kernel measures are negative and significant: closer selective co
     \item Taken together, there is no robust evidence that selective expansions take students away from selective competitors.
 \end{itemize}
 \end{frame}
+
+%====================================================
+% REDUCED FORM: SLOT SHOCKS ON INFRAMARGINAL GRADUATION (issue #3)
+%====================================================
+\subsection{Reduced Form: Slot Shocks and Inframarginal Graduation}
+\begin{frame}{Reduced form: slot shocks and inframarginal graduation}
+\scriptsize
+\textbf{Question}: do the shocks of Designs II--IV change the graduation of the program's inframarginal students?
+
+\vspace{0.08cm}
+\textbf{Outcome}: program $\times$ cohort graduation rate (pct.) of inframarginal applicants, as defined in Design I
+(First Cohort and Minimum Cohort; DEMRE selection-list place within the threshold):
+\begin{itemize}
+    \item graduation from the program of enrollment, any university or any HE, within 8 years (cohorts 2007--2016);
+    \item graduation from the program within 10 years (cohorts 2007--2014; target enrollees only).
+\end{itemize}
+
+\vspace{0.06cm}
+\textbf{Shocks}: same specification, fixed effects and clustering as each design, with no 2SLS:
+\begin{itemize}
+    \item Design II: own sudden expansion, $\text{Post}_{pt}$;
+    \item Design III: SUA exposure $\times$ Post (Total, Triangular, Gaussian);
+    \item Design IV: cumulative exposure to competitor shocks, plus own shocks.
+\end{itemize}
+
+\vspace{0.06cm}
+\textbf{Caveat}: the inframarginal threshold is fixed at the program level, but a shock can still change \emph{who} is in the inframarginal group
+(for example, if it changes who applies). These are reduced-form effects on that group's graduation rate.
+Graduation uses titulados through 2024.
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Reduced form, Design II: own sudden expansions}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.55\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/own_expansion/tables/oe_rf_design2.tex}}
+\end{column}
+\begin{column}{0.43\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../output/own_expansion/figures/oe_rf_d2_es_g8p_f.pdf}
+\end{column}
+\end{columns}
+
+\vspace{0.1cm}
+\begin{itemize}\scriptsize
+    \setlength{\itemsep}{1pt}
+    \item TWFE (1): program and year FE. TWFE (2): adds field $\times$ year and region $\times$ year FE. SE clustered by program. Event study: selective programs.
+    \item Among selective programs, program graduation falls by 6.5 pp with program and year FE, but the estimate shrinks and loses significance with
+    field- and region-year FE ($-4.1$) and with Callaway--Sant'Anna ($-1.3$). The CS pre-period test rejects ($p=0.008$). No effect across all programs.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Reduced form, Design III: SUA entry}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.55\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/own_expansion/tables/oe_rf_sua.tex}}
+\end{column}
+\begin{column}{0.43\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../output/own_expansion/figures/oe_rf_sua_es_g8p_f.pdf}
+\end{column}
+\end{columns}
+
+\vspace{0.1cm}
+\begin{itemize}\scriptsize
+    \setlength{\itemsep}{1pt}
+    \item Levels specification of Design III, $10\times E_p\times\text{Post}_t$, broad area $\times$ region markets, SE clustered by market.
+    \item The PSU-weighted measures are negative, especially for 10-year graduation (Triangular $-4.0^{***}$, $-3.1^{***}$ with region $\times$ year FE).
+    \item The event study shows no break at 2012: 2007--2008 sit above 2011 and the post period is flat. The static estimate reflects a pre-existing trend.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Reduced form, Design IV: competitor vacancy shocks}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.55\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/own_expansion/tables/oe_rf_vs.tex}}
+\end{column}
+\begin{column}{0.43\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../output/own_expansion/figures/oe_rf_vs_es_g8p_f.pdf}
+\end{column}
+\end{columns}
+
+\vspace{0.1cm}
+\begin{itemize}\scriptsize
+    \setlength{\itemsep}{1pt}
+    \item Design IV model (1): cumulative exposure in 10 pp units, own-shock control, broad markets, SE clustered by market.
+    \item No effect on inframarginal graduation for any measure or horizon, and the event study is flat.
+\end{itemize}
+\end{frame}
+
+
 
 \section{Appendix}
 

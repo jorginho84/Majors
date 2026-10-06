@@ -52,11 +52,15 @@ the four orphan files in `output/tables/` (committed in a91f9e5 with no generati
 | Design IV, selective vs selective | Exposure moments, levels/log first stages, composition, event study | `Own_expansion/03_selective_competitors.do` (needs `02`) | `output/own_expansion/tables/oe_sel_{exposure_moments,fs_N_first,fs_lnN,composition}.tex` (`\input`); figure `oe_sel_es_N_first` |
 | Composition frames inside Designs I, III, IV (the separate section was removed 2026-10-06) | Entrant composition outcomes | `Own_expansion/04_composition_designs.do` (needs `01`, `02`) | `output/own_expansion/tables/oe_comp_{design1,sua,vs}.tex` (`\input`); figures `oe_comp_sua_es_c_psu_mean`, `oe_comp_vs_es_c_psu_mean` |
 
+| Design I: heterogeneity by predetermined selectivity (2 frames) | FS/RF/2SLS by quartile of 2007--09 entrant PSU; joint test, Holm, university-year FE, continuous interaction, placebo leads/lags | `Inframarginals/29_selectivity_heterogeneity_predetermined.do` (needs `21b`, `Vacancy_shocks/01`) | `output/inframarginal/tables/im_sel_{Q,G,robust,placebo}_{first,min}.tex` (`\input`) |
+| Reduced form: slot shocks and inframarginal graduation (4 frames) | Designs II-IV shocks on inframarginal graduation, 8y and 10y | `Own_expansion/05_reduced_form_infra.do` (needs `21b`, `28b`, `02`; titulados through 2024) | `output/own_expansion/tables/oe_rf_{design2,sua,vs}.tex`; figures `oe_rf_{d2,sua,vs}_es_g8p_f` |
+
 ## Blocking inputs
 
-- `admission_rank_inframarginal_2007_2016.dta` — input to `Inframarginals/21b` and `21c`; **no
-  producer in the repo** and not on the server. Blocks the inframarginal outcome of Design II
-  (issue #3).
+- ~~`admission_rank_inframarginal_2007_2016.dta`~~ — now built by `02_build/15_build_admission_rank.do`
+  from the raw `LUGAR` column (issue #4).
+- Titulados 2017--2024 must be in `data/MINEDUC/Base Titulados/` (named `titulados_ed_superior_YYYY_web.csv`);
+  without them graduation is censored after cohort 2008 (issue #4).
 
 - **Oferta Académica** Excel files (`$demre_raw/Postulacion/OfertaAcadémica_Admisión<year>.xlsx`)
   — feed `13_build_program_year_vacancies.do` → inframarginal design I (21b, 21c, 28b).

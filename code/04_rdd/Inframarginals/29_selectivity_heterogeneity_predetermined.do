@@ -100,6 +100,7 @@ foreach def in first_enroll min_enroll {
     }
     gen double dZS = D_Z_total_cupos * Sz
     gen double dNS = D_N_total_enter * Sz
+    xtset program_id_rank_analysis ao_proceso
     gen double F1dZ = F.D_Z_total_cupos
     gen double L1dZ = L.D_Z_total_cupos
 
