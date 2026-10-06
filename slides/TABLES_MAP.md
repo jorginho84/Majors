@@ -50,7 +50,7 @@ the four orphan files in `output/tables/` (committed in a91f9e5 with no generati
 
 | Design II frames | Own sudden expansions: thresholds, TWFE/CS, composition, threshold robustness | `Own_expansion/02_own_expansion.do` (needs `01`, `Vacancy_shocks/03`) | `output/own_expansion/tables/oe_{thresholds,twfe_enroll,twfe_comp,threshold_sens}.tex` (`\input`); figures `oe_dV_hist_sel`, `oe_es_*_sel` |
 | Design IV, selective vs selective | Exposure moments, levels/log first stages, composition, event study | `Own_expansion/03_selective_competitors.do` (needs `02`) | `output/own_expansion/tables/oe_sel_{exposure_moments,fs_N_first,fs_lnN,composition}.tex` (`\input`); figure `oe_sel_es_N_first` |
-| Composition Effects section | Designs I, III, IV with entrant composition outcomes | `Own_expansion/04_composition_designs.do` (needs `01`, `02`) | `output/own_expansion/tables/oe_comp_{design1,sua,vs}.tex` (`\input`); figures `oe_comp_sua_es_c_psu_mean`, `oe_comp_vs_es_c_psu_mean` |
+| Composition frames inside Designs I, III, IV (the separate section was removed 2026-10-06) | Entrant composition outcomes | `Own_expansion/04_composition_designs.do` (needs `01`, `02`) | `output/own_expansion/tables/oe_comp_{design1,sua,vs}.tex` (`\input`); figures `oe_comp_sua_es_c_psu_mean`, `oe_comp_vs_es_c_psu_mean` |
 
 ## Blocking inputs
 

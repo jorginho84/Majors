@@ -1735,6 +1735,40 @@ UBB
 \end{frame}
 
 
+%--------------------------------------------------------
+\begin{frame}{Composition effects: who enters when capacity changes?}
+\scriptsize
+\begin{itemize}
+    \item The designs ask whether capacity changes move \emph{how many} students enter a program. Here we ask whether they change \emph{who} enters.
+    \item The dependent variable is the mean characteristic of the entering cohort (Formulario D entrants, program $\times$ year), not enrollment:
+    \begin{itemize}
+        \item Mean and SD of LM PSU, mean NEM.
+        \item LM PSU of the \textbf{last admitted} (lowest application score among regular admits, status 24).
+        \item Share female; shares from private-paid and municipal schools (SES proxy).
+    \end{itemize}
+    \item \textbf{Income is not available}: Formulario A has no income and the DEMRE socioeconomic questionnaire is not in the data.
+    Income of the last admitted is replaced by the school type of the last admitted.
+    \item Each design keeps its own specification, with only the outcome replaced. The same outcomes are used in Designs I--IV.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design I: composition of the entering cohort}
+\centering
+\resizebox{0.40\textwidth}{!}{$\Delta y^{comp}_{pt}=\pi\,\Delta Z_{pt}+\alpha_t+\varepsilon_{pt}$}
+
+\vspace{0.08cm}
+\tiny
+\resizebox{0.52\textwidth}{!}{\input{../../output/own_expansion/tables/oe_comp_design1.tex}}
+
+\vspace{0.06cm}
+\parbox{0.95\textwidth}{\tiny
+\textit{Notes:} $Z$: total cupos, in tens, so each coefficient is the effect of 10 more seats. First differences, year FE,
+SE clustered by program. The first row (first-year enrollment, \texttt{enrolls\_target}) is shown for reference.
+Ten more seats bring in about 7 more entrants and lower mean entrant PSU by 0.8--1.7 points and the last admitted's PSU
+by 1.6--3.3 points: programs that expand reach further down the score distribution.}
+\end{frame}
+
 \subsection{Inframarginal Design No. 2}
 %=========================================================
 % DESIGN II: OWN SUDDEN VACANCY EXPANSIONS (issue #3)
@@ -3500,6 +3534,32 @@ in 2011. $^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.
 
 
 %--------------------------------------------------------
+%--------------------------------------------------------
+\begin{frame}{Design III: composition of the entering cohort}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.56\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/own_expansion/tables/oe_comp_sua.tex}}
+
+\vspace{0.05cm}
+\parbox{\linewidth}{\tiny
+\textit{Notes:} Levels first stage of Design III ($10\times E_p\times\text{Post}_t$), broad area $\times$ region markets, SE clustered by market.
+The enrollment row reproduces the Design III estimate ($\pi=1.97$).}
+\end{column}
+\begin{column}{0.42\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../output/own_expansion/figures/oe_comp_sua_es_c_psu_mean.pdf}
+
+\begin{itemize}\tiny
+    \item Event study: PSU-similarity-weighted exposure (Triangular, Gaussian); program, field- and region-year FE.
+    \item Mean entrant PSU is flat before and after 2012 (pre-tests $p=0.11$, $0.20$).
+    \item The field-year-FE declines in the table vanish with region-year FE.
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
 \subsection{Inframarginal Design No. 4}
 %--------------------------------------------------------
 \begin{frame}{Design IV: sudden vacancy expansions at competing programs}
@@ -4119,6 +4179,31 @@ SE clustered by market.
 \end{frame}
 
 %--------------------------------------------------------
+\begin{frame}{Design IV: composition of the entering cohort}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.56\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/own_expansion/tables/oe_comp_vs.tex}}
+
+\vspace{0.05cm}
+\parbox{\linewidth}{\tiny
+\textit{Notes:} Design IV model (1), broad markets, exposure in 10 pp units, own-shock control, SE clustered by market.}
+\end{column}
+\begin{column}{0.42\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../output/own_expansion/figures/oe_comp_vs_es_c_psu_mean.pdf}
+
+\begin{itemize}\tiny
+    \item Enrollment does not respond (as in Design IV). Under triangular weighting, mean entrant PSU falls by about 4--5 points per 10 pp.
+    This is consistent with close-competitor expansions drawing away stronger applicants without changing the number of entrants.
+    \item Total and Gaussian measures are mostly insignificant. The share from municipal schools rises by about 0.6--0.7 pp (Total).
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+%--------------------------------------------------------
 % DESIGN IV: SELECTIVE VS SELECTIVE (issue #3)
 %--------------------------------------------------------
 \begin{frame}{Design IV, selective vs selective: question and construction}
@@ -4199,98 +4284,6 @@ In levels, the kernel measures are negative and significant: closer selective co
 \end{itemize}
 \end{frame}
 
-%====================================================
-\section{Composition Effects}
-%====================================================
-\begin{frame}{Composition effects: who enters when capacity changes?}
-\scriptsize
-\begin{itemize}
-    \item Designs I--IV ask whether capacity changes move \emph{how many} students enter a program. Here we ask whether they change \emph{who} enters.
-    \item The dependent variable is the mean characteristic of the entering cohort (Formulario D entrants, program $\times$ year), not enrollment:
-    \begin{itemize}
-        \item Mean and SD of LM PSU, mean NEM.
-        \item LM PSU of the \textbf{last admitted} (lowest application score among regular admits, status 24).
-        \item Share female; shares from private-paid and municipal schools (SES proxy).
-    \end{itemize}
-    \item \textbf{Income is not available}: Formulario A has no income and the DEMRE socioeconomic questionnaire is not in the data.
-    Income of the last admitted is replaced by the school type of the last admitted.
-    \item Each design keeps its own specification, with only the outcome replaced.
-    Design II and the selective-vs-selective variant of Design IV are reported in their own sections.
-\end{itemize}
-\end{frame}
-
-%--------------------------------------------------------
-\begin{frame}{Composition effects: Design I ($\Delta$ cupos)}
-\centering
-\resizebox{0.40\textwidth}{!}{$\Delta y^{comp}_{pt}=\pi\,\Delta Z_{pt}+\alpha_t+\varepsilon_{pt}$}
-
-\vspace{0.08cm}
-\tiny
-\resizebox{0.52\textwidth}{!}{\input{../../output/own_expansion/tables/oe_comp_design1.tex}}
-
-\vspace{0.06cm}
-\parbox{0.95\textwidth}{\tiny
-\textit{Notes:} $Z$: total cupos, in tens, so each coefficient is the effect of 10 more seats. First differences, year FE,
-SE clustered by program. The first row (first-year enrollment, \texttt{enrolls\_target}) is shown for reference.
-Ten more seats bring in about 7 more entrants and lower mean entrant PSU by 0.8--1.7 points and the last admitted's PSU
-by 1.6--3.3 points: programs that expand reach further down the score distribution.}
-\end{frame}
-
-%--------------------------------------------------------
-\begin{frame}{Composition effects: Design III (SUA entry)}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.56\textwidth}
-\centering
-\tiny
-\resizebox{\linewidth}{!}{\input{../../output/own_expansion/tables/oe_comp_sua.tex}}
-
-\vspace{0.05cm}
-\parbox{\linewidth}{\tiny
-\textit{Notes:} Levels first stage of Design III ($10\times E_p\times\text{Post}_t$), broad area $\times$ region markets, SE clustered by market.
-The enrollment row reproduces the Design III estimate ($\pi=1.97$).}
-\end{column}
-\begin{column}{0.42\textwidth}
-\centering
-\includegraphics[width=\linewidth]{../../output/own_expansion/figures/oe_comp_sua_es_c_psu_mean.pdf}
-
-\begin{itemize}\tiny
-    \item Event study: PSU-similarity-weighted exposure (Triangular, Gaussian); program, field- and region-year FE.
-    \item Mean entrant PSU is flat before and after 2012 (pre-tests $p=0.11$, $0.20$).
-    \item The field-year-FE declines in the table vanish with region-year FE.
-\end{itemize}
-\end{column}
-\end{columns}
-\end{frame}
-
-%--------------------------------------------------------
-\begin{frame}{Composition effects: Design IV (competitor vacancy shocks)}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.56\textwidth}
-\centering
-\tiny
-\resizebox{\linewidth}{!}{\input{../../output/own_expansion/tables/oe_comp_vs.tex}}
-
-\vspace{0.05cm}
-\parbox{\linewidth}{\tiny
-\textit{Notes:} Design IV model (1), broad markets, exposure in 10 pp units, own-shock control, SE clustered by market.}
-\end{column}
-\begin{column}{0.42\textwidth}
-\centering
-\includegraphics[width=\linewidth]{../../output/own_expansion/figures/oe_comp_vs_es_c_psu_mean.pdf}
-
-\begin{itemize}\tiny
-    \item Enrollment does not respond (as in Design IV). Under triangular weighting, mean entrant PSU falls by about 4--5 points per 10 pp.
-    This is consistent with close-competitor expansions drawing away stronger applicants without changing the number of entrants.
-    \item Total and Gaussian measures are mostly insignificant. The share from municipal schools rises by about 0.6--0.7 pp (Total).
-\end{itemize}
-\end{column}
-\end{columns}
-\end{frame}
-
-
-
-
-\appendix
 \section{Appendix}
 
 \begin{frame}[label=nonharmonizedfields]{Non-harmonized field observations}
