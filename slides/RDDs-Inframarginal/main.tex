@@ -832,317 +832,186 @@ d5 & $\geq 50$ \\
 %====================================================
 \section{Inframarginal Program-Year Analysis}
 %====================================================
-\begin{frame}{From Marginal to Inframarginal Students}
-
-\small
-
-\begin{itemize}
-
-\item The previous analysis focused on applicants located around admission cutoffs.
-
-\item We now study \textbf{inframarginal students}: applicants who would have been admitted to their target program in every year of the relevant period.
-
-\item To identify them, we reconstruct each student's application score using the admission weights from each year and compare it with the corresponding admission cutoff.
-
-\item The objective is to estimate whether changes in program capacity affect the outcomes of these inframarginal cohorts.
-
-\end{itemize}
-\end{frame}
-
-%----------------------------------------------------
 \subsection{Inframarginal Design No. 1}
-\begin{frame}{Inframarginal Design}
+%====================================================
+% DESIGN I: VACANCY CHANGES AND INFRAMARGINAL GRADUATION (issue #5)
+% code/04_rdd/Inframarginals/31_design1_main.do (main, placebo, robustness)
+%====================================================
+\begin{frame}{Inframarginal students: definition}
+\small
+The RDD identifies effects for applicants at the admission cutoff. We now study \textbf{inframarginal} students: applicants
+ranked well inside the admitted group, who would have been admitted in any year regardless of small changes in capacity.
 
-
-\textbf{Specification}
-
-\begin{itemize}
-    \item Following the model notes, program size should be measured using \emph{total enrollment}:
-    \[
-    \Delta N^{total}_{pt}
-    =
-    \pi \Delta Z_{pt}
-    +
-    \alpha_t
-    +
-    \nu_{pt}.
-    \]
-
-    \item Outcomes continue to be computed using inframarginal students:
-    \[
-    \Delta y^{infra}_{pt}
-    =
-    \beta \widehat{\Delta N}^{total}_{pt}
-    +
-    \alpha_t
-    +
-    \varepsilon_{pt}.
-    \]
-\end{itemize} 
-
-\vspace{0.15cm}
-\begin{itemize}
-    \item $N_{pt}^{total}$: total enrollment in program $p$ and year $t$.
-    \item $Z_{pt}$: total vacancies/cupos.
-    \item $y_{pt}^{infra}$: graduation rate among inframarginal students.
-\end{itemize}
-
-
-
-\end{frame}
-
-
-
-
-\begin{frame}{Corrected Inframarginal IV Results}
-
-\centering
-\tiny
-
-\begin{tabular}{lllcccc}
-\toprule
-Period & Instrument & Outcome & First stage & F-stat & Reduced form & 2SLS \\
-\midrule
-
-2007--2012 & $\Delta$ Total Cupos & Target grad. 8y
-& 0.816 & 482.57 & -0.00038 & -0.00048 \\
-& & 
-& (0.037) &  & (0.00024) & (0.00030) \\
-
-2007--2012 & $\Delta$ Total Cupos & Univ. grad. 8y
-& 0.816 & 482.57 & 0.00063 & 0.00079** \\
-& &
-& (0.037) &  & (0.00030) & (0.00035) \\
-
-2007--2012 & $\Delta$ Total Cupos & HE grad. 8y
-& 0.816 & 482.57 & 0.00063 & 0.00079** \\
-& &
-& (0.037) &  & (0.00030) & (0.00035) \\
-
-\midrule
-
-
-2013--2016 & $\Delta$ Total Cupos & Target grad. 8y
-& 0.543 & 96.11 & -0.00011 & -0.00020 \\
-& &
-& (0.054) &  & (0.00034) & (0.00064) \\
-
-2013--2016 & $\Delta$ Total Cupos & Univ. grad. 8y
-& 0.543 & 96.11 & 0.00048* & 0.00088** \\
-& &
-& (0.054) &  & (0.00025) & (0.00039) \\
-
-2013--2016 & $\Delta$ Total Cupos & HE grad. 8y
-& 0.543 & 96.11 & 0.00048* & 0.00088** \\
-& &
-& (0.054) &  & (0.00025) & (0.00039) \\
-
-\bottomrule
-\end{tabular}
-
-\vspace{0.08cm}
-
-\tiny
-Standard errors in parentheses. First stage: $\Delta N^{total}_{pt}$ on $\Delta Z_{pt}$.
-Reduced form: $\Delta y^{infra}_{pt}$ on $\Delta Z_{pt}$.
-2SLS: $\Delta y^{infra}_{pt}$ on predicted $\Delta N^{total}_{pt}$.
-$^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
-
-\end{frame}
-
-
-
-
-\begin{frame}{First Stage Robustness and Residual Variation}
-
-\centering
-\tiny 
-\textbf{Panel A. Sequential first-stage specifications}
-
-\vspace{0.05cm}
-
-
-
-\begin{tabular}{lcc}
-\toprule
-Specification & 2007--2012 & 2013--2016 \\
-\midrule
-Differences, no FE & 0.817 & 0.543 \\
-Differences + year FE & 0.816 & 0.543 \\
-Differences + program FE & 0.816 & 0.637 \\
-Differences + program + year FE & 0.813 & 0.638 \\
-Levels + program + year FE & 0.824 & 0.525 \\
-\bottomrule
-\end{tabular}
-
-\vspace{0.25cm}
-
-\textbf{Panel B. Residual variation after program and year FE}
-
-\vspace{0.05cm}
-
-\begin{tabular}{lcccc}
-\toprule
-Period 
-& Enrollment SD
-& Residual enrollment SD
-& Cupos SD
-& Residual Cupos SD \\
-\midrule
-2007--2012 & 45.5 & 31.8 & 49.6 & 33.5 \\
-2013--2016 & 62.4 & 37.9 & 67.7 & 40.0 \\
-\bottomrule
-\end{tabular}
-
-\vspace{0.2cm}
-
-\scriptsize
-\begin{itemize}
-\item Adding fixed effects does not eliminate the first stage.
-\item Residual variation remains substantial in both periods.
-\item The weaker 2013--2016 first stage does not appear to be driven by a lack of within-program variation.
-\end{itemize}
-
-\end{frame}
-
-
-%------------------------------------------------
-\begin{frame}{Inframarginal Student Definitions}
-
-Identify students who would have enrolled in the target program regardless of small changes in annual admission capacity.
-
-
+\vspace{0.12cm}
 \textbf{Construction}
-
 \begin{itemize}
-    \item For each program, compute the annual number of students who actually enrolled.
-    \item Define an enrollment threshold using one of two alternative rules:
+    \item For each program $p$, fix a threshold $T_p$ from its effective (enrolled) cohort sizes:
     \begin{itemize}
-        \item \textbf{First Cohort:} size of the first observed enrolled cohort.
-        \item \textbf{Minimum Cohort:} minimum enrolled cohort observed over the sample period.
+        \item \textbf{First Cohort} (main): size of the first enrolled cohort observed for $p$.
+        \item \textbf{Minimum Cohort} (robustness): smallest enrolled cohort of $p$ over 2007--2016.
     \end{itemize}
-    \item An applicant is classified as inframarginal if their admission rank is at or above the threshold defined for that program.
-\end{itemize}
-
+    \item Applicant $i$ to program $p$ in year $t$ is inframarginal if their admission rank is within the threshold:
 \[
 \text{Inframarginal}_{ipt}=1
 \quad \Longleftrightarrow \quad
-Rank_{ipt}\leq T_p,
+Rank_{ipt}\leq T_p .
 \]
-
-where $T_p$ is either the first enrolled cohort size or the minimum enrolled cohort size for program $p$.
+    \item $T_p$ is one number per program, fixed for every year. Membership does not move with that year's vacancies,
+    and the same definition applies to the whole 2007--2016 sample.
+    \item All applicants with an observed rank count, whether or not they enroll.
+\end{itemize}
 \end{frame}
 
-
-\begin{frame}{Results}
-
+%--------------------------------------------------------
+\begin{frame}{Design I: does a larger cohort lower inframarginal graduation?}
 \scriptsize
-\centering
+\textbf{Research question}
 
-\begin{tabular}{lcccc}
-\toprule
-& \shortstack{First\\Cohort}
-& \shortstack{80\% First\\Cohort}
-& \shortstack{Minimum\\Cohort}
-& \shortstack{80\% Minimum\\Cohort} \\
-\midrule
+When a program admits a larger entering cohort, do its inframarginal students, who would have been admitted anyway,
+become less likely to graduate \emph{from that program}?
 
-Infra students (N)
-& 388,867
-& 314,482
-& 354,631
-& 284,126 \\
+\vspace{0.10cm}
+\textbf{Approach}
+\begin{itemize}
+    \item Programs change their vacancies from year to year. These changes shift the size of the entering cohort, but not who is inframarginal.
+    \item We instrument the change in cohort size with the change in vacancies and look at inframarginal graduation.
+    \item Mechanisms: congestion (larger classes, fewer resources per student) and peer composition (expansions admit weaker entrants).
+\end{itemize}
 
-Share ranked infra (\%)
-& 72.90 & 58.96 & 66.48 & 53.27 \\
-
-FD observations
-& 6,523 & 6,523 & 6,521 & 6,519 \\
-
-Programs
-& 1,257 & 1,257 & 1,257 & 1,257 \\
-
-First stage
-& 0.7317*** & 0.7317*** & 0.7317*** & 0.7317*** \\
-& (0.0504) & (0.0504) & (0.0504) & (0.0504) \\
-
-F-stat
-& 210.7 & 210.7 & 210.6 & 210.6 \\
-
-2SLS Program
-& 0.00009 & 0.00011 & 0.00018 & 0.00019 \\
-& (0.00022) & (0.00023) & (0.00027) & (0.00029) \\
-
-\bottomrule
-\end{tabular}
-
-\vspace{0.15cm}
-
-\raggedright
-\tiny
-\textit{Notes:} Columns differ only in the definition of inframarginal students. In all columns, the threshold used to define inframarginal status is based on effective enrollment. \textbf{First Cohort} defines inframarginal students as applicants whose admission rank is weakly below the number of students effectively enrolled in the first observed cohort of each program. \textbf{80\% First Cohort} restricts this threshold to 80 percent of the first enrolled cohort. \textbf{Minimum Cohort} uses the minimum annual effective enrollment observed for each program over the sample period. \textbf{80\% Minimum Cohort} restricts this minimum threshold to 80 percent. The first stage instruments annual changes in total program enrollment with annual changes in total vacancies. The outcome is graduation from the program in which the student initially enrolled within eight years. Robust standard errors clustered at the program level are reported in parentheses.
-
+\vspace{0.06cm}
+\textbf{Outcome}
+\begin{itemize}
+    \item \textbf{Main}: share of the program-year's inframarginal applicants who graduate from that program within 8 years.
+    \item Secondary: graduation from any university and from any higher-education institution within 8 years.
+    \item Graduation records (titulados) run through 2024, so 8-year graduation is observed for every cohort, 2007--2016.
+\end{itemize}
 \end{frame}
 
-
-\begin{frame}{Alternative inframarginal}
-
-\tiny
+%--------------------------------------------------------
+\begin{frame}{Design I: data and sample}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.50\textwidth}
 \centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d1_desc.tex}}
+\end{column}
+\begin{column}{0.47\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{3pt}
+    \item \textbf{Unit}: program $\times$ admission year, 2007--2016.
+    \item \textbf{Applications and rank}: DEMRE Formulario C and the admission rank (\texttt{lugar}).
+    \item \textbf{Enrollment}: Formulario D and MINEDUC enrollment, $N_{pt}$.
+    \item \textbf{Vacancies}: total vacancies offered by the program, $Z_{pt}$.
+    \item \textbf{Graduation}: MINEDUC titulados, 2007--2024.
+    \item Inframarginal status with the First Cohort threshold.
+\end{itemize}
+\end{column}
+\end{columns}
 
-\begin{tabular}{lcccccc}
-\toprule
-Definition & N & Share (\%) & FD Obs. & First stage & F-stat & 2SLS \\
-\midrule
+\vspace{0.1cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} Means and SD over program-years. First-difference observations are program-years with the previous year observed (2008--2016).}
+\end{frame}
 
-\multicolumn{7}{l}{\textit{First Cohort}} \\
+%--------------------------------------------------------
+\begin{frame}{Design I: model}
+\small
+First differences within program, 2008--2016:
+\[
+\Delta N_{pt} = \pi\,\Delta Z_{pt} + \alpha_t \;[+\;\gamma_{u(p)t}] + \nu_{pt}
+\]
+\[
+\Delta y^{infra}_{pt} = \beta\,\widehat{\Delta N}_{pt} + \alpha_t \;[+\;\gamma_{u(p)t}] + \varepsilon_{pt}
+\]
+\begin{itemize}
+    \item $N_{pt}$: total first-year enrollment. $Z_{pt}$: total vacancies (instrument).
+    \item $y^{infra}_{pt}$: 8-year graduation rate of the inframarginal applicants of program $p$ in year $t$.
+    \item $\beta$: change in inframarginal graduation per additional entering student.
+    \item Two specifications:
+    \begin{enumerate}
+        \item[(1)] Year FE $\alpha_t$.
+        \item[(2)] Adds university $\times$ year FE $\gamma_{u(p)t}$: compares programs of the same university in the same year,
+        absorbing university-wide shocks (budget, demand, policy) that move both vacancies and graduation.
+    \end{enumerate}
+    \item Weights: average number of inframarginal applicants of the program (same in FS, RF and 2SLS). SE clustered by program.
+\end{itemize}
+\end{frame}
 
-100\% & 388,867 & 70.59 & 6,523 & 0.7317*** & 210.7 & 0.00009 \\
-      &         &       &       & (0.0504) &       & (0.00022) \\
+%--------------------------------------------------------
+\begin{frame}{Design I: results}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.55\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d1_main.tex}}
+\end{column}
+\begin{column}{0.42\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{3pt}
+    \item Ten more vacancies bring in about 7--8 more students ($F>190$).
+    \item With year FE only, the effect on program graduation is zero.
+    \item Within university and year, ten more entrants lower inframarginal graduation from the program by
+    \textbf{0.33 pp} (mean 36.9\%).
+    \item Graduation from any university does not fall: the loss looks like switching programs, not dropping out of higher education.
+    \item The Minimum Cohort threshold gives the same sign and size, but it is not significant.
+\end{itemize}
+\end{column}
+\end{columns}
 
-90\% & 350,913 & 63.70 & 6,523 & 0.7317*** & 210.7 & 0.00011 \\
-     &         &       &       & (0.0504) &       & (0.00023) \\
+\vspace{0.08cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} RF and 2SLS $\times 100$: pp of graduation per vacancy (RF) or per entering student (2SLS).
+SE clustered by program. \sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$.}
+\end{frame}
 
-80\% & 314,482 & 57.09 & 6,523 & 0.7317*** & 210.7 & 0.00011 \\
-     &         &       &       & (0.0504) &       & (0.00023) \\
+%--------------------------------------------------------
+\begin{frame}{Design I: robustness to the threshold and the horizon}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.55\textwidth}
+\centering
+\tiny
+\textbf{Share of the threshold}
 
-70\% & 276,422 & 50.18 & 6,521 & 0.7317*** & 210.7 & 0.00009 \\
-     &         &       &       & (0.0504) &       & (0.00023) \\
+\vspace{0.04cm}
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d1_thresholds.tex}}
+\end{column}
+\begin{column}{0.42\textwidth}
+\centering
+\tiny
+\textbf{8 vs.\ 10 years, cohorts 2007--2014}
 
-60\% & 238,522 & 43.30 & 6,519 & 0.7317*** & 210.7 & 0.00009 \\
-     &         &       &       & (0.0504) &       & (0.00024) \\
-
-\midrule
-
-\multicolumn{7}{l}{\textit{Minimum Cohort}} \\
-
-100\% & 354,631 & 64.37 & 6,521 & 0.7317*** & 210.6 & 0.00018 \\
-      &         &       &       & (0.0504) &       & (0.00027) \\
-
-90\% & 318,091 & 57.74 & 6,519 & 0.7317*** & 210.6 & 0.00021 \\
-     &         &       &       & (0.0504) &       & (0.00028) \\
-
-80\% & 284,126 & 51.58 & 6,519 & 0.7317*** & 210.6 & 0.00019 \\
-     &         &       &       & (0.0504) &       & (0.00029) \\
-
-70\% & 249,085 & 45.21 & 6,513 & 0.7317*** & 210.6 & 0.00014 \\
-     &         &       &       & (0.0504) &       & (0.00029) \\
-
-60\% & 214,682 & 38.97 & 6,511 & 0.7317*** & 210.6 & 0.00020 \\
-     &         &       &       & (0.0504) &       & (0.00030) \\
-
-\bottomrule
-\end{tabular}
+\vspace{0.04cm}
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d1_horizon.tex}}
+\end{column}
+\end{columns}
 
 \vspace{0.12cm}
-
-\raggedright
-\tiny
-\textit{Notes:} The table reports robustness checks using progressively more conservative definitions of inframarginal students. For each program, the baseline definition uses either the size of the first enrolled cohort (\textit{First Cohort}) or the minimum enrolled cohort observed over 2007--2016 (\textit{Minimum Cohort}). Alternative definitions restrict the inframarginal sample to the top 90\%, 80\%, 70\%, and 60\% of each baseline cohort size. All thresholds are based on effective enrollment and then applied to applicants according to their admission ranking. The first stage instruments annual changes in total enrollment with annual changes in total vacancies. The outcome is graduation from the initially enrolled program within eight years. Robust standard errors clustered at the program level are reported in parentheses.
-
+\begin{itemize}\scriptsize
+    \setlength{\itemsep}{1pt}
+    \item 2SLS, program graduation, $\times 100$. Left: inframarginal = rank within 60--100\% of $T_p$. Right: same students observed at both horizons.
+    \item With university $\times$ year FE the effect is negative and of similar size under every threshold (significant for First Cohort).
+    It persists at 10 years, so it is not only delayed graduation.
+\end{itemize}
 \end{frame}
 
+%--------------------------------------------------------
+\begin{frame}{Design I: heterogeneity by field of study}
+\centering
+\tiny
+\resizebox{0.95\textwidth}{!}{\input{../../output/inframarginal/tables/im_d1_field.tex}}
 
+\vspace{0.08cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} First Cohort. 2SLS $\times 100$, pp of program graduation per entering student.
+Field group fixed at the program level. SE clustered by program. \sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$.}
+
+\vspace{0.06cm}
+\begin{itemize}\scriptsize
+    \item The negative effect concentrates in STEM, where the first stage is strongest ($-0.05$ pp per student with university $\times$ year FE).
+    \item Business and Law moves the other way.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
 \begin{frame}{Heterogeneity by University Selectivity: First Cohort}
 
 \scriptsize
@@ -1250,8 +1119,8 @@ annual changes in total program enrollment. The 2SLS coefficient estimates the
 effect of one additional enrolled student induced by changes in vacancies on
 the eight-year graduation rate from the initially enrolled program among
 inframarginal students. Robust standard errors clustered at the program level
-are reported in parentheses. $^{*}p<0.10$, $^{**}p<0.05$,
-$^{***}p<0.01$.
+are reported in parentheses. Within a single university, university $\times$ year FE coincide with year FE.
+$^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
 
 \end{frame}
 
@@ -1362,378 +1231,10 @@ annual changes in total program enrollment. The 2SLS coefficient estimates the
 effect of one additional enrolled student induced by changes in vacancies on
 the eight-year graduation rate from the initially enrolled program among
 inframarginal students. Robust standard errors clustered at the program level
-are reported in parentheses. $^{*}p<0.10$, $^{**}p<0.05$,
-$^{***}p<0.01$.
+are reported in parentheses. Within a single university, university $\times$ year FE coincide with year FE.
+$^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
 
 \end{frame}
-
-\begin{frame}{Program selectivity and graduation effects}
-
-\tiny
-\centering
-
-\textbf{Panel A. First Cohort}
-
-\vspace{0.05cm}
-
-\begin{tabular}{lccccc}
-\toprule
-Program selectivity & Programs & FD obs. & First Stage & F-stat & 2SLS \\
-\midrule
-PSU $<550$
-    & 410 & 1,400 & 0.4356*** & 217.0 & 0.00125 \\
-    &&& (0.0296) && (0.00112) \\
-
-PSU 550--600
-    & 467 & 2,563 & 0.5165*** & 196.3 & 0.00036 \\
-    &&& (0.0369) && (0.00071) \\
-
-PSU 600--650
-    & 249 & 1,665 & 0.7510*** & 238.9 & -0.00032 \\
-    &&& (0.0486) && (0.00053) \\
-
-PSU $\geq650$
-    & 131 & 895 & 0.9229*** & 802.3 & -0.00009 \\
-    &&& (0.0326) && (0.00018) \\
-\bottomrule
-\end{tabular}
-
-\vspace{0.35cm}
-
-\textbf{Panel B. Minimum Cohort}
-
-\vspace{0.05cm}
-
-\begin{tabular}{lccccc}
-\toprule
-Program selectivity & Programs & FD obs. & First Stage & F-stat & 2SLS \\
-\midrule
-PSU $<550$
-    & 410 & 1,400 & 0.4356*** & 217.0 & 0.00140 \\
-    &&& (0.0296) && (0.00117) \\
-
-PSU 550--600
-    & 467 & 2,561 & 0.5162*** & 196.0 & 0.00048 \\
-    &&& (0.0369) && (0.00077) \\
-
-PSU 600--650
-    & 249 & 1,665 & 0.7510*** & 238.9 & -0.00023 \\
-    &&& (0.0486) && (0.00052) \\
-
-PSU $\geq650$
-    & 131 & 895 & 0.9229*** & 802.3 & -0.00004 \\
-    &&& (0.0326) && (0.00025) \\
-\bottomrule
-\end{tabular}
-
-\vspace{0.15cm}
-
-\raggedright
-\tiny
-Notes: Programs are classified according to the average Language--Mathematics PSU score of enrolled students over 2007--2016:
-PSU $<550$, 550--600, 600--650, and PSU $\geq650$.
-Standard errors clustered at the program level are reported in parentheses.
-Outcomes correspond to graduation from the initially enrolled program within eight years.
-
-\end{frame}
-
-
-
-\begin{frame}{Heterogeneity by Field of Study}
-
-\tiny
-\centering
-
-\begin{tabular}{lccccc}
-\toprule
-Field group & Programs & FD obs. & First stage & F-stat & 2SLS \\
-\midrule
-
-\multicolumn{6}{l}{\textbf{Panel A. First Cohort}} \\
-
-Business and Law
-& 130 & 651 & 0.6305*** & 93.0 & 0.00179** \\
-&&& (0.0654) && (0.00084) \\
-
-Health
-& 221 & 1,290 & 0.4074*** & 142.1 & -0.00013 \\
-&&& (0.0342) && (0.00082) \\
-
-STEM
-& 432 & 2,162 & 0.8502*** & 320.7 & -0.00015 \\
-&&& (0.0475) && (0.00010) \\
-
-Education and Humanities
-& 372 & 1,913 & 0.7158*** & 51.9 & -0.00060 \\
-&&& (0.0994) && (0.00061) \\
-
-Arts, Architecture and Agriculture
-& 102 & 507 & 0.6541*** & 138.0 & 0.00070 \\
-&&& (0.0557) && (0.00120) \\
-
-\midrule
-
-\multicolumn{6}{l}{\textbf{Panel B. Minimum Cohort}} \\
-
-Business and Law
-& 130 & 651 & 0.6305*** & 93.0 & 0.00189** \\
-&&& (0.0654) && (0.00084) \\
-
-Health
-& 221 & 1,288 & 0.4069*** & 141.9 & 0.00013 \\
-&&& (0.0342) && (0.00084) \\
-
-STEM
-& 432 & 2,162 & 0.8502*** & 320.7 & -0.00014 \\
-&&& (0.0475) && (0.00012) \\
-
-Education and Humanities
-& 372 & 1,913 & 0.7158*** & 51.9 & -0.00062 \\
-&&& (0.0994) && (0.00064) \\
-
-Arts, Architecture and Agriculture
-& 102 & 507 & 0.6541*** & 138.0 & 0.00073 \\
-&&& (0.0557) && (0.00117) \\
-
-\bottomrule
-\end{tabular}
-
-\vspace{0.10cm}
-
-\raggedright
-\tiny
-\textit{Notes:} Results use the 2007--2016 panel. Fields are grouped using the target program's field of study and fixed at the program level. The first stage estimates the effect of annual changes in vacancies on annual changes in total enrollment. The 2SLS coefficient estimates the effect of one additional enrolled student, induced by changes in vacancies, on the eight-year graduation rate from the initially enrolled program among inframarginal students. Robust standard errors clustered at the program level are reported in parentheses. $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
-
-\end{frame}
-
-
-
-\begin{frame}{Inframarginal Students: Graduation at 8 vs. 10 Years}
-
-\scriptsize
-\centering
-
-\begin{tabular}{lccccc}
-\toprule
-Definition & Horizon & Programs & FD obs. & First stage & 2SLS \\
-\midrule
-
-First Cohort
-& 8 years
-& 1,092
-& 4,881
-& 0.7413***
-& 0.00002 \\
-&&&& (0.0579) & (0.00021) \\[0.05cm]
-
-First Cohort
-& 10 years
-& 1,092
-& 4,881
-& 0.7413***
-& 0.00031 \\
-&&&& (0.0579) & (0.00034) \\[0.05cm]
-
-Minimum Cohort
-& 8 years
-& 1,092
-& 4,881
-& 0.7413***
-& 0.00010 \\
-&&&& (0.0579) & (0.00027) \\[0.05cm]
-
-Minimum Cohort
-& 10 years
-& 1,092
-& 4,881
-& 0.7413***
-& 0.00048 \\
-&&&& (0.0579) & (0.00043) \\
-
-\bottomrule
-\end{tabular}
-
-\vspace{0.15cm}
-
-\raggedright
-\tiny
-\textit{Notes:} The table compares graduation outcomes measured within eight and ten years using the same 2007--2014 sample. The outcome is graduation from the program in which the student initially enrolled. Each estimate uses 1,092 programs and 4,881 first-difference observations. The first stage instruments annual changes in total program enrollment with annual changes in total vacancies; the first-stage coefficient implies that 10 additional vacancies increase enrollment by approximately 7.4 students. Robust standard errors clustered at the program level are reported in parentheses. $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
-\end{frame}
-
-%------------------------------------------------
-\begin{frame}{Inframarginal IV results}
-
-\scriptsize
-
-\begin{center}
-\begin{tabular}{lcccc}
-\toprule
-Outcome & First stage & F-stat & Reduced form & 2SLS \\
-\midrule
-
-Target graduation, 8y
-& 0.732
-& 210.7
-& 0.00013
-& 0.00019 \\
-&
-(0.050)
-&
-&
-(0.00020)
-&
-(0.00028) \\
-
-University graduation, 8y
-& 0.732
-& 210.7
-& 0.00005
-& 0.00007 \\
-&
-(0.050)
-&
-&
-(0.00012)
-&
-(0.00016) \\
-
-Higher education graduation, 8y
-& 0.732
-& 210.7
-& 0.00005
-& 0.00007 \\
-&
-(0.050)
-&
-&
-(0.00012)
-&
-(0.00016) \\
-
-\bottomrule
-\end{tabular}
-\end{center}
-
-\vspace{0.2cm}
-
-\begin{itemize}
-    \item 494,675 inframarginal students (90.6\% of enrollment).
-\end{itemize}
-
-\end{frame}
-
-%------------------------------------------------
-\begin{frame}{Heterogeneity by university selectivity}
-
-\scriptsize
-
-\begin{center}
-\begin{tabular}{lccccc}
-\toprule
-University &
-Mean PSU &
-First stage &
-F-stat &
-Reduced form &
-2SLS \\
-\midrule
-
-\multicolumn{6}{l}{\textit{Highly selective universities}} \\
-
-UC
-& 693.1
-& 0.993
-& 903.9
-& 0.00024
-& 0.00024 \\
-&
-&
-(0.028)
-&
-&
-(0.00028)
-&
-(0.00028) \\
-
-UCH
-& 686.1
-& 0.804
-& 390.5
-& 0.00096***
-& 0.00119*** \\
-&
-&
-(0.045)
-&
-&
-(0.00026)
-&
-(0.00036) \\
-
-\midrule
-
-\multicolumn{6}{l}{\textit{Less selective universities}} \\
-
-UNAB
-& 559.2
-& 0.380
-& 90.8
-& -0.00029
-& -0.00076 \\
-&
-&
-(0.040)
-&
-&
-(0.00022)
-&
-(0.00060) \\
-
-UCSC
-& 563.5
-& 0.445
-& 75.4
-& -0.00174**
-& -0.00385** \\
-&
-&
-(0.052)
-&
-&
-(0.00076)
-&
-(0.00157) \\
-
-UBB
-& 567.5
-& 0.668
-& 14.1
-& -0.00464**
-& -0.00673* \\
-&
-&
-(0.191)
-&
-&
-(0.00206)
-&
-(0.00366) \\
-
-\bottomrule
-\end{tabular}
-\end{center}
-
-\vspace{0.15cm}
-
-\tiny
-\begin{itemize}
-    \item Mean PSU is based on target-program selectivity.
-    \item Outcome: university graduation among inframarginal students.
-    \item Negative effects emerge mainly among less selective institutions.
-\end{itemize}
-
-\end{frame}
-
 
 %--------------------------------------------------------
 \begin{frame}{Design I: heterogeneity by predetermined program selectivity}
@@ -1744,12 +1245,12 @@ UBB
 \vspace{0.04cm}
 \parbox{0.97\textwidth}{\tiny
 \textit{Notes:} Quartiles of 2007--2009 entrant PSU (predetermined). First differences, year FE, First Cohort, SE clustered by program.
-FS, RF and 2SLS share one weight. Coefficients $\times 100$ (pp per seat or student). Holm and equality tests come from one joint model.
+FS, RF and 2SLS share one weight. Coefficients $\times 100$ (pp per seat or student). The next slide adds university $\times$ year FE.
 \sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$.}
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Design I: selectivity heterogeneity, robustness and placebo}
+\begin{frame}{Design I: selectivity heterogeneity, university $\times$ year FE and placebo}
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.47\textwidth}
 \centering
@@ -1767,7 +1268,7 @@ FS, RF and 2SLS share one weight. Coefficients $\times 100$ (pp per seat or stud
 \begin{itemize}\scriptsize
     \setlength{\itemsep}{1pt}
     \item The first stage rises monotonically with selectivity (0.41 to 0.89). Seats bind in selective programs, and added seats go partly unfilled elsewhere.
-    \item Graduation effects are small and imprecise in every quartile, and equality is not rejected. Effects become more negative with selectivity
+    \item With year FE, graduation effects are small and imprecise in every quartile. Effects become more negative with selectivity
     ($\Delta N\times\tilde S$: $-0.029^{*}$), and Q4 turns significant with university $\times$ year FE ($-0.034^{**}$, $-0.34$ pp per 10 students).
     \item The placebo leads reject in Q1 and Q4, so the signal in the extreme quartiles is fragile.
 \end{itemize}
@@ -1781,9 +1282,10 @@ FS, RF and 2SLS share one weight. Coefficients $\times 100$ (pp per seat or stud
 
 \vspace{0.06cm}
 \parbox{0.97\textwidth}{\tiny
-\textit{Notes:} 2SLS, pp of graduation per additional student; First Cohort; year FE; SE clustered by program. ``All ranked'': current
-definition (non-enrollees count as non-graduates). ``Enrolled'': inframarginals enrolled in the program (conditions on take-up). Top half and
-near threshold split enrolled inframarginals at half the threshold. \sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$.}
+\textit{Notes:} 2SLS, pp of graduation per additional student; First Cohort; year FE unless noted; SE clustered by program. ``All ranked
+inframarginals'': every applicant with $Rank_{ipt}\le T_p$ (non-enrollees count as non-graduates). ``Enrolled'': inframarginals enrolled in the
+program (conditions on take-up). Top half and near threshold split enrolled inframarginals at half the threshold.
+\sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$.}
 
 \vspace{0.06cm}
 \begin{itemize}\tiny
@@ -1815,18 +1317,18 @@ near threshold split enrolled inframarginals at half the threshold. \sym{***}~$p
 %--------------------------------------------------------
 \begin{frame}{Design I: composition of the entering cohort}
 \centering
-\resizebox{0.40\textwidth}{!}{$\Delta y^{comp}_{pt}=\pi\,\Delta Z_{pt}+\alpha_t+\varepsilon_{pt}$}
+\resizebox{0.50\textwidth}{!}{$\Delta y^{comp}_{pt}=\pi\,\Delta Z_{pt}+\alpha_t\;[+\;\gamma_{u(p)t}]+\varepsilon_{pt}$}
 
 \vspace{0.08cm}
 \tiny
-\resizebox{0.52\textwidth}{!}{\input{../../output/own_expansion/tables/oe_comp_design1.tex}}
+\resizebox{0.50\textwidth}{!}{\input{../../output/own_expansion/tables/oe_comp_design1.tex}}
 
 \vspace{0.06cm}
 \parbox{0.95\textwidth}{\tiny
-\textit{Notes:} $Z$: total cupos, in tens, so each coefficient is the effect of 10 more seats. First differences, year FE,
-SE clustered by program. The first row (first-year enrollment, \texttt{enrolls\_target}) is shown for reference.
-Ten more seats bring in about 7 more entrants and lower mean entrant PSU by 0.8--1.7 points and the last admitted's PSU
-by 1.6--3.3 points: programs that expand reach further down the score distribution.}
+\textit{Notes:} $Z$: total vacancies, in tens, so each coefficient is the effect of 10 more seats. First differences, 2008--2016,
+SE clustered by program. The first row (first-year enrollment) is shown for reference.
+Ten more seats bring in about 7 more entrants and lower mean entrant PSU by 1.3 points and the last admitted's PSU by 2.3--2.4 points,
+with or without university $\times$ year FE: programs that expand reach further down the score distribution.}
 \end{frame}
 
 \subsection{Inframarginal Design No. 2}
@@ -1890,21 +1392,24 @@ When a selective program suddenly increases its regular-admission vacancies, wha
 \textbf{Outcomes}: regular vacancies $V_{pt}$ (mechanical check), first-year enrollment $N_{pt}$ (Formulario D), and composition of entrants.
 
 \vspace{0.08cm}
-\textbf{(1) TWFE}
+\textbf{(A) TWFE}, two sets of fixed effects, reported as columns (1) and (2) of the tables:
 \[
-y_{pt}=\beta\,\text{Post}_{pt}+\mu_p+\alpha_{f(p),t}+\gamma_{r(p),t}+\varepsilon_{pt}
+\text{(1)}\quad y_{pt}=\beta\,\text{Post}_{pt}+\mu_p+\lambda_t+\varepsilon_{pt}
+\qquad\qquad
+\text{(2)}\quad y_{pt}=\beta\,\text{Post}_{pt}+\mu_p+\lambda_{f(p)t}+\lambda_{r(p)t}+\varepsilon_{pt}
 \]
-\textbf{(2) Event study}
+{\tiny $\mu_p$: program FE. $\lambda_t$: year FE. $\lambda_{f(p)t}$: field (\'area del conocimiento) $\times$ year FE. $\lambda_{r(p)t}$: campus region $\times$ year FE.}
+
+\textbf{(B) Event study}, FE of (2)
 \[
-y_{pt}=\sum_{\ell\neq-1}b_\ell\,\mathbf 1\{t-g_p=\ell\}+\mu_p+\alpha_{f(p),t}+\gamma_{r(p),t}+e_{pt},\qquad \ell\in\{\le-5,\dots,\ge4\}
+y_{pt}=\sum_{\ell\neq-1}b_\ell\,\mathbf 1\{t-g_p=\ell\}+\mu_p+\lambda_{f(p)t}+\lambda_{r(p)t}+e_{pt},\qquad \ell\in\{\le-5,\dots,\ge4\}
 \]
-\textbf{(3) Callaway \& Sant'Anna}: never treated only, and not yet treated plus never treated. Balanced panel.
+\textbf{(C) Callaway \& Sant'Anna}: never treated only, and not yet treated plus never treated. Balanced panel; program and year only.
 
 \vspace{0.05cm}
 \begin{itemize}
-    \item SE clustered by program. Specification (1) in the tables also includes a version with program and year FE only.
-    \item Inframarginal outcome (graduation of inframarginal students): \textbf{pending}. The Design I rank file
-    (\texttt{admission\_rank\_inframarginal\_2007\_2016.dta}) has no builder in the repository.
+    \item SE clustered by program.
+    \item Inframarginal graduation: see the reduced-form section at the end of the inframarginal designs.
 \end{itemize}
 \end{frame}
 
@@ -1938,11 +1443,12 @@ with flat leads (TWFE joint-leads $p=0.74$).}
 \begin{frame}{Design II: composition of the entering cohort}
 \centering
 \tiny
-\resizebox{0.90\textwidth}{!}{\input{../../output/own_expansion/tables/oe_twfe_comp.tex}}
+\resizebox{0.50\textwidth}{!}{\input{../../output/own_expansion/tables/oe_twfe_comp.tex}}
 
 \vspace{0.05cm}
 \parbox{0.97\textwidth}{\tiny
-\textit{Notes:} As in the previous table. Shares are in percentage points. Last admitted = lowest application score among regular admits.
+\textit{Notes:} All incumbent programs. TWFE (1): program and year FE. TWFE (2): program, field $\times$ year and region $\times$ year FE.
+SE clustered by program. Shares are in percentage points. Last admitted = lowest application score among regular admits.
 Income is not available in the data (Formulario A has no income; the socioeconomic questionnaire is not in \texttt{data/}),
 so school dependency is the SES proxy.}
 \end{frame}
@@ -1952,9 +1458,7 @@ so school dependency is the SES proxy.}
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.50\textwidth}
 \centering
-\includegraphics[width=\linewidth, height=0.40\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_es_c_psu_mean_sel.pdf}
-
-\includegraphics[width=\linewidth, height=0.40\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_es_c_psu_last_sel.pdf}
+\includegraphics[width=\linewidth, height=0.55\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_es_c_psu_mean_sel.pdf}
 \end{column}
 \begin{column}{0.48\textwidth}
 \centering
@@ -1964,8 +1468,7 @@ so school dependency is the SES proxy.}
 \vspace{0.2cm}
 \begin{itemize}\scriptsize
     \setlength{\itemsep}{2pt}
-    \item Mean entrant PSU falls by 6--9 points (about 0.15 SD of program-year means), with flat leads.
-    \item The PSU of the last admitted shows no significant change, but the estimate is imprecise (SE $\approx 6$ points), so a fall of the size of the mean effect cannot be ruled out.
+    \item Event study and table: selective programs. Mean entrant PSU falls by 6--9 points (about 0.15 SD of program-year means), with flat leads.
     \item Results are robust to the top 25\% and top 10\% shock definitions.
     \item The table uses full FE (program, field $\times$ year, region $\times$ year).
 \end{itemize}
@@ -4178,7 +3681,7 @@ delivers a significant effect.}
     shock and, at 5\%, for log enrollment after a market shock and enrollment after a cosine shock.
     \item After a close-competitor or market shock, CS shows enrollment \emph{rising} by 2--4 students; TWFE, which
     absorbs field- and region-year shocks, is flat. After a shock at a top-5 cosine program, both point to declines of 1--3 students, imprecisely estimated.
-    \item These event studies use a binary first-shock indicator and discard the dose. The next two slides keep it.
+    \item These event studies use a binary first-shock indicator and discard the dose. The next slide keeps it.
 \end{itemize}
 \end{frame}
 
@@ -4216,30 +3719,12 @@ Leads beyond 2016 set to zero, as in the binary event studies.}
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Design IV: dose event studies, average post-exposure effect}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.4\textwidth}
-\centering
-\resizebox{\linewidth}{!}{\input{../../output/vacancy_shocks/tables/vs_esd_summary.tex}}
-\end{column}
-\begin{column}{0.57\textwidth}
-\tiny
-\textit{Notes:} Coefficient: average of $\beta_0,\dots,\beta_3$ per 10 pp of exposure (SE in parentheses);
-$p$-value of the joint test $\beta_{\le -5}=\beta_{-4}=\beta_{-3}=\beta_{-2}=0$ in brackets.
-Panel B keeps years up to 2012, where every interior lead is observed. Program FE, field $\times$ year FE, own shocks;
-SE clustered by market.
-
-\vspace{0.2cm}
-\begin{itemize}\scriptsize
-    \item Keeping the dose, pre-trends are not rejected at 5\% for any measure in the full sample, unlike the binary CS event studies (which also lack field- and region-year FE). In panel B, one of 16 tests rejects (Triangular KD, $p=0.018$).
-    \item Post-exposure effects are positive and insignificant (0.4--1 students per 10 pp; below 3\% in logs), consistent with the static first stages. No sign of business stealing.
-\end{itemize}
-\end{column}
-\end{columns}
-\end{frame}
-
-%--------------------------------------------------------
 \begin{frame}{Design IV: composition of the entering cohort}
+\scriptsize
+\textbf{Question}: when competitors $j$ of program $k$ suddenly add seats, does the profile of \emph{$k$'s} entrants change
+(e.g.\ $k$ loses its strongest applicants to $j$)?
+
+\vspace{0.06cm}
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.56\textwidth}
 \centering
@@ -4248,7 +3733,9 @@ SE clustered by market.
 
 \vspace{0.05cm}
 \parbox{\linewidth}{\tiny
-\textit{Notes:} Design IV model (1), broad markets, exposure in 10 pp units, own-shock control, SE clustered by market.}
+\textit{Notes:} Dependent variable: mean characteristic of the entrants to incumbent $k$ in year $t$. Regressor: $\text{cum}E^{w}_{kt}$,
+the seats added by sudden expansions at competitors $j$ in $k$'s market (10 pp units). Design IV model (1), broad markets, own-shock control,
+SE clustered by market.}
 \end{column}
 \begin{column}{0.42\textwidth}
 \centering
@@ -4303,21 +3790,16 @@ E^{w,sel}_{kt}=100\times\frac{\sum_{j\in m(k),\,j\neq k,\,j\ \text{sel.}} w(k,j)
 
 \vspace{0.05cm}
 \tiny
-\textit{Panel A: First-year enrollment}
+\textit{First-year enrollment}
 
-\resizebox{0.66\textwidth}{!}{\input{../../output/own_expansion/tables/oe_sel_fs_N_first.tex}}
-
-\vspace{0.04cm}
-\textit{Panel B: Log first-year enrollment}
-
-\resizebox{0.66\textwidth}{!}{\input{../../output/own_expansion/tables/oe_sel_fs_lnN.tex}}
+\resizebox{0.72\textwidth}{!}{\input{../../output/own_expansion/tables/oe_sel_fs_N_first.tex}}
 
 \vspace{0.04cm}
 \parbox{0.97\textwidth}{\tiny
 \textit{Notes:} Exposure in 10 pp units. All regressions control for own shocks. SE clustered by market.
 \sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$.
 In levels, the kernel measures are negative and significant: closer selective competitors expanding lowers $k$'s enrollment by about
-12 entrants per 10 pp (triangular). The log specification is null, and there are only about 30 broad markets.}
+12 entrants per 10 pp (triangular). There are only about 30 broad markets.}
 \end{frame}
 
 %--------------------------------------------------------

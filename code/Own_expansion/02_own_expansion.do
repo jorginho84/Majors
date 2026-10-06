@@ -242,19 +242,32 @@ program define oe_cell, rclass
     return local ym "`ym'"
 end
 
-* (a) main table: enrollment, selective vs all, two FE specs + CS
+* (a) enrollment: selective (two FE specs + CS) and all programs (two FE specs)
+*     composition: all programs only, two FE specs (issue #5 review)
 foreach tab in enroll comp {
-    if "`tab'" == "enroll" local rows V_dem N_first lnN
-    else local rows c_psu_mean c_psu_last c_psu_sd c_nem_mean c_female c_priv c_mun c_priv_last
+    if "`tab'" == "enroll" {
+        local rows V_dem N_first lnN
+        local cols `""sel fe1" "sel fe2" "sel CSnv" "sel CSny" "all fe1" "all fe2""'
+    }
+    else {
+        local rows c_psu_mean c_psu_sd c_nem_mean c_female c_priv c_mun c_priv_last
+        local cols `""all fe1" "all fe2""'
+    }
     file open T using "$oe_out/tables/oe_twfe_`tab'.tex", write replace
-    file write T "\begin{tabular}{lcccccc}" _n "\toprule" _n
-    file write T " & \multicolumn{4}{c}{Selective programs} & \multicolumn{2}{c}{All programs} \\" _n
-    file write T "\cmidrule(lr){2-5}\cmidrule(lr){6-7}" _n
-    file write T " & TWFE & TWFE & CS & CS & TWFE & TWFE \\" _n
-    file write T " & (1) & (2) & never & not yet & (1) & (2) \\" _n "\midrule" _n
+    if "`tab'" == "enroll" {
+        file write T "\begin{tabular}{lcccccc}" _n "\toprule" _n
+        file write T " & \multicolumn{4}{c}{Selective programs} & \multicolumn{2}{c}{All programs} \\" _n
+        file write T "\cmidrule(lr){2-5}\cmidrule(lr){6-7}" _n
+        file write T " & TWFE & TWFE & CS & CS & TWFE & TWFE \\" _n
+        file write T " & (1) & (2) & never & not yet & (1) & (2) \\" _n "\midrule" _n
+    }
+    else {
+        file write T "\begin{tabular}{lcc}" _n "\toprule" _n
+        file write T " & TWFE (1) & TWFE (2) \\" _n "\midrule" _n
+    }
     foreach y of local rows {
         file write T "`lab_`y''"
-        foreach c in "sel fe1" "sel fe2" "sel CSnv" "sel CSny" "all fe1" "all fe2" {
+        foreach c of local cols {
             tokenize `c'
             oe_cell `1' `y' `2'
             if "`r(b)'" == "" | "`r(b)'" == "." {
@@ -266,7 +279,7 @@ foreach tab in enroll comp {
             file write T " & " %7.3f (`bb') "`r(stars)'"
         }
         file write T " \\" _n
-        foreach c in "sel fe1" "sel fe2" "sel CSnv" "sel CSny" "all fe1" "all fe2" {
+        foreach c of local cols {
             tokenize `c'
             oe_cell `1' `y' `2'
             if "`r(se)'" == "" | "`r(se)'" == "." {
@@ -276,13 +289,19 @@ foreach tab in enroll comp {
             file write T " & (" %6.3f (`r(se)') ")"
         }
         file write T " \\" _n
-        oe_cell sel `y' fe1
-        local ym = "`r(ym)'"
-        local Ns = "`r(N)'"
         oe_cell all `y' fe1
-        file write T "\quad \textit{Pre-mean treated; N} & \multicolumn{4}{c}{\scriptsize " ///
-            %6.2f (`ym') "; " %5.0fc (`Ns') "} & \multicolumn{2}{c}{\scriptsize " ///
-            %6.2f (`r(ym)') "; " %5.0fc (`r(N)') "} \\" _n "\addlinespace" _n
+        local yma = "`r(ym)'"
+        local Na = "`r(N)'"
+        if "`tab'" == "enroll" {
+            oe_cell sel `y' fe1
+            file write T "\quad \textit{Pre-mean treated; N} & \multicolumn{4}{c}{\scriptsize " ///
+                %6.2f (`r(ym)') "; " %5.0fc (`r(N)') "} & \multicolumn{2}{c}{\scriptsize " ///
+                %6.2f (`yma') "; " %5.0fc (`Na') "} \\" _n "\addlinespace" _n
+        }
+        else {
+            file write T "\quad \textit{Pre-mean treated; N} & \multicolumn{2}{c}{\scriptsize " ///
+                %6.2f (`yma') "; " %5.0fc (`Na') "} \\" _n "\addlinespace" _n
+        }
     }
     file write T "\bottomrule" _n "\end{tabular}" _n
     file close T
@@ -292,7 +311,7 @@ foreach tab in enroll comp {
 file open T using "$oe_out/tables/oe_threshold_sens.tex", write replace
 file write T "\begin{tabular}{lccc}" _n "\toprule" _n
 file write T "Outcome & Top 25\% & Top 20\% (main) & Top 10\% \\" _n "\midrule" _n
-foreach y in V_dem N_first lnN c_psu_mean c_psu_last c_priv {
+foreach y in V_dem N_first lnN c_psu_mean c_priv {
     file write T "`lab_`y''"
     foreach sp in p75 fe2 p90 {
         oe_cell sel `y' `sp'

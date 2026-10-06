@@ -23,18 +23,8 @@ the four orphan files in `output/tables/` (committed in a91f9e5 with no generati
 | 447 | Target graduation by field | `04_rdd/07_rdd_graduation_by_field.do:75-160` | writes .tex |
 | 490 | Univ & HE graduation by field | same | **Baseline column: no producer** |
 | 621 | Delta selectivity definitions | static text | nothing to generate |
-| 875 | Corrected inframarginal IV | `04_rdd/21_compare_inframarginal_two_instruments_full.do:83-196` | inputs `inframarginal_program_year_panel_*.dta` have **no builder**; Univ and HE rows identical — check |
-| 939 A | First-stage robustness | only "Differences + year FE" row from script 21:102 | **4 of 5 rows: no producer** |
-| 957 B | Raw/residual SDs | — | **no producer** |
-| 1015 | Results (four definitions) | `04_rdd/Inframarginals/21b_...:438-628` | csv/dta; needs Oferta Académica |
-| 1066 | Alternative inframarginal | `04_rdd/Inframarginals/21c_...:430-597` | csv/dta; share 70.59 vs 72.90 at 1015 for the same definition — check |
-| 1124 | Univ. selectivity, first cohort | — | **no producer** (script 23 reads a .dta nothing builds; script 26 could do it with the `_first_enroll` panel) |
-| 1236 | Univ. selectivity, minimum cohort | `Inframarginals/26_...:183-422` | csv/dta |
-| 1352, 1380 | Program selectivity A/B | `Inframarginals/25_...:142-417` | csv |
-| 1420 | Field of study | `Inframarginals/27_...:371-778` | csv |
-| 1489 | Graduation 8 vs 10 years | `Inframarginals/28b_...:488-1032` (needs 28a) | csv; needs Oferta Académica |
-| 1542 | Inframarginal IV results | — | **no producer** (older definition) |
-| 1604 | Heterogeneity by univ. selectivity | — | **no producer** (uses UNAB, not in any script) |
+| Design I (2026-10-06) | Univ. selectivity, first cohort | — | **no producer** (script 23 reads a .dta nothing builds; script 26 could do it with the `_first_enroll` panel) |
+| Design I (2026-10-06) | Univ. selectivity, minimum cohort | `Inframarginals/26_...:183-422` | csv/dta |
 | 1922, 1971 | SUA samples and exposure | `Sua/03c_...:228-270, 486, 662` | log only |
 | 2156 | SUA levels first stage | `Sua/04_sua_levels_first_stages.do:109-722` | log only |
 | appendix (`sua-fs-{lvl,log}-{entrant,positive}`) | SUA levels and log first stages, entrant regions only / positive exposure only | `Sua/04g_sua_first_stages_restricted_samples.do` | `output/tables/sua_fs_{lvl,log}_{entrant,positive}.tex` (`\input`) |
@@ -50,9 +40,11 @@ the four orphan files in `output/tables/` (committed in a91f9e5 with no generati
 
 | Design II frames | Own sudden expansions: thresholds, TWFE/CS, composition, threshold robustness | `Own_expansion/02_own_expansion.do` (needs `01`, `Vacancy_shocks/03`) | `output/own_expansion/tables/oe_{thresholds,twfe_enroll,twfe_comp,threshold_sens}.tex` (`\input`); figures `oe_dV_hist_sel`, `oe_es_*_sel` |
 | Design IV, selective vs selective | Exposure moments, levels/log first stages, composition, event study | `Own_expansion/03_selective_competitors.do` (needs `02`) | `output/own_expansion/tables/oe_sel_{exposure_moments,fs_N_first,fs_lnN,composition}.tex` (`\input`); figure `oe_sel_es_N_first` |
-| Composition frames inside Designs I, III, IV (the separate section was removed 2026-10-06) | Entrant composition outcomes | `Own_expansion/04_composition_designs.do` (needs `01`, `02`) | `output/own_expansion/tables/oe_comp_{design1,sua,vs}.tex` (`\input`); figures `oe_comp_sua_es_c_psu_mean`, `oe_comp_vs_es_c_psu_mean` |
+| Composition frames inside Designs I, III, IV (the separate section was removed 2026-10-06) | Entrant composition outcomes | `Own_expansion/04_composition_designs.do` (needs `01`, `02`); Design I in `Inframarginals/32` | `output/own_expansion/tables/oe_comp_{sua,vs}.tex` (`\input`); figures `oe_comp_sua_es_c_psu_mean`, `oe_comp_vs_es_c_psu_mean` |
 
-| Design I: heterogeneity by predetermined selectivity (2 frames) | FS/RF/2SLS by quartile of 2007--09 entrant PSU; joint test, Holm, university-year FE, continuous interaction, placebo leads/lags | `Inframarginals/29_selectivity_heterogeneity_predetermined.do` (needs `21b`, `Vacancy_shocks/01`) | `output/inframarginal/tables/im_sel_{Q,G,robust,placebo}_{first,min}.tex` (`\input`) |
+| Design I: data, results, placebo, threshold and horizon robustness, field (issue #5) | Pooled 2007--2016, First Cohort threshold; FS/RF/2SLS with year FE and with university-year FE; placebo leads/lags figure | `Inframarginals/31_design1_main.do` (needs `21b`, `21c`, `28b`, `27`) | `output/inframarginal/tables/im_d1_{desc,main,thresholds,horizon,field}.tex`; figure `output/inframarginal/figures/im_d1_placebo.pdf` |
+| Design I: composition of the entering cohort | Pooled, year FE and university-year FE | `Inframarginals/32_design1_composition.do` | `output/own_expansion/tables/oe_comp_design1.tex` |
+| Design I: heterogeneity by predetermined selectivity (2 frames) | FS/RF/2SLS by quartile of 2007--09 entrant PSU; university-year FE, continuous interaction, placebo leads/lags | `Inframarginals/29_selectivity_heterogeneity_predetermined.do` (needs `21b`, `Vacancy_shocks/01`) | `output/inframarginal/tables/im_sel_{Q,G,robust,placebo}_{first,min}.tex` (`\input`) |
 | Design I: selectivity heterogeneity by inframarginal population | 2SLS by quartile for all ranked / enrolled / top half / near threshold | `Inframarginals/30_selectivity_heterogeneity_population.do` (needs `21b`) | `output/inframarginal/tables/im_pop_{first,min}.tex` (`\input`) |
 | Reduced form: slot shocks and inframarginal graduation (4 frames) | Designs II-IV shocks on inframarginal graduation, 8y and 10y | `Own_expansion/05_reduced_form_infra.do` (needs `21b`, `28b`, `02`; titulados through 2024) | `output/own_expansion/tables/oe_rf_{design2,sua,vs}.tex`; figures `oe_rf_{d2,sua,vs}_es_g8p_f` |
 

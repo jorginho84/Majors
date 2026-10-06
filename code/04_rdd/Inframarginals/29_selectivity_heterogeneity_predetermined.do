@@ -19,8 +19,8 @@
 * (1) By quartile of S_p and by the deck's fixed PSU cutoffs: FS, RF,
 *     2SLS, Kleibergen-Paap F.
 *     Joint model: dN x Q_q instrumented by dZ x Q_q, year x Q_q FE, so
-*     the four 2SLS coefficients share one VCV: equality test, Holm-
-*     adjusted p-values. Continuous version: (dN, dN x S~) by
+*     the four 2SLS coefficients share one VCV (equality and Holm are
+*     computed but no longer tabulated, issue #5). Continuous version: (dN, dN x S~) by
 *     (dZ, dZ x S~), S~ standardized, Sanderson-Windmeijer F.
 *     Robustness: university x year FE; wild-cluster bootstrap p-values
 *     (boottest) for the RF in each quartile.
@@ -299,14 +299,6 @@ foreach def in first_enroll min_enroll {
                 }
                 file write T " & (" %6.3f (100 * `P_`e'se_`y'') ") \\" _n
             }
-            if "`gv'" == "Q" {
-                file write T "\quad Holm-adjusted \(p\) (2SLS)"
-                forvalues g = 1/4 {
-                    file write T " & " %5.3f (`J_holm_`y'_`g'')
-                }
-                file write T " & \\" _n "\quad Equality of the four 2SLS (\(p\))" ///
-                    " & \multicolumn{4}{c}{" %5.3f (`J_eq_`y'') "} & \\" _n
-            }
             file write T "\addlinespace" _n
         }
         if "`gv'" == "Q" {
@@ -336,7 +328,7 @@ foreach def in first_enroll min_enroll {
         forvalues g = 1/4 {
             file write T " & (" %6.3f (100 * `U_ivse_`y'_`g'') ")"
         }
-        file write T " \\" _n "\quad Equality (\(p\)) & \multicolumn{4}{c}{" %5.3f (`U_eq_`y'') "} \\" _n
+        file write T " \\" _n
     }
     file write T "\midrule" _n
     file write T "\multicolumn{5}{l}{\textit{Panel B. Continuous interaction, program graduation (\(\times 100\))}} \\" _n

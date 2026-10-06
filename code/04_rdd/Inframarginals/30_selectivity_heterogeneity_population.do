@@ -163,13 +163,13 @@ foreach def in first_enroll min_enroll {
     * 4. Table: 2SLS, outcome in pct., so coefficients are pp per student
     ******************************************************************/
     file open T using "$im_out/tables/im_pop_`sfx'.tex", write replace
-    file write T "\begin{tabular}{lccccccccc}" _n "\toprule" _n
-    file write T "Population & Mean & Pooled & Q1 & Q2 & Q3 & Q4 & Equality \(p\) & Q4, univ.\(\times\)year FE & \(\Delta N\times\tilde S\) \\" _n "\midrule" _n
+    file write T "\begin{tabular}{lcccccccc}" _n "\toprule" _n
+    file write T "Population & Mean & Pooled & Q1 & Q2 & Q3 & Q4 & Q4, univ.\(\times\)year FE & \(\Delta N\times\tilde S\) \\" _n "\midrule" _n
     foreach v in gp gu {
         local vlab = cond("`v'" == "gp", "Graduation from the program, 8 years", "Graduation from any university, 8 years")
-        file write T "\multicolumn{10}{l}{\textit{`vlab'}} \\" _n
+        file write T "\multicolumn{9}{l}{\textit{`vlab'}} \\" _n
         foreach p in all enr top near {
-            local plab = cond("`p'" == "all", "All ranked (current)", cond("`p'" == "enr", "Enrolled in program", ///
+            local plab = cond("`p'" == "all", "All ranked inframarginals", cond("`p'" == "enr", "Enrolled in program", ///
                 cond("`p'" == "top", "\quad Enrolled, top half of ranks", "\quad Enrolled, near threshold")))
             file write T "`plab' & " %5.1f (`m_`p'_`v'')
             forvalues g = 0/4 {
@@ -178,12 +178,12 @@ foreach def in first_enroll min_enroll {
             }
             stars `u4p_`p'_`v'' s4
             stars `cSp_`p'_`v'' s5
-            file write T " & " %5.3f (`eq_`p'_`v'') " & " %7.3f (`u4_`p'_`v'') "`s4'" ///
+            file write T " & " %7.3f (`u4_`p'_`v'') "`s4'" ///
                 " & " %7.3f (`cS_`p'_`v'') "`s5'" " \\" _n " & "
             forvalues g = 0/4 {
                 file write T " & (" %6.3f (`s_`p'_`v'_`g'') ")"
             }
-            file write T " & & (" %6.3f (`u4s_`p'_`v'') ") & (" %6.3f (`cSs_`p'_`v'') ") \\" _n
+            file write T " & (" %6.3f (`u4s_`p'_`v'') ") & (" %6.3f (`cSs_`p'_`v'') ") \\" _n
         }
         file write T "\addlinespace" _n
     }
