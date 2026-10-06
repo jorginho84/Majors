@@ -19,7 +19,8 @@
 * Design III SUA first stage in levels (Sua/04): y_pt = b 10 E_p Post_t
 *            + mu_p + a_{f,t} [+ g_{r,t}], broad-area x region markets,
 *            Total / Triangular / Gaussian. SE clustered by market.
-*            Event study: 10 E_p x 1{year = t}, base 2011.
+*            Event study: 10 E_p x 1{year = t}, base 2011, program,
+*            field-year and region-year FE.
 * Design IV  Vacancy_shocks/05 model (1): y_kt = pi cumE^w_kt / 10
 *            + d Own_kt + mu_k + a_{f,t} [+ g_{r,t}], broad markets.
 *            SE clustered by market. Event study around g_mkt.
@@ -165,7 +166,7 @@ forvalues t = 2007/2016 {
 }
 drop ez_2011
 foreach y in N c_psu_mean c_psu_last {
-    quietly reghdfe `y' ez_*, absorb(program_id fy) cluster(market_pre)
+    quietly reghdfe `y' ez_*, absorb(program_id fy ry) cluster(market_pre)
     quietly test ez_2007 ez_2008 ez_2009 ez_2010
     local ptr = string(r(p), "%5.3f")
     preserve
@@ -185,7 +186,7 @@ foreach y in N c_psu_mean c_psu_last {
     twoway (rcap lo hi year, lcolor(navy)) (scatter b year, mcolor(navy)), ///
         yline(0, lcolor(gs10)) xline(2011.5, lcolor(cranberry) lpattern(dash)) ///
         xlabel(2007(1)2016) xtitle("Admission year") ytitle("`ylab'") legend(off) ///
-        note("Coefficient on 10 x Total SUA exposure x year (2011 omitted); program and field-year FE." ///
+        note("Coefficient on 10 x Total SUA exposure x year (2011 omitted); program, field-year and region-year FE." ///
              "Pre-2011 joint test p = `ptr'. SE clustered by market.", size(vsmall)) ///
         graphregion(color(white)) plotregion(color(white))
     graph export "$oe_out/figures/oe_comp_sua_es_`y'.pdf", replace
