@@ -554,15 +554,16 @@ di as result ///
     %12.0fc `min_not_target'
 
 
+* 21b applies the threshold to every ranked applicant, so inframarginals
+* who did not enroll in the target exist by construction. Their 10y
+* outcome stays missing (graduates_target_10y covers target enrollees
+* only), and 28b keeps infra == 1 & enrolls_target == 1, so they never
+* enter the 10y panels. Warn instead of stopping (issue #4).
 if `first_not_target' > 0 | `min_not_target' > 0 {
 
-    di as error ///
-        "Hay inframarginales no matriculados en target."
-
-    di as error ///
-        "En ese caso graduates_target_10y no es suficiente."
-
-    exit 459
+    di as text ///
+        "Note: inframarginals not enrolled in target have no 10y outcome;" ///
+        " 28b restricts to enrolls_target == 1."
 }
 
 
