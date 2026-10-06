@@ -2550,8 +2550,7 @@ differences reflect singleton removal by \texttt{reghdfe}.
 $^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.
 Robustness: \hyperlink{sua-fs-lvl-entrant}{\color{blue}regions with entrant
 universities only $\rightarrow$} \quad
-\hyperlink{sua-fs-lvl-positive}{\color{blue}positive exposure only $\rightarrow$} \quad
-\hyperlink{sua-exposure-selectivity-trends}{\color{blue}selectivity trends $\rightarrow$}
+\hyperlink{sua-fs-lvl-positive}{\color{blue}positive exposure only $\rightarrow$}
 }
 
 \end{frame}
@@ -2721,8 +2720,7 @@ are excluded because the dependent variable is in logs.
 $^{*}p<0.10$, $^{**}p<0.05$, $^{***}p<0.01$.
 Robustness: \hyperlink{sua-fs-log-entrant}{\color{blue}regions with entrant
 universities only $\rightarrow$} \quad
-\hyperlink{sua-fs-log-positive}{\color{blue}positive exposure only $\rightarrow$} \quad
-\hyperlink{sua-exposure-selectivity-trends}{\color{blue}selectivity trends $\rightarrow$}
+\hyperlink{sua-fs-log-positive}{\color{blue}positive exposure only $\rightarrow$}
 }
 
 \end{frame}
@@ -2767,8 +2765,7 @@ Exposure in 10 percentage-point units. As in the
 \hyperlink{sua-first-stage}{\color{blue}main first stage}, coefficients are
 positive with field $\times$ year FE and negative with region $\times$ year FE.
 Magnitudes are smaller because KD exposure takes larger values (Broad, 2011
-mean: 0.11 for Triangular KD vs.\ 0.03 for Triangular). Robustness to selectivity trends:
-\hyperlink{sua-exposure-selectivity-trends}{\color{blue}appendix $\rightarrow$}.
+mean: 0.11 for Triangular KD vs.\ 0.03 for Triangular).
 $^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.
 }
 
@@ -4934,71 +4931,6 @@ Triangular KD and Gaussian KD are 0.034, 0.171 and 0.133 in the left panel, and
 \end{frame}
 
 %---------------------------------------------------------
-\begin{frame}[label=sua-exposure-selectivity-trends]
-
-\frametitle{
-    SUA exposure and selectivity trends
-    \hfill
-    \hyperlink{sua-exposure-selectivity-es}{\scriptsize\color{blue}Event studies $\rightarrow$}
-}
-
-\centering
-
-\resizebox{0.6\textwidth}{!}{\input{../../output/tables/sua_fs_selectivity_trends.tex}}
-
-\vspace{0.05cm}
-
-\parbox{0.97\textwidth}{%
-\tiny
-\textit{Notes:}
-Panel A reproduces the region $\times$ year columns of the main
-(\hyperlink{sua-first-stage}{\color{blue}levels},
-\hyperlink{sua-log-first-stage}{\color{blue}logs}) and
-\hyperlink{sua-kd-first-stage}{\color{blue}kernel-denominator} first stages.
-Panel B adds fixed effects for deciles of the incumbent's 2009--2011 mean PSU
-score interacted with year. Weighted exposure is entrant share times
-conditional similarity, which falls with incumbent selectivity
-(\hyperlink{sua-q-selectivity-trends}{\color{blue}appendix}). Levels in 10
-percentage-point units; logs as in the main log first stage. SE clustered by
-pre-treatment market. $^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.
-}
-
-\end{frame}
-
-%---------------------------------------------------------
-\begin{frame}[label=sua-exposure-selectivity-es]
-
-\frametitle{
-    SUA exposure and selectivity trends: event studies
-    \hfill
-    \hyperlink{sua-exposure-selectivity-trends}{\scriptsize\color{blue}$\leftarrow$ Table}
-}
-
-\centering
-
-\vspace{-0.2cm}
-
-\includegraphics[width=0.92\textwidth]{../../output/sua_es_selectivity_trends.png}
-
-\vspace{0.02cm}
-
-\parbox{0.97\textwidth}{%
-\tiny
-\textit{Notes:}
-Broad-field levels event studies of first-year enrollment on
-$10\times E_p\times\mathbf{1}\{t=s\}$, 2011 omitted. Blue circles: program,
-field $\times$ year and region $\times$ year fixed effects. Red diamonds: adding
-selectivity-decile $\times$ year fixed effects. 95\% confidence intervals; SE
-clustered by pre-treatment market. Joint 2007--2010 pretrend $p$-values
-(blue / red): Total 0.285 / 0.385; Triangular 0.385 / 0.836; Gaussian
-0.368 / 0.592; Triangular KD 0.146 / 0.219; Gaussian KD 0.177 / 0.055.
-Mean 2012--16 coefficient (blue / red): Triangular $-3.34$ / $-0.19$;
-Gaussian $-1.70$ / $0.19$.
-}
-
-\end{frame}
-
-%---------------------------------------------------------
 \begin{frame}{Decomposing weighted exposure}
 
 \scriptsize
@@ -5363,75 +5295,6 @@ $^{***}p<0.01$.
 }
 
 \end{table}
-
-\end{frame}
-
-%---------------------------------------------------------
-\begin{frame}[label=sua-q-selectivity-trends]
-
-\frametitle{
-    Conditional similarity and selectivity trends
-    \hfill
-    \hyperlink{sua-q-selectivity-es}{\scriptsize\color{blue}Event studies $\rightarrow$}
-}
-
-\scriptsize
-
-Within a market, entrants sit in a given PSU range, so $Q_p^k$ is largely a
-function of the incumbent's own selectivity $S_p$: it falls monotonically from
-the lowest to the highest $S_p$ decile (Triangular 0.35 to 0.04; Gaussian 0.68
-to 0.17). $S_p$ and $S_p^2$ explain 25\% (Triangular) and 47\% (Gaussian) of
-its variance, and 59\% and 77\% with market fixed effects.
-
-\vspace{0.1cm}
-
-\centering
-\resizebox{0.92\textwidth}{!}{\input{../../output/tables/sua_q_selectivity_trends.tex}}
-
-\vspace{0.08cm}
-
-\parbox{0.97\textwidth}{%
-\tiny
-\textit{Notes:}
-Broad-field markets with entrant presence ($M_m>0$); 591 programs, 36 markets.
-All regressions include program fixed effects. The first row reproduces the
-\hyperlink{sua-similarity-first-stage}{\color{blue}main similarity table}.
-Selectivity deciles are deciles of $S_p$, the incumbent's 2009--2011 mean PSU score, across programs.
-Levels: effect of a 0.10 increase in $Q$; logs: $\widetilde{\log Q}\times Post$
-with $\mathbf{1}\{Q>0\}\times Post$. Event-study columns report the joint
-2007--2010 pretrend $p$-value of the levels event study. SE clustered by
-pre-treatment market. $^{***}p<0.01$, $^{**}p<0.05$, $^{*}p<0.10$.
-}
-
-\end{frame}
-
-%---------------------------------------------------------
-\begin{frame}[label=sua-q-selectivity-es]
-
-\frametitle{
-    Conditional similarity: event studies with selectivity trends
-    \hfill
-    \hyperlink{sua-q-selectivity-trends}{\scriptsize\color{blue}$\leftarrow$ Table}
-}
-
-\centering
-
-\includegraphics[width=\textwidth]{../../output/sua_q_event_study_selectivity_trends.png}
-
-\vspace{0.1cm}
-
-\parbox{0.97\textwidth}{%
-\tiny
-\textit{Notes:}
-Levels event studies of first-year enrollment on $10\times Q_p^k\times\mathbf{1}\{t=s\}$,
-2011 omitted, with program, Broad-field $\times$ year and region $\times$ year
-fixed effects (blue), and additionally selectivity-decile $\times$ year fixed
-effects (red). 95\% confidence intervals; SE clustered by pre-treatment market.
-Under the base specification the coefficient declines steadily from 2007, so
-the post-2012 gap continues a pre-existing trend. Once selectivity trends are
-absorbed the path is flat before and after 2012 (pretrend $p$ = 0.785 and
-0.631).
-}
 
 \end{frame}
 

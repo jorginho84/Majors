@@ -114,8 +114,6 @@ SCRIPTS=(
   "code/Sua/Sua kernel weights/04i_sua_kernelden_first_stage_tables.do"
   "code/Sua/05_event_studies_exposure_comparison.do|kd"
   "code/Sua/05a_sua_log_event_studies.do|kd"
-  "code/Sua/04j_sua_similarity_selectivity_trends.do"
-  "code/Sua/04k_sua_exposure_selectivity_trends.do"
   # 6. SUA cosine exposure
   "code/Sua/Cosine/01_cosine_build_inputs_2011.do"
   "code/Sua/Cosine/02_cosine_build_exposure_measures.do"
