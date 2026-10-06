@@ -53,6 +53,7 @@ the four orphan files in `output/tables/` (committed in a91f9e5 with no generati
 | Composition frames inside Designs I, III, IV (the separate section was removed 2026-10-06) | Entrant composition outcomes | `Own_expansion/04_composition_designs.do` (needs `01`, `02`) | `output/own_expansion/tables/oe_comp_{design1,sua,vs}.tex` (`\input`); figures `oe_comp_sua_es_c_psu_mean`, `oe_comp_vs_es_c_psu_mean` |
 
 | Design I: heterogeneity by predetermined selectivity (2 frames) | FS/RF/2SLS by quartile of 2007--09 entrant PSU; joint test, Holm, university-year FE, continuous interaction, placebo leads/lags | `Inframarginals/29_selectivity_heterogeneity_predetermined.do` (needs `21b`, `Vacancy_shocks/01`) | `output/inframarginal/tables/im_sel_{Q,G,robust,placebo}_{first,min}.tex` (`\input`) |
+| Design I: selectivity heterogeneity by inframarginal population | 2SLS by quartile for all ranked / enrolled / top half / near threshold | `Inframarginals/30_selectivity_heterogeneity_population.do` (needs `21b`) | `output/inframarginal/tables/im_pop_{first,min}.tex` (`\input`) |
 | Reduced form: slot shocks and inframarginal graduation (4 frames) | Designs II-IV shocks on inframarginal graduation, 8y and 10y | `Own_expansion/05_reduced_form_infra.do` (needs `21b`, `28b`, `02`; titulados through 2024) | `output/own_expansion/tables/oe_rf_{design2,sua,vs}.tex`; figures `oe_rf_{d2,sua,vs}_es_g8p_f` |
 
 ## Blocking inputs
