@@ -16,7 +16,7 @@
 clear all
 set more off
 
-do "C:/Users/jigodoy/Documents/GitHub/Majors/code/config.do"
+do "code/config.do"
 
 capture mkdir "$output/figures"
 capture mkdir "$output/figures/field_relationships"

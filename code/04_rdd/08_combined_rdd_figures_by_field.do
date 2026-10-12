@@ -10,7 +10,7 @@ set more off
 * 0. Cargar configuración
 ************************************************************
 
-do "C:/Users/jigodoy/Documents/GitHub/Majors/code/config.do"
+do "code/config.do"
 
 
 ************************************************************

@@ -1,0 +1,24 @@
+\begin{tabular}{lcccccc}
+\toprule
+ & \multicolumn{3}{c}{Field \(\times\) year FE} & \multicolumn{3}{c}{\(+\) Region \(\times\) year FE} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+Exposure measure & Broad & ISCED-97 & Generic & Broad & ISCED-97 & Generic \\
+\midrule
+\textit{Triangular KD} & -0.001 &  0.014 &  0.022 & -0.052\sym{***} & -0.032\sym{*} & -0.014 \\
+ & (0.014) & (0.018) & (0.023) & (0.018) & (0.017) & (0.018) \\
+\quad Wald \(F\) &  0.00 &  0.60 &  0.96 &  8.86 &  3.83 &  0.60 \\
+\quad Programs with zero exposure &       444 &       540 &       767 &       443 &       539 &       766 \\
+\addlinespace
+\textit{Gaussian KD} & -0.012 & -0.018 &  0.009 & -0.138\sym{***} & -0.095\sym{***} & -0.030\sym{*} \\
+ & (0.036) & (0.032) & (0.019) & (0.037) & (0.028) & (0.018) \\
+\quad Wald \(F\) &  0.12 &  0.32 &  0.24 & 13.59 & 11.31 &  3.01 \\
+\quad Programs with zero exposure &       358 &       408 &       616 &       357 &       407 &       615 \\
+\midrule
+Observations &     8,041 &     8,030 &     7,756 &     8,038 &     8,027 &     7,753 \\
+Programs &       949 &       949 &       922 &       948 &       948 &       921 \\
+Markets &       130 &       215 &       615 &       129 &       214 &       614 \\
+Program FE & Yes & Yes & Yes & Yes & Yes & Yes \\
+Field \(\times\) year FE & Yes & Yes & Yes & Yes & Yes & Yes \\
+Region \(\times\) year FE & No & No & No & Yes & Yes & Yes \\
+\bottomrule
+\end{tabular}

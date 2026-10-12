@@ -17,7 +17,7 @@
 clear all
 set more off
 
-do "C:/Users/jigodoy/Documents/GitHub/Majors/code/config.do"
+do "code/config.do"
 
 
 foreach y in 2017 2018 {

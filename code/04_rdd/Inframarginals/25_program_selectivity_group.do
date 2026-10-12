@@ -34,7 +34,7 @@
 clear all
 set more off
 
-do "C:/Users/jigodoy/Documents/GitHub/Majors/code/config.do"
+do "code/config.do"
 
 local selectivity_file ///
     "$processed/program_selectivity_2007_2016.dta"
