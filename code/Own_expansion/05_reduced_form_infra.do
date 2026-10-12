@@ -113,6 +113,8 @@ label var g8u_m  "Grad. university 8y, Minimum Cohort (pct.)"
 label var g8h_m  "Grad. HE 8y, Minimum Cohort (pct.)"
 label var g10p_m "Grad. program 10y, Minimum Cohort (pct.)"
 save `infra', replace
+* also used by 06_design2_2sls.do
+save "$processed/oe_infra_outcomes.dta", replace
 
 di as text _n "Inframarginal outcome coverage by cohort"
 tabstat g8p_f g10p_f g8p_m g10p_m, by(ao_proceso) statistics(n mean) format(%6.1f)

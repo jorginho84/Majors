@@ -60,6 +60,89 @@
   \titlepage
 \end{frame}
 
+\begin{frame}{Overview: what we are trying to do}
+\small
+\textbf{Motivating question.} Why don't we increase capacity in high-return programs?
+
+\vspace{0.3cm}
+Expanding a program's capacity has two sides, and we study each one:
+\begin{itemize}
+    \setlength{\itemsep}{6pt}
+    \item \textbf{At the margin (RDD).} What happens if we change capacity at the margin?
+    Applicants just above the admission cutoff get the seat, and those just below do not.
+    Comparing them tells us what an additional seat does for the student who receives it.
+    \item \textbf{Inframarginal students.} What happens to the students who would have been admitted anyway
+    if we change capacity? A larger program may change class size and who their classmates are, so more seats could affect students already in the program.
+\end{itemize}
+
+\vspace{0.3cm}
+Together, the two pieces tell us whether expanding capacity is worthwhile: the gain for the marginal student, and what happens to everyone else in the program.
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Overview: the four inframarginal designs}
+\small
+\begin{description}
+    \setlength{\itemsep}{6pt}
+    \item[I. Yearly vacancy changes] Every year-to-year change in a program's vacancies, used as an instrument for the size of its entering cohort (2SLS).
+    \item[II. Own sudden expansion] A selective program suddenly increases its seats. Difference-in-differences with an event study.
+    \item[III. Entry of new universities (SUA)] Programs more exposed to the 2012 entry of new universities, compared with less exposed ones.
+    \item[IV. Competitors' sudden expansions] A program's competitors expand their seats. Exposure is larger when the competitors are closer.
+\end{description}
+
+\vspace{0.3cm}
+In every design we look at three things: \textbf{enrollment} (does the program get more or fewer students?),
+\textbf{composition} (does the type of entrant change?) and \textbf{graduation of the inframarginal students}.
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Main results: changing capacity at the margin (RDD)}
+\small
+An additional seat for applicants at the cutoff (crossing the admission cutoff):
+\begin{itemize}
+    \setlength{\itemsep}{5pt}
+    \item \textbf{Target-program enrollment}: $+50.7$ pp.
+    \item \textbf{Target-program graduation (8 years)}: $+18.0$ pp.
+    \item Graduation from \emph{any university}: $+2.9$ pp. From \emph{any higher-education institution}: $+2.4$ pp.
+    \item PSU retaking: $-4.9$ pp.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Reading.} The seat changes \emph{where} the student enrolls and graduates, much more than \emph{whether} they do:
+most rejected applicants find another program. The effect is present in every field and is larger when the target
+program is much more selective than the next-best option.
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Main results: changing capacity, effects on inframarginal students}
+\small
+\begin{description}
+    \setlength{\itemsep}{6pt}
+    \item[I.] The first stage is strong (about 0.74 more entrants per added seat). The effect on inframarginal graduation is zero with year FE and small within university and year:
+    $-0.33$ pp per 10 additional entrants (mean 36.9\%). Graduation from any university does not fall, so students switch programs rather than drop out.
+    \item[II.] A sudden expansion adds about 18 entrants and lowers entrant PSU by 6 to 9 points. The negative effect on inframarginal graduation
+    comes from a decline that was already under way before the expansion.
+    \item[III.] The first stage has the opposite sign to the one predicted, rejects the pre-trend test and is no longer significant once region $\times$ year FE are added. The reduced form on inframarginal graduation is negative, but the event study shows no break in 2012.
+    \item[IV.] Competitors' expansions show no effect on inframarginal graduation. Among selective programs, close competitors lose entrants gradually,
+    with no change in who enters.
+\end{description}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Main take-away}
+\normalsize
+\begin{enumerate}
+    \setlength{\itemsep}{8pt}
+    \item \textbf{At the margin}, an additional seat decides which program the student attends, not whether they study.
+    It raises graduation from the target program, with larger effects when the target program is much more selective than the next-best alternative.
+    \item \textbf{Inframarginal students} are barely affected when capacity changes. The cleanest estimate (Design I) is small
+    and points to switching programs, not dropping out.
+    \item The larger effects in Designs II--IV \textbf{do not survive} event studies or richer fixed effects.
+    \item So the evidence does not show a large cost of expanding capacity for the students already in the program.
+    The question of \emph{why capacity is not expanded in high-return programs} is therefore not answered by costs to inframarginal students.
+\end{enumerate}
+\end{frame}
+
 \begin{frame}{Outline}
 \tableofcontents
 \end{frame}
@@ -837,53 +920,111 @@ d5 & $\geq 50$ \\
 % DESIGN I: VACANCY CHANGES AND INFRAMARGINAL GRADUATION (issue #5)
 % code/04_rdd/Inframarginals/31_design1_main.do (main, placebo, robustness)
 %====================================================
-\begin{frame}{Inframarginal students: definition}
-\small
-The RDD identifies effects for applicants at the admission cutoff. We now study \textbf{inframarginal} students: applicants
-ranked well inside the admitted group, who would have been admitted in any year regardless of small changes in capacity.
+\begin{frame}{Design I: the question and the three ingredients}
+\footnotesize
+\textbf{Question.} When a program admits a larger entering cohort, do the students who would have been admitted
+anyway (the \emph{inframarginal} students) become less likely to graduate?
 
 \vspace{0.12cm}
-\textbf{Construction}
+\textbf{Why inframarginals.} The RDD above identifies effects for applicants \emph{at} the admission cutoff, a very particular group.
+Inframarginal students are ranked well inside the admitted group. A small change in capacity does not decide whether they get in;
+it only changes \emph{who their classmates are and how crowded the program is}.
+Two mechanisms:
 \begin{itemize}
-    \item For each program $p$, fix a threshold $T_p$ from its effective (enrolled) cohort sizes:
-    \begin{itemize}
-        \item \textbf{First Cohort} (main): size of the first enrolled cohort observed for $p$.
-        \item \textbf{Minimum Cohort} (robustness): smallest enrolled cohort of $p$ over 2007--2016.
-    \end{itemize}
-    \item Applicant $i$ to program $p$ in year $t$ is inframarginal if their admission rank is within the threshold:
+    \item \textbf{Congestion}: larger classes, fewer resources per student.
+    \item \textbf{Peer composition}: expansions admit weaker entrants (see the composition slide).
+\end{itemize}
+
+\vspace{0.12cm}
+\textbf{The exercise has three ingredients, defined one by one on the next slides:}
+\begin{enumerate}
+    \item \textbf{Who} is inframarginal in program $p$: applicants whose admission rank is at most a fixed threshold $T_p$.
+    \item \textbf{Treatment and instrument}: the size of the entering cohort $N_{pt}$, instrumented by the vacancies offered $Z_{pt}$.
+    \item \textbf{Outcome}: the share of those inframarginal applicants who graduate within 8 years.
+\end{enumerate}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Step 1. Who is inframarginal?}
+\scriptsize
+\textbf{Admission rank.} $Rank_{ipt}$ is the position of applicant $i$ in the selection list of program $p$ in year $t$
+(DEMRE \texttt{LUGAR}). It exists only for applicants who were admitted or wait-listed, so only they can be inframarginal.
+
+\vspace{0.08cm}
+\textbf{Threshold.} Each program gets \emph{one} number $T_p$, the same for all years 2007--2016, built from its
+\emph{enrolled} cohort sizes $N_{pt}$ (students who actually enrolled in $p$):
+\begin{itemize}
+    \item \textbf{First Cohort} (main): $T_p$ = size of the first enrolled cohort observed for $p$.
+    \item \textbf{Minimum Cohort} (robustness): $T_p$ = size of the \emph{smallest} enrolled cohort of $p$ over 2007--2016.
+\end{itemize}
+Always $T_p^{\text{Min}}\le T_p^{\text{First}}$: the Minimum Cohort definition is stricter and keeps only applicants who rank inside the
+entering class of \emph{every} observed year, even the smallest.
+
+\vspace{0.08cm}
+\textbf{Definition.}
+$\;\text{Inframarginal}_{ipt}=\mathbf 1\{Rank_{ipt}\le T_p\}$, applied to every ranked applicant, whether or not $i$ ends up enrolling in $p$.
+
+\vspace{0.08cm}
+\textbf{Example.} Program $p$ enrolled 60 students in its first observed year, then 80, 55, 70 (2007--2010).
+\begin{center}
+\begin{tabular}{lcccc}
+\toprule
+ & $T_p$ & Rank 50 & Rank 58 & Rank 65 \\
+\midrule
+First Cohort & 60 & inframarginal & inframarginal & not \\
+Minimum Cohort & 55 & inframarginal & not & not \\
+\bottomrule
+\end{tabular}
+\end{center}
+\vspace{-0.1cm}
+$T_p$ does not move with a given year's vacancies, so a capacity change in $t$ cannot change who counts as inframarginal.
+\textbf{Caveat}: ranks count admitted plus wait-listed applicants and $T_p$ is based on enrollment, so ``inframarginal'' means
+ranked inside a typical entering class, not a guarantee of admission.
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Step 2. The dependent variable depends on the definition}
+\scriptsize
+For program $p$ and year $t$, let $\mathcal I_{pt}(T_p)=\{i:\ i \text{ applied to } p \text{ in } t,\ Rank_{ipt}\le T_p\}$ be its inframarginal applicants
+and $|\mathcal I_{pt}|$ their number. The outcome is
 \[
-\text{Inframarginal}_{ipt}=1
-\quad \Longleftrightarrow \quad
-Rank_{ipt}\leq T_p .
+y_{pt}(T_p)=\frac{1}{|\mathcal I_{pt}(T_p)|}\sum_{i\in\mathcal I_{pt}(T_p)} \mathbf 1\{i \text{ graduates within 8 years of } t \text{ from the program where } i \text{ first enrolled}\}.
 \]
-    \item $T_p$ is one number per program, fixed for every year. Membership does not move with that year's vacancies,
-    and the same definition applies to the whole 2007--2016 sample.
-    \item All applicants with an observed rank count, whether or not they enroll.
+\begin{itemize}
+    \item \textbf{The sample behind each $y_{pt}$ is set by $T_p$.} First Cohort and Minimum Cohort contain different applicants,
+    so they give different outcome values, different weights and different estimates. Each panel of the results table is a
+    separate run with its own $y$.
+    \item \textbf{Non-enrollees count as zeros.} An inframarginal applicant who never enrolls (or leaves higher education) counts as not graduating.
+    $y$ therefore mixes take-up and completion. The population slide below restricts to enrollees as a check.
+    \item \textbf{Which program?} Graduation is measured in the program where the student \emph{actually enrolled} first (MINEDUC, then DEMRE records).
+    For most students this is $p$; an applicant ranked in $p$ who enrolls elsewhere counts as a graduate if they finish \emph{that} program.
+    \item \textbf{Secondary outcomes} (same applicants): graduation from \emph{any university}, and from \emph{any higher-education institution}, within 8 years.
+    These separate dropping out of the system from switching programs.
+    \item \textbf{8 years} after the admission year, using titulados through 2024, so all cohorts 2007--2016 are fully observed.
 \end{itemize}
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Design I: does a larger cohort lower inframarginal graduation?}
+\begin{frame}{Step 3. Treatment, instrument and model}
 \scriptsize
-\textbf{Research question}
+\textbf{Treatment.} $N_{pt}$: total entering cohort of $p$ in year $t$ (all students enrolled in $p$, not only the inframarginal ones).
+\textbf{Instrument.} $Z_{pt}$: total vacancies offered by $p$ in $t$. Neither depends on the inframarginal definition.
 
-When a program admits a larger entering cohort, do its inframarginal students, who would have been admitted anyway,
-become less likely to graduate \emph{from that program}?
-
-\vspace{0.10cm}
-\textbf{Approach}
+\vspace{0.1cm}
+First differences within program, 2008--2016 (this removes any permanent program characteristic):
+\[
+\text{First stage:}\quad \Delta N_{pt} = \pi\,\Delta Z_{pt} + \alpha_t \;[+\;\gamma_{u(p)t}] + \nu_{pt}
+\]
+\[
+\text{Second stage:}\quad \Delta y_{pt} = \beta\,\widehat{\Delta N}_{pt} + \alpha_t \;[+\;\gamma_{u(p)t}] + \varepsilon_{pt}
+\]
 \begin{itemize}
-    \item Programs change their vacancies from year to year. These changes shift the size of the entering cohort, but not who is inframarginal.
-    \item We instrument the change in cohort size with the change in vacancies and look at inframarginal graduation.
-    \item Mechanisms: congestion (larger classes, fewer resources per student) and peer composition (expansions admit weaker entrants).
-\end{itemize}
-
-\vspace{0.06cm}
-\textbf{Outcome}
-\begin{itemize}
-    \item \textbf{Main}: share of the program-year's inframarginal applicants who graduate from that program within 8 years.
-    \item Secondary: graduation from any university and from any higher-education institution within 8 years.
-    \item Graduation records (titulados) run through 2024, so 8-year graduation is observed for every cohort, 2007--2016.
+    \item $\beta$: change in the graduation rate of inframarginal applicants (pp, results $\times100$) per additional entering student that is induced by a change in vacancies.
+    \item Two specifications: (1) year FE $\alpha_t$; (2) adds university $\times$ year FE $\gamma_{u(p)t}$, comparing programs of the same
+    university in the same year. This absorbs university-wide shocks (budget, demand, policy) that move both vacancies and graduation.
+    \item \textbf{Identifying assumption}: conditional on the FE, changes in vacancies affect inframarginal graduation only through the size of the cohort.
+    The placebo on leads of $\Delta Z$ checks this.
+    \item Weights: average number of inframarginal applicants of $p$ in $t$ and $t-1$ (same weights in first stage, reduced form and 2SLS). SE clustered by program.
 \end{itemize}
 \end{frame}
 
@@ -904,37 +1045,13 @@ become less likely to graduate \emph{from that program}?
     \item \textbf{Enrollment}: Formulario D and MINEDUC enrollment, $N_{pt}$.
     \item \textbf{Vacancies}: total vacancies offered by the program, $Z_{pt}$.
     \item \textbf{Graduation}: MINEDUC titulados, 2007--2024.
-    \item Inframarginal status with the First Cohort threshold.
+    \item Table shown for the First Cohort definition.
 \end{itemize}
 \end{column}
 \end{columns}
 
 \vspace{0.1cm}
 \parbox{0.97\textwidth}{\tiny \textit{Notes:} Means and SD over program-years. First-difference observations are program-years with the previous year observed (2008--2016).}
-\end{frame}
-
-%--------------------------------------------------------
-\begin{frame}{Design I: model}
-\small
-First differences within program, 2008--2016:
-\[
-\Delta N_{pt} = \pi\,\Delta Z_{pt} + \alpha_t \;[+\;\gamma_{u(p)t}] + \nu_{pt}
-\]
-\[
-\Delta y^{infra}_{pt} = \beta\,\widehat{\Delta N}_{pt} + \alpha_t \;[+\;\gamma_{u(p)t}] + \varepsilon_{pt}
-\]
-\begin{itemize}
-    \item $N_{pt}$: total first-year enrollment. $Z_{pt}$: total vacancies (instrument).
-    \item $y^{infra}_{pt}$: 8-year graduation rate of the inframarginal applicants of program $p$ in year $t$.
-    \item $\beta$: change in inframarginal graduation per additional entering student.
-    \item Two specifications:
-    \begin{enumerate}
-        \item[(1)] Year FE $\alpha_t$.
-        \item[(2)] Adds university $\times$ year FE $\gamma_{u(p)t}$: compares programs of the same university in the same year,
-        absorbing university-wide shocks (budget, demand, policy) that move both vacancies and graduation.
-    \end{enumerate}
-    \item Weights: average number of inframarginal applicants of the program (same in FS, RF and 2SLS). SE clustered by program.
-\end{itemize}
 \end{frame}
 
 %--------------------------------------------------------
@@ -954,13 +1071,13 @@ First differences within program, 2008--2016:
     \item Within university and year, ten more entrants lower inframarginal graduation from the program by
     \textbf{0.33 pp} (mean 36.9\%).
     \item Graduation from any university does not fall: the loss looks like switching programs, not dropping out of higher education.
-    \item The Minimum Cohort threshold gives the same sign and size, but it is not significant.
+    \item Panel B repeats the whole exercise with the Minimum Cohort definition (smaller group of applicants, new $y$ and weights): same sign and size, not significant.
 \end{itemize}
 \end{column}
 \end{columns}
 
 \vspace{0.08cm}
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} RF and 2SLS $\times 100$: pp of graduation per vacancy (RF) or per entering student (2SLS).
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} Panel A: First Cohort threshold. Panel B: Minimum Cohort threshold (Step 1). Outcome: 8-year graduation of inframarginal applicants (Step 2). RF and 2SLS $\times 100$: pp of graduation per vacancy (RF) or per entering student (2SLS).
 SE clustered by program. \sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$.}
 \end{frame}
 
@@ -988,7 +1105,7 @@ SE clustered by program. \sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$
 \vspace{0.12cm}
 \begin{itemize}\scriptsize
     \setlength{\itemsep}{1pt}
-    \item 2SLS, program graduation, $\times 100$. Left: inframarginal = rank within 60--100\% of $T_p$. Right: same students observed at both horizons.
+    \item 2SLS, program graduation, $\times 100$. Left: inframarginal = $Rank\le s\cdot T_p$ with $s$ from 60\% to 100\% (100\% is the main definition; lower $s$ keeps only applicants ranked further inside the class). Right: same students observed at both horizons.
     \item With university $\times$ year FE the effect is negative and of similar size under every threshold (significant for First Cohort).
     It persists at 10 years, so it is not only delayed graduation.
 \end{itemize}
@@ -1350,6 +1467,8 @@ When a selective program suddenly increases its regular-admission vacancies, wha
     \item Design I uses every year-to-year change in vacancies, most of which are small and routine.
     Here, identification comes from discrete capacity decisions, and the event study makes pre-trends testable.
     \item The shock is the program's own decision, so it is not exogenous to its demand. Leads in the event study are the main diagnostic.
+    \item Questions (a) and (b) are DiD effects of the shock. Question (c) uses the shock as an \emph{instrument} for the size of the entering cohort,
+    with the inframarginal graduation outcome of Design I in the second stage (2SLS).
 \end{itemize}
 
 \vspace{0.06cm}
@@ -1409,7 +1528,43 @@ y_{pt}=\sum_{\ell\neq-1}b_\ell\,\mathbf 1\{t-g_p=\ell\}+\mu_p+\lambda_{f(p)t}+\l
 \vspace{0.05cm}
 \begin{itemize}
     \item SE clustered by program.
-    \item Inframarginal graduation: see the reduced-form section at the end of the inframarginal designs.
+    \item (D) Inframarginal outcomes, question (c): 2SLS with $\text{Post}_{pt}$ as the instrument for $N_{pt}$ and the event study (B) of its reduced form. The 2SLS results close this design.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design II (D): 2SLS for inframarginal graduation}
+\scriptsize
+\setlength{\abovedisplayskip}{2pt}
+\setlength{\belowdisplayskip}{2pt}
+\textbf{Idea.} The sudden expansion raises the size of the entering cohort (first stage = result (a)). We ask how much the graduation of the
+students who would have been admitted anyway changes per additional entrant.
+
+\vspace{0.06cm}
+\textbf{Variables}
+\begin{itemize}
+    \item Endogenous regressor: $N_{pt}$, first-year enrollment of $p$ in $t$ (all entrants, Formulario D).
+    \item Instrument: $\text{Post}_{pt}=\mathbf 1\{t\ge g_p\}$, after the first own sudden expansion (same treatment as (A)).
+    \item Outcome: $y_{pt}$, the graduation rate (\%) of the \emph{inframarginal applicants} of $p$ in $t$, \textbf{exactly as in Design I}:
+    applicants with $Rank_{ipt}\le T_p$ (Step 1, First Cohort main, Minimum Cohort robustness), graduation from the program of first enrollment
+    within 8 years, non-enrollees count as zeros (Step 2). Secondary: any university, any HE (8y), and program graduation at 10 years (cohorts $\le 2014$).
+    $T_p$ is fixed per program, so the shock does not mechanically change who is inframarginal.
+\end{itemize}
+
+\textbf{Model}, same FE sets (1) and (2) as the TWFE:
+\[
+N_{pt}=\pi\,\text{Post}_{pt}+\mu_p+\lambda+\nu_{pt},
+\qquad
+y_{pt}=\beta\,\widehat N_{pt}+\mu_p+\lambda+\varepsilon_{pt},
+\qquad \beta=\frac{\rho}{\pi}
+\]
+{\tiny $\lambda$: year FE in (1); field $\times$ year and region $\times$ year FE in (2). $\rho$: reduced form (effect of Post on $y$).}
+\begin{itemize}
+    \item $\beta$: pp of inframarginal graduation per additional entrant. Same units as Design I's 2SLS.
+    \item Differences with Design I: binary, large and discrete instrument instead of every yearly $\Delta Z$; levels with program FE instead of first differences;
+    unweighted. FS, RF and 2SLS use the same program-years (non-missing $y$). SE clustered by program.
+    \item \textbf{Exclusion}: the shock also changes \emph{who} enters (entrant PSU falls, see composition). $\beta$ is the effect of an expansion of
+    one entrant, size and composition together, not of class size alone.
 \end{itemize}
 \end{frame}
 
@@ -1474,6 +1629,115 @@ so school dependency is the SES proxy.}
 \end{itemize}
 \end{column}
 \end{columns}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design II (D): reduced form, inframarginal graduation}
+\centering
+\tiny
+\resizebox{0.62\textwidth}{!}{\input{../../output/own_expansion/tables/oe_rf_design2.tex}}
+
+\vspace{0.1cm}
+\parbox{0.95\textwidth}{\scriptsize
+\textit{Notes:} Reduced form of the 2SLS below: effect of $\text{Post}_{pt}$ on the inframarginal graduation outcomes of Design I (Steps 1--2),
+for both thresholds. Graduation uses titulados through 2024; 10-year outcomes cover cohorts 2007--2014. TWFE (1): program and year FE. TWFE (2): adds field $\times$ year
+and region $\times$ year FE. CS: Callaway--Sant'Anna, not yet treated. SE clustered by program.
+Caveat: the shock can change \emph{who} applies, hence who is inframarginal, even though $T_p$ is fixed; these are effects on that group's graduation rate.
+\sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$.}
+
+\vspace{0.05cm}
+\begin{itemize}\scriptsize
+    \setlength{\itemsep}{1pt}
+    \item Among selective programs, program graduation falls by 6.5 pp with program and year FE, but the estimate shrinks and loses significance with
+    field- and region-year FE ($-4.1$) and with Callaway--Sant'Anna ($-1.3$). No effect across all programs. The event studies follow.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design II (D): reduced-form event study, inframarginal graduation}
+\scriptsize
+\setlength{\abovedisplayskip}{1pt}
+\setlength{\belowdisplayskip}{1pt}
+Outcome = second-stage $y_{pt}$ (program graduation 8y of inframarginal applicants, First Cohort); event time around the first own sudden expansion $g_p$; selective programs:
+\[
+y_{pt}=\sum_{\ell\neq-1}b_\ell\,\mathbf 1\{t-g_p=\ell\}+\mu_p+\lambda+e_{pt},\qquad \ell\in\{\le-5,\dots,\ge4\}
+\]
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.49\textwidth}
+\centering
+\textbf{(1) Program and year FE}
+
+\includegraphics[width=\linewidth, height=0.50\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_2sls_rf_es_g8p_f_fe1.pdf}
+\end{column}
+\begin{column}{0.49\textwidth}
+\centering
+\textbf{(2) Program, field $\times$ year, region $\times$ year FE}
+
+\includegraphics[width=\linewidth, height=0.50\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_2sls_rf_es_g8p_f_fe2.pdf}
+\end{column}
+\end{columns}
+\begin{itemize}\tiny
+    \setlength{\itemsep}{0pt}
+    \item With FE (1) the leads reject (joint $p=0.001$): graduation is already falling before the shock (+10 pp at $\le-5$, +6 pp at $-2$).
+    The $-6.5^{***}$ reduced form, and the $-0.28^{***}$ 2SLS, compare post years with a high pre-period.
+    \item With FE (2) the leads pass ($p=0.21$) and the post coefficients are $-1$ to $-5$ pp, none significant.
+    CS (program and year only) also fails its pre-period test ($p=0.008$ never treated, $0.012$ not yet) and gives post effects near $-2$ pp.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design II (D): reduced-form event study, other outcomes}
+\scriptsize
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.49\textwidth}
+\centering
+\textbf{Program graduation 8y, Minimum Cohort}
+
+\includegraphics[width=\linewidth, height=0.55\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_2sls_rf_es_g8p_m_fe2.pdf}
+\end{column}
+\begin{column}{0.49\textwidth}
+\centering
+\textbf{University graduation 8y, First Cohort}
+
+\includegraphics[width=\linewidth, height=0.55\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_2sls_rf_es_g8u_f_fe2.pdf}
+\end{column}
+\end{columns}
+\vspace{0.05cm}
+\begin{itemize}\tiny
+    \setlength{\itemsep}{0pt}
+    \item Selective programs, TWFE with FE (2); CS with program and year. Minimum Cohort: same pattern as First Cohort (TWFE leads $p=0.36$; CS pre-period $p=0.04$ / $0.05$).
+    \item Graduation from any university: flat leads (TWFE $p=0.55$; CS $p=0.58$) and no visible post effect.
+    \item Bottom line: the reduced form behind the Design II 2SLS does not survive the event study; the negative estimate reflects a pre-existing decline.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design II (D): results, inframarginal graduation}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.56\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/own_expansion/tables/oe_2sls_design2.tex}}
+\end{column}
+\begin{column}{0.42\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{3pt}
+    \item First stage: a sudden expansion adds 19--23 entrants in selective programs (F 21--28), 17--18 in all programs.
+    \item Selective, program + year FE: $-0.28^{***}$ pp of program graduation per entrant, about $-6$ pp for a typical shock (mean 42.8\%).
+    \item With field $\times$ year and region $\times$ year FE: $-0.21$, not significant.
+    \item Any university / any HE: about $-0.11$, not significant. Part of the loss is switching or delay.
+    \item At 10 years the effect disappears ($-0.03$ / $+0.25$).
+    \item All programs: zero. Both inframarginal definitions give the same estimates.
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.06cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} (1) program and year FE; (2) program, field $\times$ year and region $\times$ year FE. Unweighted, SE clustered by program.
+2SLS: pp of graduation per additional entrant (Design I, with university $\times$ year FE: $-0.033$). \textbf{Caveat}: the reduced form fails the CS pre-period test
+($p=0.008$) and CS not-yet-treated gives $-1.3$ (1.9), so the 2SLS inherits a fragile reduced form.
+\sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$.}
 \end{frame}
 
 \subsection{Inframarginal Design No. 3}
@@ -3123,6 +3387,30 @@ The enrollment row reproduces the Design III estimate ($\pi=1.97$).}
 \end{columns}
 \end{frame}
 
+%--------------------------------------------------------
+\begin{frame}{Design III: reduced form, inframarginal graduation}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.55\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/own_expansion/tables/oe_rf_sua.tex}}
+\end{column}
+\begin{column}{0.43\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../output/own_expansion/figures/oe_rf_sua_es_g8p_f.pdf}
+\end{column}
+\end{columns}
+
+\vspace{0.1cm}
+\begin{itemize}\scriptsize
+    \setlength{\itemsep}{1pt}
+    \item Outcome: inframarginal graduation as defined in Design I (program of first enrollment, any university, any HE; 8 and 10 years). No 2SLS.
+    \item Levels specification of this design, $10\times E_p\times\text{Post}_t$, broad area $\times$ region markets, SE clustered by market.
+    \item The PSU-weighted measures are negative, especially for 10-year graduation (Triangular $-4.0^{***}$, $-3.1^{***}$ with region $\times$ year FE).
+    \item The event study shows no break at 2012: 2007--2008 sit above 2011 and the post period is flat. The static estimate reflects a pre-existing trend.
+\end{itemize}
+\end{frame}
+
 \subsection{Inframarginal Design No. 4}
 %--------------------------------------------------------
 \begin{frame}{Design IV: sudden vacancy expansions at competing programs}
@@ -3753,6 +4041,29 @@ SE clustered by market.}
 %--------------------------------------------------------
 % DESIGN IV: SELECTIVE VS SELECTIVE (issue #3)
 %--------------------------------------------------------
+\begin{frame}{Design IV: reduced form, inframarginal graduation}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.55\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/own_expansion/tables/oe_rf_vs.tex}}
+\end{column}
+\begin{column}{0.43\textwidth}
+\centering
+\includegraphics[width=\linewidth]{../../output/own_expansion/figures/oe_rf_vs_es_g8p_f.pdf}
+\end{column}
+\end{columns}
+
+\vspace{0.1cm}
+\begin{itemize}\scriptsize
+    \setlength{\itemsep}{1pt}
+    \item Outcome: inframarginal graduation as defined in Design I (program of first enrollment, any university, any HE; 8 and 10 years). No 2SLS.
+    \item Design IV model (1): cumulative exposure in 10 pp units, own-shock control, broad markets, SE clustered by market.
+    \item No effect on inframarginal graduation for any measure or horizon, and the event study is flat.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
 \begin{frame}{Design IV, selective vs selective: question and construction}
 \scriptsize
 \setlength{\abovedisplayskip}{2pt}
@@ -3803,128 +4114,145 @@ In levels, the kernel measures are negative and significant: closer selective co
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Design IV, selective vs selective: event study and composition}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.50\textwidth}
-\centering
-\includegraphics[width=\linewidth]{../../output/own_expansion/figures/oe_sel_es_N_first.pdf}
-\end{column}
-\begin{column}{0.48\textwidth}
-\centering
-\tiny
-\resizebox{\linewidth}{!}{\input{../../output/own_expansion/tables/oe_sel_composition.tex}}
-\end{column}
-\end{columns}
-
-\vspace{0.1cm}
-\begin{itemize}\scriptsize
-    \setlength{\itemsep}{2pt}
-    \item The event study does not support the negative level effect. Callaway--Sant'Anna gives a \emph{positive} ATT
-    ($+8.7$, SE 2.5, never treated; pre-period average $p=0.32$), and the TWFE leads reject ($p=0.001$).
-    \item Composition (broad market, Total and Gaussian): mean entrant PSU rises by about 3 points with field $\times$ year FE, and the effect disappears with region $\times$ year FE.
-    \item Taken together, there is no robust evidence that selective expansions take students away from selective competitors.
-\end{itemize}
-\end{frame}
-
-%====================================================
-% REDUCED FORM: SLOT SHOCKS ON INFRAMARGINAL GRADUATION (issue #3)
-%====================================================
-\subsection{Reduced Form: Slot Shocks and Inframarginal Graduation}
-\begin{frame}{Reduced form: slot shocks and inframarginal graduation}
+\begin{frame}{Design IV, selective vs selective: event study of the exposure dose}
 \scriptsize
-\textbf{Question}: do the shocks of Designs II--IV change the graduation of the program's inframarginal students?
-
-\vspace{0.08cm}
-\textbf{Outcome}: program $\times$ cohort graduation rate (pct.) of inframarginal applicants, as defined in Design I
-(First Cohort and Minimum Cohort; DEMRE selection-list place within the threshold):
-\begin{itemize}
-    \item graduation from the program of enrollment, any university or any HE, within 8 years (cohorts 2007--2016);
-    \item graduation from the program within 10 years (cohorts 2007--2014; target enrollees only).
-\end{itemize}
-
-\vspace{0.06cm}
-\textbf{Shocks}: same specification, fixed effects and clustering as each design, with no 2SLS:
-\begin{itemize}
-    \item Design II: own sudden expansion, $\text{Post}_{pt}$;
-    \item Design III: SUA exposure $\times$ Post (Total, Triangular, Gaussian);
-    \item Design IV: cumulative exposure to competitor shocks, plus own shocks.
-\end{itemize}
-
-\vspace{0.06cm}
-\textbf{Caveat}: the inframarginal threshold is fixed at the program level, but a shock can still change \emph{who} is in the inframarginal group
-(for example, if it changes who applies). These are reduced-form effects on that group's graduation rate.
-Graduation uses titulados through 2024.
-\end{frame}
-
-%--------------------------------------------------------
-\begin{frame}{Reduced form, Design II: own sudden expansions}
+\setlength{\abovedisplayskip}{1pt}
+\setlength{\belowdisplayskip}{1pt}
+Event-study counterpart of the previous table. The dose is each program's end-of-sample cumulative exposure, $X_k=\text{cum}E^{w,sel}_{k,2016}/10$, interacted with year dummies (2009 omitted):
+\[
+N^{\mathrm{first}}_{kt}=\sum_{t\neq 2009} b_t\,X_k\,\mathbf 1\{\text{year}=t\}+\delta\,\text{Own}_{kt}+\mu_k+\alpha_{f(k),t}\;[+\;\gamma_{r(k),t}]+\nu_{kt}
+\]
 \begin{columns}[T,onlytextwidth]
-\begin{column}{0.55\textwidth}
+\begin{column}{0.49\textwidth}
 \centering
-\tiny
-\resizebox{\linewidth}{!}{\input{../../output/own_expansion/tables/oe_rf_design2.tex}}
+\includegraphics[width=\linewidth, height=0.46\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_sel_dose_es_N_first_f.pdf}
 \end{column}
-\begin{column}{0.43\textwidth}
+\begin{column}{0.49\textwidth}
 \centering
-\includegraphics[width=\linewidth]{../../output/own_expansion/figures/oe_rf_d2_es_g8p_f.pdf}
+\includegraphics[width=\linewidth, height=0.46\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_sel_dose_es_N_first_fr.pdf}
 \end{column}
 \end{columns}
-
-\vspace{0.1cm}
-\begin{itemize}\scriptsize
-    \setlength{\itemsep}{1pt}
-    \item TWFE (1): program and year FE. TWFE (2): adds field $\times$ year and region $\times$ year FE. SE clustered by program. Event study: selective programs.
-    \item Among selective programs, program graduation falls by 6.5 pp with program and year FE, but the estimate shrinks and loses significance with
-    field- and region-year FE ($-4.1$) and with Callaway--Sant'Anna ($-1.3$). The CS pre-period test rejects ($p=0.008$). No effect across all programs.
+\begin{itemize}\tiny
+    \setlength{\itemsep}{0pt}
+    \item $b_t$: entrants per 10 pp of final exposure in year $t$, relative to 2009. Broad market, 31 clusters, selective incumbents; all regressions control for own shocks. First shocks are dated 2010.
+    \item Field $\times$ year FE only (left): the leads reject (joint $p=0.000$ Total and Gaussian, $0.027$ Triangular), so the dose is not balanced before 2010.
+    \item Adding region $\times$ year FE (right): flat leads ($p=0.24$--$0.41$) and a negative effect that builds up, about $-6$ to $-30$ entrants per 10 pp by 2016 (Triangular); Total is smaller and imprecise.
 \end{itemize}
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Reduced form, Design III: SUA entry}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.55\textwidth}
+\begin{frame}{Design IV, selective vs selective: composition}
 \centering
 \tiny
-\resizebox{\linewidth}{!}{\input{../../output/own_expansion/tables/oe_rf_sua.tex}}
-\end{column}
-\begin{column}{0.43\textwidth}
-\centering
-\includegraphics[width=\linewidth]{../../output/own_expansion/figures/oe_rf_sua_es_g8p_f.pdf}
-\end{column}
-\end{columns}
+\resizebox{0.60\textwidth}{!}{\input{../../output/own_expansion/tables/oe_sel_composition.tex}}
 
 \vspace{0.1cm}
-\begin{itemize}\scriptsize
-    \setlength{\itemsep}{1pt}
-    \item Levels specification of Design III, $10\times E_p\times\text{Post}_t$, broad area $\times$ region markets, SE clustered by market.
-    \item The PSU-weighted measures are negative, especially for 10-year graduation (Triangular $-4.0^{***}$, $-3.1^{***}$ with region $\times$ year FE).
-    \item The event study shows no break at 2012: 2007--2008 sit above 2011 and the post period is flat. The static estimate reflects a pre-existing trend.
+\parbox{0.95\textwidth}{\scriptsize
+\textit{Notes:} Same specification as the enrollment results (cumulative exposure in 10 pp, broad market, own shocks as control, SE clustered by market),
+with the composition of the entering cohort as outcome. Total and Gaussian exposure. Mean entrant PSU rises by about 3 points with field $\times$ year FE
+and the estimate vanishes with region $\times$ year FE; the other outcomes are not robustly different from zero.
+\sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$.}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design IV, selective vs selective: composition event study: entrant PSU}
+\scriptsize
+\setlength{\abovedisplayskip}{1pt}
+\setlength{\belowdisplayskip}{1pt}
+Same dose event study as for enrollment, with the mean LM PSU of entrants as outcome:
+\[
+y_{kt}=\sum_{t\neq 2009} b_t\,X_k\,\mathbf 1\{\text{year}=t\}+\delta\,\text{Own}_{kt}+\mu_k+\alpha_{f(k),t}\;[+\;\gamma_{r(k),t}]+\nu_{kt},\qquad X_k=\text{cum}E^{w,sel}_{k,2016}/10
+\]
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.49\textwidth}
+\centering
+\includegraphics[width=\linewidth, height=0.46\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_sel_dose_es_c_psu_mean_f.pdf}
+\end{column}
+\begin{column}{0.49\textwidth}
+\centering
+\includegraphics[width=\linewidth, height=0.46\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_sel_dose_es_c_psu_mean_fr.pdf}
+\end{column}
+\end{columns}
+\begin{itemize}\tiny
+    \setlength{\itemsep}{0pt}
+    \item $b_t$: points of mean entrant PSU per 10 pp of final exposure in year $t$, relative to 2009. Leads pass in both specifications (joint $p=0.30$--$0.82$).
+    \item With field $\times$ year FE (left) the coefficients turn positive only at the end of the sample (2016: about $+5$ to $+7$), after negative values in 2011--2012; with region $\times$ year FE (right) there is no pattern.
+    \item No stable change in who enters: the enrollment loss of the previous slide does not come with a systematic change in mean entrant PSU.
 \end{itemize}
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Reduced form, Design IV: competitor vacancy shocks}
+\begin{frame}{Design IV, selective vs selective: composition event study: other outcomes}
+\scriptsize
+Field $\times$ year and region $\times$ year FE. Same dose specification; 2009 omitted; SE clustered by market.
 \begin{columns}[T,onlytextwidth]
-\begin{column}{0.55\textwidth}
+\begin{column}{0.49\textwidth}
 \centering
-\tiny
-\resizebox{\linewidth}{!}{\input{../../output/own_expansion/tables/oe_rf_vs.tex}}
+\includegraphics[width=\linewidth, height=0.36\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_sel_dose_es_c_psu_last_fr.pdf}
+
+\includegraphics[width=\linewidth, height=0.36\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_sel_dose_es_c_priv_fr.pdf}
 \end{column}
-\begin{column}{0.43\textwidth}
+\begin{column}{0.49\textwidth}
 \centering
-\includegraphics[width=\linewidth]{../../output/own_expansion/figures/oe_rf_vs_es_g8p_f.pdf}
-\end{column}
-\end{columns}
+\includegraphics[width=\linewidth, height=0.36\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_sel_dose_es_c_psu_sd_fr.pdf}
 
 \vspace{0.1cm}
+\begin{itemize}\tiny
+    \setlength{\itemsep}{1pt}
+    \item Top left: PSU of the last admitted. Top right: SD of entrant PSU. Bottom left: share of entrants from private-paid schools.
+    \item Leads pass for the kernel measures (joint $p\ge0.30$ for Triangular and Gaussian). For Total, the private-paid share rejects ($p=0.02$) and the SD is borderline ($p=0.06$).
+    \item No outcome shows a clear post-2010 shift. Intervals are wide (30 clusters).
+\end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design IV, selective vs selective: reduced form, inframarginals}
+\centering
+\resizebox{0.66\textwidth}{!}{$y_{kt}=\rho_w\,\text{cum}E^{w,sel}_{kt}+\delta\,\text{Own}_{kt}+\mu_k+\alpha_{f(k),t}\;[+\;\gamma_{r(k),t}]+\nu_{kt}$}
+
+\vspace{0.05cm}
+\tiny
+\resizebox{0.82\textwidth}{!}{\input{../../output/own_expansion/tables/oe_sel_rf_infra.tex}}
+
+\vspace{0.04cm}
+\parbox{0.97\textwidth}{\tiny
+\textit{Notes:} Same exposure, sample and FE as the selective-vs-selective enrollment results (broad market, exposure in 10 pp units, own-shock control,
+SE clustered by market). Outcome: graduation (pct.) of $k$'s inframarginal applicants as defined in Design I (Steps 1--2); 10-year outcomes cover cohorts 2007--2014.
+Pre-mean: treated selective incumbents before their first selective-competitor shock. No 2SLS.
+\sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$.}
+
+\vspace{0.04cm}
 \begin{itemize}\scriptsize
     \setlength{\itemsep}{1pt}
-    \item Design IV model (1): cumulative exposure in 10 pp units, own-shock control, broad markets, SE clustered by market.
-    \item No effect on inframarginal graduation for any measure or horizon, and the event study is flat.
+    \item With field $\times$ year FE, program graduation falls by 3.5--6 pp per 10 pp of exposure; with region $\times$ year FE the 8-year estimates are close to zero (10-year Total: $+4.1^{*}$, imprecise elsewhere).
+    \item Graduation from any university or any HE does not move in either specification.
 \end{itemize}
 \end{frame}
 
-
+%--------------------------------------------------------
+\begin{frame}{Design IV, selective vs selective: reduced-form dose event study}
+\scriptsize
+Same dose event study as for enrollment ($X_k=\text{cum}E^{w,sel}_{k,2016}/10$ $\times$ year, 2009 omitted), with program graduation in 8 years of the inframarginal applicants (First Cohort) as outcome.
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.49\textwidth}
+\centering
+\includegraphics[width=\linewidth, height=0.50\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_sel_dose_es_g8p_f_f.pdf}
+\end{column}
+\begin{column}{0.49\textwidth}
+\centering
+\includegraphics[width=\linewidth, height=0.50\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_sel_dose_es_g8p_f_fr.pdf}
+\end{column}
+\end{columns}
+\begin{itemize}\tiny
+    \setlength{\itemsep}{0pt}
+    \item Field $\times$ year FE (left): the leads are large and positive (2008: about $+15$ to $+17$; joint $p=0.000$) and the post period is flat. The negative static estimate reflects
+    graduation that was already falling in more exposed programs before 2010.
+    \item Region $\times$ year FE (right): leads borderline (joint $p=0.06$ Total, $0.12$ Triangular, $0.007$ Gaussian); post coefficients near zero, slightly negative in 2015--2016.
+    \item Minimum Cohort gives the same pattern. Exposure that lowers enrollment (previous slides) does not change inframarginal graduation.
+\end{itemize}
+\end{frame}
 
 \section{Appendix}
 
