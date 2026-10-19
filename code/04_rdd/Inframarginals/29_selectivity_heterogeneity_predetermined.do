@@ -147,6 +147,7 @@ foreach def in first_enroll min_enroll {
     quietly reg D_N_total_enter D_Z_total_cupos i.ao_proceso `W' if samp, vce(cluster program_id_rank_analysis)
     local P_fs = _b[D_Z_total_cupos]
     local P_fsse = _se[D_Z_total_cupos]
+    local P_fsp = 2 * ttail(e(df_r), abs(_b[D_Z_total_cupos] / _se[D_Z_total_cupos]))
     local P_F = (_b[D_Z_total_cupos] / _se[D_Z_total_cupos])^2
     local P_N = e(N)
     foreach y in program uni he {
@@ -160,6 +161,36 @@ foreach def in first_enroll min_enroll {
         local P_iv_`y' = _b[D_N_total_enter]
         local P_ivse_`y' = _se[D_N_total_enter]
         local P_ivp_`y' = 2 * normal(-abs(_b[D_N_total_enter] / _se[D_N_total_enter]))
+    }
+
+    /******************************************************************
+    * (1b) Design I column (2) spec by quartile: year + university x year FE
+    ******************************************************************/
+    foreach g in 1 2 3 4 P {
+        local c = cond("`g'" == "P", "samp", "samp & Q == `g'")
+        quietly reghdfe D_N_total_enter D_Z_total_cupos `W' if `c', ///
+            absorb(ao_proceso univ#ao_proceso) cluster(program_id_rank_analysis)
+        local X`g'_fs = _b[D_Z_total_cupos]
+        local X`g'_fsse = _se[D_Z_total_cupos]
+        local X`g'_fsp = 2 * ttail(e(df_r), abs(_b[D_Z_total_cupos] / _se[D_Z_total_cupos]))
+        local X`g'_N = e(N)
+        quietly distinct program_id_rank_analysis if e(sample)
+        local X`g'_np = r(ndistinct)
+        local X`g'_F = .
+        foreach y in program uni he {
+            local yv = cond("`y'" == "program", "grad_enrolled_program_rate_8y", "grad_`y'_rate_8y")
+            quietly reghdfe D_`yv' D_Z_total_cupos `W' if `c', ///
+                absorb(ao_proceso univ#ao_proceso) cluster(program_id_rank_analysis)
+            local X`g'_rf_`y' = _b[D_Z_total_cupos]
+            local X`g'_rfse_`y' = _se[D_Z_total_cupos]
+            local X`g'_rfp_`y' = 2 * ttail(e(df_r), abs(_b[D_Z_total_cupos] / _se[D_Z_total_cupos]))
+            quietly ivreghdfe D_`yv' (D_N_total_enter = D_Z_total_cupos) `W' if `c', ///
+                absorb(ao_proceso univ#ao_proceso) cluster(program_id_rank_analysis)
+            local X`g'_iv_`y' = _b[D_N_total_enter]
+            local X`g'_ivse_`y' = _se[D_N_total_enter]
+            local X`g'_ivp_`y' = 2 * normal(-abs(_b[D_N_total_enter] / _se[D_N_total_enter]))
+            if "`y'" == "program" local X`g'_F = e(widstat)
+        }
     }
 
     /******************************************************************
@@ -201,12 +232,11 @@ foreach def in first_enroll min_enroll {
         local U_eq_`y' = r(p)
     }
 
-    * continuous interaction, Sanderson-Windmeijer F
-    capture drop yr_*
-    quietly tab ao_proceso, gen(yr_)
-    quietly ivreg2 D_grad_enrolled_program_rate_8y yr_* Sz ///
+    * continuous interaction, Sanderson-Windmeijer F: dN and dN x S~ both
+    * instrumented (dZ, dZ x S~), year x univ FE (Design I column (2) spec)
+    quietly ivreghdfe D_grad_enrolled_program_rate_8y Sz ///
         (D_N_total_enter dNS = D_Z_total_cupos dZS) `W' if samp, ///
-        cluster(program_id_rank_analysis) partial(yr_*) first
+        absorb(ao_proceso univ#ao_proceso) cluster(program_id_rank_analysis) first
     local C_b = _b[D_N_total_enter]
     local C_se = _se[D_N_total_enter]
     local C_p = 2 * normal(-abs(_b[D_N_total_enter] / _se[D_N_total_enter]))
@@ -216,8 +246,8 @@ foreach def in first_enroll min_enroll {
     matrix sw = e(first)
     local C_swF1 = sw[rownumb(sw, "SWF"), 1]
     local C_swF2 = sw[rownumb(sw, "SWF"), 2]
-    quietly reg D_grad_enrolled_program_rate_8y D_Z_total_cupos dZS Sz i.ao_proceso `W' if samp, ///
-        vce(cluster program_id_rank_analysis)
+    quietly reghdfe D_grad_enrolled_program_rate_8y D_Z_total_cupos dZS Sz `W' if samp, ///
+        absorb(ao_proceso univ#ao_proceso) cluster(program_id_rank_analysis)
     local C_rfS = _b[dZS]
     local C_rfseS = _se[dZS]
     local C_rfpS = 2 * ttail(e(df_r), abs(_b[dZS] / _se[dZS]))
@@ -273,7 +303,8 @@ foreach def in first_enroll min_enroll {
             stars ``gv'`g'_fsp' s
             file write T " & " %6.3f (``gv'`g'_fs') "`s'"
         }
-        file write T " & " %6.3f (`P_fs') " \\" _n
+        stars `P_fsp' s
+        file write T " & " %6.3f (`P_fs') "`s'" " \\" _n
         forvalues g = 1/4 {
             file write T " & (" %5.3f (``gv'`g'_fsse') ")"
         }
@@ -312,6 +343,57 @@ foreach def in first_enroll min_enroll {
         file close T
     }
 
+    * (a2) quartiles with university x year FE (Design I column (2) spec)
+    file open T using "$im_out/tables/im_sel_Q_ufe_`sfx'.tex", write replace
+    file write T "\begin{tabular}{lccccc}" _n "\toprule" _n
+    file write T " & Q1 & Q2 & Q3 & Q4 & Pooled \\" _n
+    file write T "Mean 2007--09 entrant PSU"
+    forvalues g = 1/4 {
+        file write T " & " %5.1f (`Q`g'_psu')
+    }
+    file write T " & \\" _n "Programs"
+    foreach g in 1 2 3 4 P {
+        file write T " & " %5.0f (`X`g'_np')
+    }
+    file write T " \\" _n "FD observations"
+    foreach g in 1 2 3 4 P {
+        file write T " & " %6.0fc (`X`g'_N')
+    }
+    file write T " \\" _n "\midrule" _n "First stage (\(\Delta N\) on \(\Delta Z\))"
+    foreach g in 1 2 3 4 P {
+        stars `X`g'_fsp' s
+        file write T " & " %6.3f (`X`g'_fs') "`s'"
+    }
+    file write T " \\" _n
+    foreach g in 1 2 3 4 P {
+        file write T " & (" %5.3f (`X`g'_fsse') ")"
+    }
+    file write T " \\" _n "Kleibergen--Paap F"
+    foreach g in 1 2 3 4 P {
+        file write T " & " %6.1f (`X`g'_F')
+    }
+    file write T " \\" _n "\midrule" _n
+    foreach y in program uni he {
+        local ylab = cond("`y'" == "program", "Program", cond("`y'" == "uni", "Any university", "Any HE"))
+        file write T "\multicolumn{6}{l}{\textit{Graduation within 8 years: `ylab'}} \\" _n
+        foreach e in rf iv {
+            local elab = cond("`e'" == "rf", "\quad Reduced form (\(\times 100\))", "\quad 2SLS (\(\times 100\))")
+            file write T "`elab'"
+            foreach g in 1 2 3 4 P {
+                stars `X`g'_`e'p_`y'' s
+                file write T " & " %7.3f (100 * `X`g'_`e'_`y'') "`s'"
+            }
+            file write T " \\" _n
+            foreach g in 1 2 3 4 P {
+                file write T " & (" %6.3f (100 * `X`g'_`e'se_`y'') ")"
+            }
+            file write T " \\" _n
+        }
+        file write T "\addlinespace" _n
+    }
+    file write T "\bottomrule" _n "\end{tabular}" _n
+    file close T
+
     * (b) robustness: university x year FE, continuous interaction
     file open T using "$im_out/tables/im_sel_robust_`sfx'.tex", write replace
     file write T "\begin{tabular}{lcccc}" _n "\toprule" _n
@@ -331,7 +413,7 @@ foreach def in first_enroll min_enroll {
         file write T " \\" _n
     }
     file write T "\midrule" _n
-    file write T "\multicolumn{5}{l}{\textit{Panel B. Continuous interaction, program graduation (\(\times 100\))}} \\" _n
+    file write T "\multicolumn{5}{l}{\textit{Panel B. Continuous interaction with university \(\times\) year FE, program graduation (\(\times 100\))}} \\" _n
     stars `C_p' s1
     stars `C_pS' s2
     stars `C_rfpS' s3
