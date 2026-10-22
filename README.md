@@ -33,7 +33,7 @@ Preliminary results, from the deck [`slides/RDDs-Inframarginal/main.tex`](slides
 
 So far the evidence does not show a large cost of expansion for the students already in a program, which means the question of why capacity is not expanded is not answered by costs to inframarginal students alone.
 
-The levels and log-log versions of Design I (issue #7) were run but are not in the deck; they give a precise zero for program graduation. Open items include a specification for Design V that absorbs program trends, a geographic-distance kernel in the Design III exposure measure, program-level estimates for all designs, a waiting-list measure of queue length, and labor-market outcomes (a data request to the Ministry of Labor is pending).
+Open items include a specification for Design V that absorbs program trends, a geographic-distance kernel in the Design III exposure measure, program-level estimates for all designs, a waiting-list measure of queue length, and labor-market outcomes (a data request to the Ministry of Labor is pending).
 
 ## Data
 
@@ -56,7 +56,7 @@ code/
   01_clean/                  # raw DEMRE/MINEDUC → .dta
   02_build/                  # cutoffs, running variable, outcomes, vacancies, admission rank, inframarginal samples
   04_rdd/                    # RDD estimation and figures
-    Inframarginals/          # Design I (31–35), Design V (36–38) and heterogeneity/graduation scripts
+    Inframarginals/          # Design I (31–33, 35), Design V (36–38) and heterogeneity/graduation scripts
   Vacancy_shocks/            # vacancy-shock panel, similarity, exposure (inputs to Designs II–IV; Design V is built in 02_build/16)
   Own_expansion/             # Design II, selective-competitor Design IV, composition (see its README)
   Sua/                       # Design III, SUA entry (see its README); Sua/Cosine for the cosine exposure variant

@@ -4,11 +4,11 @@
 - [ ] Send the labor market data request to the Ministry of Labor — created 2026-10-15 · status: In progress · missing: letter drafted, not yet sent
 - [ ] Share the GitHub repo link with the full team — created 2026-10-15 · status: Not started
 - [ ] Add a geographic-distance kernel to the Design III exposure measure — created 2026-10-15 · status: Not started
-- [ ] Try a log-log specification for Design I — created 2026-10-15 · status: Not started
 - [ ] Revisit the RDD framing to align with the high-return program narrative — created 2026-10-15 · status: Not started
 - [ ] Review a Chris Walters-style reallocation paper — created 2026-10-15 · status: Not started
 
 ## Done
+- [x] Try a log-log specification for Design I (done as first differences of logs) — created 2026-10-15 · done 2026-10-19 · status: Done; slide "Design I: first differences of logs" (`35_design1_dlogs.do`). The levels with program FE and log-log version (issue #7) was dropped and its script and table removed.
 - [x] Run the individual-level inframarginal design with application-portfolio (ROL) fixed effects (Design V) — created 2026-10-20 · done 2026-10-20 · issue #8 · status: Done; estimates and balance/placebo posted on the issue. Note: the placebo with next-year vacancies flags within-program trends, so how to absorb them is still open on #8.
   Original email that motivated it:
   > We are currently using program-level data, not individual-level outcomes, but I don't see why we can't run regressions at the individual level. Let Y_i = 1 if I graduates within 8 years
