@@ -8,7 +8,7 @@
 *   ln n_pt = a ln Z_pt + x_i'a2 + psi_p + psi_t + psi_ROL(i) + nu
 *   Y_i     = b ln n_pt + x_i'b2 + phi_p + phi_t + phi_ROL(i) + e   (2SLS)
 *
-*   Y x 100, so b/10 = pp change in graduation per 10% more entrants
+*   b/10 = change in the probability of graduating per 10% more entrants
 *   Columns as in im_d5_main.tex: program+year, + controls,
 *   + top1u ROL (main), + exact ROL. SE clustered by program-year.
 *
@@ -47,7 +47,7 @@ egen long programs = group(program_id_rank_analysis)
 
 foreach v in program uni he {
     local src = cond("`v'" == "program", "graduates_enrolled_program_8y", "graduates_`v'_8y")
-    gen double y_`v' = 100 * `src'
+    gen double y_`v' = `src'
 }
 
 local ctrl ""
@@ -125,17 +125,17 @@ forvalues c = 1/4 {
     file write T " & " %6.0f (`F`c'')
 }
 file write T " \\" _n "\addlinespace" _n
-file write T "\multicolumn{5}{l}{2SLS, \(\times 100\) (pp per log point of \(n_{pt}\))} \\" _n
+file write T "\multicolumn{5}{l}{2SLS (change in probability per log point of \(n_{pt}\))} \\" _n
 foreach y in program uni he {
     local yl = cond("`y'" == "program", "Graduation, enrolled program, 8y", cond("`y'" == "uni", "Graduation, any university, 8y", "Graduation, any higher education, 8y"))
     file write T "\quad `yl'"
     forvalues c = 1/4 {
         stars `ivp`c'`y'' s
-        file write T " & " %6.2f (`iv`c'`y'') "`s'"
+        file write T " & " %7.4f (`iv`c'`y'') "`s'"
     }
     file write T " \\" _n
     forvalues c = 1/4 {
-        file write T " & (" %5.2f (`ivse`c'`y'') ")"
+        file write T " & (" %7.4f (`ivse`c'`y'') ")"
     }
     file write T " \\" _n
 }

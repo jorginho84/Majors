@@ -19,7 +19,7 @@
 *   FE   : program and year always; ROL under seven definitions, from
 *          coarse to fine: top1, univ, top2, top1u (main), top3, set, exact
 *   SE   : clustered by program-year
-*   RF and 2SLS reported x 100 (pp per vacancy / per entrant)
+*   Y is the 0/1 graduation indicator: RF and 2SLS are changes in the probability of graduating (per vacancy / per entrant)
 *
 * Panel A: full sample (each column keeps its own non-singleton sample).
 * Panel B: every column on the common sample retained by the exact-ROL
@@ -68,7 +68,7 @@ egen long programs = group(program_id_rank_analysis)
 
 foreach v in program uni he {
     local src = cond("`v'" == "program", "graduates_enrolled_program_8y", "graduates_`v'_8y")
-    gen double y_`v' = 100 * `src'
+    gen double y_`v' = `src'
 }
 
 local ctrl ""
@@ -228,13 +228,13 @@ foreach y in program uni he {
             file write T " & " %6.0f (``P'`c'`y'_F')
         }
         file write T " \\" _n "\addlinespace" _n
-        file write T "\multicolumn{`=`ncol'+1'}{l}{`ylab_`y'' (\(\times 100\))} \\" _n
+        file write T "\multicolumn{`=`ncol'+1'}{l}{`ylab_`y''} \\" _n
         foreach e in rf iv {
             local elab = cond("`e'" == "rf", "\quad Reduced form", "\quad \textbf{2SLS}")
             file write T "`elab'"
             forvalues c = 1/`ncol' {
                 stars ``P'`c'`y'_`e'p' s
-                file write T " & " %7.3f (``P'`c'`y'_`e'') "`s'"
+                file write T " & " %8.5f (``P'`c'`y'_`e'') "`s'"
             }
             file write T " \\" _n
             forvalues c = 1/`ncol' {
@@ -244,7 +244,7 @@ foreach y in program uni he {
         }
         file write T "Mean of outcome"
         forvalues c = 1/`ncol' {
-            file write T " & " %5.1f (``P'`c'`y'_ym')
+            file write T " & " %5.3f (``P'`c'`y'_ym')
         }
         file write T " \\" _n "Students"
         forvalues c = 1/`ncol' {
@@ -290,17 +290,17 @@ foreach c of local cc {
     file write T " & " %6.0f (`A`c'program_F')
 }
 file write T " \\" _n "\addlinespace" _n
-file write T "\multicolumn{5}{l}{2SLS, \(\times 100\)} \\" _n
+file write T "\multicolumn{5}{l}{2SLS} \\" _n
 foreach y in program uni he {
     local yl = cond("`y'" == "program", "Graduation, enrolled program, 8y", cond("`y'" == "uni", "Graduation, any university, 8y", "Graduation, any higher education, 8y"))
     file write T "\quad `yl'"
     foreach c of local cc {
         stars `A`c'`y'_ivp' s
-        file write T " & " %6.3f (`A`c'`y'_iv') "`s'"
+        file write T " & " %8.5f (`A`c'`y'_iv') "`s'"
     }
     file write T " \\" _n
     foreach c of local cc {
-        file write T " & (" %5.3f (`A`c'`y'_ivse') ")"
+        file write T " & (" %8.5f (`A`c'`y'_ivse') ")"
     }
     file write T " \\" _n
 }
