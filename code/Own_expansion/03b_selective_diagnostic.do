@@ -7,8 +7,8 @@
 *
 * Same outcome (N_first), same panel (oe_selective_panel.dta, from 03).
 * The two differ in (i) treatment: kernel-weighted cumulative exposure
-* vs. a binary first-shock-in-market indicator; (ii) FE: field-year and
-* region-year vs. program and year only; (iii) estimator: TWFE vs. CS
+* vs. a binary first-shock-in-market indicator; (ii) FE: field-year
+* vs. program and year only; (iii) estimator: TWFE vs. CS
 * (robust to heterogeneous effects under staggered adoption).
 *
 * Ladder, changing one thing at a time:
@@ -25,7 +25,7 @@
 *       FE full, own control (dose)
 *   R11 continuous triangular, program + year FE, own control
 *   R12 binary Post and continuous triangular together, FE full, own
-*   FE full = program, broad field x year, region x year. SE clustered
+*   FE full = program, broad field x year. SE clustered
 *   by broad market.
 *
 * Output: output/own_expansion/tables/oe_sel_diag.tex
@@ -39,7 +39,7 @@ global oe_out "$output/own_expansion"
 use "$processed/oe_selective_panel.dta", clear
 gen byte post_sel = g_sel > 0 & ao_proceso >= g_sel
 gen int Ei = g_sel if g_sel > 0
-local full "pid fy_broad ry"
+local full "pid fy_broad"
 
 tab g_sel if ao_proceso == 2016
 quietly summarize N_first if g_sel > 0 & post_sel == 0
@@ -54,13 +54,13 @@ program define keep_b
     c_local N_`name'  = e(N)
 end
 
-reghdfe N_first x_tri_broad own_cumshock, absorb(`full') cluster(mkt_broad)
+reghdfe N_first x_tri_broad, absorb(`full') cluster(mkt_broad)
 keep_b R1 x_tri_broad
-reghdfe N_first x_tot_broad own_cumshock, absorb(`full') cluster(mkt_broad)
+reghdfe N_first x_tot_broad, absorb(`full') cluster(mkt_broad)
 keep_b R2 x_tot_broad
-reghdfe N_first post_sel own_cumshock, absorb(`full') cluster(mkt_broad)
+reghdfe N_first post_sel, absorb(`full') cluster(mkt_broad)
 keep_b R3 post_sel
-reghdfe N_first post_sel own_cumshock, absorb(pid ao_proceso) cluster(mkt_broad)
+reghdfe N_first post_sel, absorb(pid ao_proceso) cluster(mkt_broad)
 keep_b R4 post_sel
 reghdfe N_first post_sel if balanced, absorb(pid ao_proceso) cluster(mkt_broad)
 keep_b R5 post_sel
@@ -81,7 +81,7 @@ foreach cg in never notyet {
 did_imputation N_first pid ao_proceso Ei if balanced, fe(pid ao_proceso) ///
     cluster(mkt_broad) autosample
 keep_b R8 tau
-did_imputation N_first pid ao_proceso Ei, fe(`full') controls(own_cumshock) ///
+did_imputation N_first pid ao_proceso Ei, fe(`full') ///
     cluster(mkt_broad) autosample
 keep_b R9 tau
 
@@ -92,18 +92,18 @@ local med = r(p50)
 di as text "Median 2016 triangular exposure among treated: " as result %6.2f `med'
 gen byte post_hi = post_sel & tri16 >  `med'
 gen byte post_lo = post_sel & tri16 <= `med'
-reghdfe N_first post_hi post_lo own_cumshock, absorb(`full') cluster(mkt_broad)
+reghdfe N_first post_hi post_lo, absorb(`full') cluster(mkt_broad)
 keep_b R10h post_hi
 keep_b R10l post_lo
 test post_hi = post_lo
 local p_eq = r(p)
 
 * also: continuous triangular with program + year FE only
-reghdfe N_first x_tri_broad own_cumshock, absorb(pid ao_proceso) cluster(mkt_broad)
+reghdfe N_first x_tri_broad, absorb(pid ao_proceso) cluster(mkt_broad)
 keep_b R11 x_tri_broad
 
 * level (exposed market) and dose (closeness) together
-reghdfe N_first post_sel x_tri_broad own_cumshock, absorb(`full') cluster(mkt_broad)
+reghdfe N_first post_sel x_tri_broad, absorb(`full') cluster(mkt_broad)
 keep_b R12p post_sel
 keep_b R12x x_tri_broad
 
@@ -145,10 +145,10 @@ local e_R9 "Imputation (BJS)"
 local e_R10h "TWFE"
 local e_R10l "TWFE"
 foreach r in R1 R2 R3 R9 R10h R10l R12p R12x {
-    local f_`r' "Full + own"
+    local f_`r' "Program, field-year"
 }
-local f_R11 "Program, year + own"
-local f_R4 "Program, year + own"
+local f_R11 "Program, year"
+local f_R4 "Program, year"
 foreach r in R5 R6 R7 R8 {
     local f_`r' "Program, year"
 }

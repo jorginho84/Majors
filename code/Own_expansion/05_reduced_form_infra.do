@@ -15,13 +15,13 @@
 *
 * Shocks, same specification, FE and clusters as each design:
 *   Design II  own sudden expansion, Post_pt (02_own_expansion.do);
-*              TWFE (program + year; + field-year + region-year), SE by
+*              TWFE (program + year; + university-year), SE by
 *              program; event study + CS, selective programs.
 *   Design III SUA exposure x Post (Total, Triangular, Gaussian), program +
 *              field-year [+ region-year], SE by market; event study with
 *              the PSU-weighted exposures and region-year FE.
 *   Design IV  cumulative competitor exposure / 10 (Total, Triangular,
-*              Gaussian, broad markets) + own shocks, program + field-year
+*              Gaussian, broad markets), program + field-year
 *              [+ region-year], SE by market; event study around g_mkt.
 *
 * Caveat: the outcome is measured on inframarginal applicants, defined by
@@ -137,7 +137,7 @@ foreach s in sel all {
     foreach y of local yvars {
         quietly reghdfe `y' post_main `cond', absorb(pid ao_proceso) cluster(pid)
         oe_coef post_main d2_`s'_`y'_fe1_
-        quietly reghdfe `y' post_main `cond', absorb(pid fy ry) cluster(pid)
+        quietly reghdfe `y' post_main `cond', absorb(pid uy) cluster(pid)
         oe_coef post_main d2_`s'_`y'_fe2_
     }
 }
@@ -145,7 +145,7 @@ foreach s in sel all {
 preserve
 keep if selective
 foreach y in g8p_f g8p_m {
-    oe_es `y', g(g_main) rel(rel_main) absorb(pid fy ry) cluster(pid) ///
+    oe_es `y', g(g_main) rel(rel_main) absorb(pid uy) cluster(pid) ///
         ylab("`lab_`y''") xlab("Years since first own vacancy shock") ///
         file("$oe_out/figures/oe_rf_d2_es_`y'.pdf")
     local d2_cs_`y'_b  = r(attCSny)
@@ -289,16 +289,16 @@ foreach w in tot tri gau {
 }
 foreach y of local yvars {
     foreach w in tot tri gau {
-        foreach fe in f fr {
-            local abs = cond("`fe'" == "f", "pid fy", "pid fy ry")
-            quietly reghdfe `y' x_`w' own_cumshock, absorb(`abs') cluster(mkt_broad)
+        foreach fe in b f {
+            local abs = cond("`fe'" == "b", "pid ao_proceso", "pid fy")
+            quietly reghdfe `y' x_`w', absorb(`abs') cluster(mkt_broad)
             oe_coef x_`w' vs_`y'_`w'_`fe'_
         }
     }
 }
 foreach y in g8p_f g8p_m {
-    oe_es `y', g(g_mkt) rel(rel_mkt) absorb(pid fy ry) cluster(mkt_broad) ///
-        controls(own_cumshock) ylab("`lab_`y''") ///
+    oe_es `y', g(g_mkt) rel(rel_mkt) absorb(pid fy) cluster(mkt_broad) ///
+        ylab("`lab_`y''") ///
         xlab("Years since first shock in market") ///
         file("$oe_out/figures/oe_rf_vs_es_`y'.pdf")
 }
@@ -310,21 +310,23 @@ foreach y in g8p_f g8p_m {
 
 foreach d in sua vs {
     local ks = cond("`d'" == "sua", "unw tri50 gau50", "tot tri gau")
+    local fes = cond("`d'" == "sua", "f fr", "b f")
     file open T using "$oe_out/tables/oe_rf_`d'.tex", write replace
     file write T "\begin{tabular}{lcccccc}" _n "\toprule" _n
-    file write T " & \multicolumn{3}{c}{Field \(\times\) year FE} & \multicolumn{3}{c}{\(+\) Region \(\times\) year FE} \\" _n
+    if "`d'" == "sua" file write T " & \multicolumn{3}{c}{Field \(\times\) year FE} & \multicolumn{3}{c}{\(+\) Region \(\times\) year FE} \\" _n
+    else file write T " & \multicolumn{3}{c}{Program and year FE} & \multicolumn{3}{c}{Program, field \(\times\) year FE} \\" _n
     file write T "\cmidrule(lr){2-4}\cmidrule(lr){5-7}" _n
     file write T "Outcome & Total & Triangular & Gaussian & Total & Triangular & Gaussian \\" _n "\midrule" _n
     foreach y of local yvars {
         file write T "`lab_`y''"
-        foreach fe in f fr {
+        foreach fe of local fes {
             foreach k of local ks {
                 oe_stars ``d'_`y'_`k'_`fe'_p'
                 file write T " & " %6.2f (``d'_`y'_`k'_`fe'_b') "`r(stars)'"
             }
         }
         file write T " \\" _n
-        foreach fe in f fr {
+        foreach fe of local fes {
             foreach k of local ks {
                 file write T " & (" %5.2f (``d'_`y'_`k'_`fe'_se') ")"
             }
@@ -334,7 +336,7 @@ foreach d in sua vs {
     }
     local k1 : word 1 of `ks'
     file write T "\midrule" _n "Observations (8y, First Cohort)"
-    foreach fe in f fr {
+    foreach fe of local fes {
         foreach k of local ks {
             file write T " & " %6.0fc (``d'_g8p_f_`k1'_`fe'_N')
         }

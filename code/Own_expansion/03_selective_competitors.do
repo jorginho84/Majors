@@ -165,11 +165,11 @@ program define fsreg
 end
 
 foreach y in N_first lnN {
-    foreach fe in f fr {
+    foreach fe in b f {
         foreach f in broad isced generic {
-            local abs = cond("`fe'" == "f", "pid fy_`f'", "pid fy_`f' ry")
+            local abs = cond("`fe'" == "b", "pid ao_proceso", "pid fy_`f'")
             foreach w in tot tri gau {
-                fsreg `y' x_`w'_`f' own_cumshock, x(x_`w'_`f') absorb(`abs') ///
+                fsreg `y' x_`w'_`f', x(x_`w'_`f') absorb(`abs') ///
                     cluster(mkt_`f') prefix(`y'_`w'_`fe'_`f'_)
             }
         }
@@ -178,20 +178,20 @@ foreach y in N_first lnN {
     local ylab = cond("`y'" == "lnN", "Log first-year enrollment", "First-year enrollment")
     file open T using "$oe_out/tables/oe_sel_fs_`y'.tex", write replace
     file write T "\begin{tabular}{lcccccc}" _n "\toprule" _n
-    file write T " & \multicolumn{3}{c}{Field \(\times\) year FE} & \multicolumn{3}{c}{\(+\) Region \(\times\) year FE} \\" _n
+    file write T " & \multicolumn{3}{c}{Program and year FE} & \multicolumn{3}{c}{Program, field \(\times\) year FE} \\" _n
     file write T "\cmidrule(lr){2-4}\cmidrule(lr){5-7}" _n
     file write T "Exposure measure & Broad & ISCED-97 & Generic & Broad & ISCED-97 & Generic \\" _n "\midrule" _n
     foreach w in tot tri gau {
         local wl = cond("`w'" == "tot", "Total", cond("`w'" == "tri", "Triangular", "Gaussian"))
         file write T "\textit{`wl'}"
-        foreach fe in f fr {
+        foreach fe in b f {
             foreach f in broad isced generic {
                 oe_stars ``y'_`w'_`fe'_`f'_p'
                 file write T " & " %7.3f (``y'_`w'_`fe'_`f'_b') "`r(stars)'"
             }
         }
         file write T " \\" _n
-        foreach fe in f fr {
+        foreach fe in b f {
             foreach f in broad isced generic {
                 file write T " & (" %6.3f (``y'_`w'_`fe'_`f'_se') ")"
             }
@@ -199,13 +199,13 @@ foreach y in N_first lnN {
         file write T " \\" _n
     }
     file write T "\midrule" _n "Observations"
-    foreach fe in f fr {
+    foreach fe in b f {
         foreach f in broad isced generic {
             file write T " & " %6.0fc (``y'_tot_`fe'_`f'_N')
         }
     }
     file write T " \\" _n "Markets (clusters)"
-    foreach fe in f fr {
+    foreach fe in b f {
         foreach f in broad isced generic {
             file write T " & " %6.0fc (``y'_tot_`fe'_`f'_nc')
         }
@@ -223,9 +223,9 @@ local cvars c_psu_mean c_psu_last c_psu_sd c_nem_mean c_female c_priv c_mun
 foreach y of local cvars {
     local lab_`y' : variable label `y'
     foreach w in tot gau {
-        foreach fe in f fr {
-            local abs = cond("`fe'" == "f", "pid fy_broad", "pid fy_broad ry")
-            fsreg `y' x_`w'_broad own_cumshock, x(x_`w'_broad) absorb(`abs') ///
+        foreach fe in b f {
+            local abs = cond("`fe'" == "b", "pid ao_proceso", "pid fy_broad")
+            fsreg `y' x_`w'_broad, x(x_`w'_broad) absorb(`abs') ///
                 cluster(mkt_broad) prefix(c_`y'_`w'_`fe'_)
         }
     }
@@ -235,18 +235,18 @@ file open T using "$oe_out/tables/oe_sel_composition.tex", write replace
 file write T "\begin{tabular}{lcccc}" _n "\toprule" _n
 file write T " & \multicolumn{2}{c}{Total} & \multicolumn{2}{c}{Gaussian} \\" _n
 file write T "\cmidrule(lr){2-3}\cmidrule(lr){4-5}" _n
-file write T "Outcome & Field-year & \(+\) Region-year & Field-year & \(+\) Region-year \\" _n "\midrule" _n
+file write T "Outcome & Year & Field-year & Year & Field-year \\" _n "\midrule" _n
 foreach y of local cvars {
     file write T "`lab_`y''"
     foreach w in tot gau {
-        foreach fe in f fr {
+        foreach fe in b f {
             oe_stars `c_`y'_`w'_`fe'_p'
             file write T " & " %7.3f (`c_`y'_`w'_`fe'_b') "`r(stars)'"
         }
     }
     file write T " \\" _n
     foreach w in tot gau {
-        foreach fe in f fr {
+        foreach fe in b f {
             file write T " & (" %6.3f (`c_`y'_`w'_`fe'_se') ")"
         }
     }
@@ -262,8 +262,8 @@ file close T
 
 foreach y in N_first lnN c_psu_mean {
     local ylab : variable label `y'
-    oe_es `y', g(g_sel) rel(rel_sel) absorb(pid fy_broad ry) cluster(mkt_broad) ///
-        controls(own_cumshock) ylab("`ylab'") ///
+    oe_es `y', g(g_sel) rel(rel_sel) absorb(pid fy_broad) cluster(mkt_broad) ///
+        ylab("`ylab'") ///
         xlab("Years since first selective-competitor shock in market") ///
         file("$oe_out/figures/oe_sel_es_`y'.pdf")
     di as text "`y': pretrend p TWFE " %5.3f r(pTWFE) ", CS never " %5.3f r(pCSnv) ///

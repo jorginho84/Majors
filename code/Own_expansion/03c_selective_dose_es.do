@@ -53,10 +53,10 @@ foreach y of local yvars {
 local ylab_N_first "First-year enrollment"
 
 foreach y of local yvars {
-    foreach fe in f fr {
-        local abs = cond("`fe'" == "f", "pid fy_broad", "pid fy_broad ry")
+    foreach fe in b f {
+        local abs = cond("`fe'" == "b", "pid ao_proceso", "pid fy_broad")
         foreach w in tot tri gau {
-            quietly reghdfe `y' xe_`w'_* own_cumshock if !missing(X_`w'), ///
+            quietly reghdfe `y' xe_`w'_* if !missing(X_`w'), ///
                 absorb(`abs') cluster(mkt_broad)
             quietly test xe_`w'_2007 xe_`w'_2008
             local pre = r(p)
@@ -81,8 +81,8 @@ use "$oe_out/tables/_sel_dose_es.dta", clear
 gen double x = year + cond(w == "tot", -0.2, cond(w == "tri", 0, 0.2))
 
 foreach y of local yvars {
-    foreach fe in f fr {
-        local ttl = cond("`fe'" == "f", "Field x year FE", "Field x year and region x year FE")
+    foreach fe in b f {
+        local ttl = cond("`fe'" == "b", "Program and year FE", "Program and field x year FE")
         foreach w in tot tri gau {
             quietly summarize pre if y == "`y'" & fe == "`fe'" & w == "`w'"
             local p_`w' = string(r(mean), "%5.3f")

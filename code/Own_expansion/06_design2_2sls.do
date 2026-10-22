@@ -15,7 +15,7 @@
 *        first enrollment, any university, any HE; 8 years (10 years for
 *        the program outcome, cohorts <= 2014)
 *   Inframarginal definitions: First Cohort (main), Minimum Cohort
-*   FE : (1) program + year; (2) program + field x year + region x year
+*   FE : (1) program + year; (2) program + university x year
 *   Samples: selective programs (main), all incumbent programs
 *   Unweighted, as the reduced form in 05. SE clustered by program.
 *   Each regression uses the program-years with a non-missing outcome, so
@@ -54,7 +54,7 @@ foreach d in f m {
         foreach c of local cols {
             local s  = substr("`c'", 1, 3)
             local fe = substr("`c'", 5, 3)
-            local abs = cond("`fe'" == "fe1", "pid ao_proceso", "pid fy ry")
+            local abs = cond("`fe'" == "fe1", "pid ao_proceso", "pid uy")
             local if "if !missing(`y'_`d')"
             if "`s'" == "sel" local if "`if' & selective"
 
@@ -130,7 +130,7 @@ file write T " & (1) & (2) & (1) & (2) \\" _n "\midrule" _n
 foreach d in f m {
     local dl = cond("`d'" == "f", "A. First Cohort", "B. Minimum Cohort")
     file write T "\multicolumn{5}{l}{\textit{Panel `dl' threshold}} \\" _n
-    oe_row T "First stage: \(N_{pt}\) on \(\text{Post}_{pt}\)" `d' g8p fs %6.2f "`cols'"
+    oe_row T "First stage: \(N_{pt}\) on \(\text{Treated}_{pt}\)" `d' g8p fs %6.2f "`cols'"
     file write T "Kleibergen--Paap F"
     foreach c of local cols {
         file write T " & " %6.1f (${S_`d'_g8p_`c'_F})
@@ -154,7 +154,7 @@ foreach d in f m {
 }
 file write T "\midrule" _n
 file write T "Program and year FE & \checkmark & & \checkmark & \\" _n
-file write T "Program, field \(\times\) year, region \(\times\) year FE & & \checkmark & & \checkmark \\" _n
+file write T "Program, university \(\times\) year FE & & \checkmark & & \checkmark \\" _n
 file write T "\bottomrule" _n "\end{tabular}" _n
 file close T
 
@@ -173,7 +173,7 @@ foreach y in g8p_f g8p_m g8u_f {
     if "`y'" == "g8p_m" local ylab "Program graduation 8y, Minimum Cohort (pct.)"
     if "`y'" == "g8u_f" local ylab "University graduation 8y, First Cohort (pct.)"
     foreach fe in fe1 fe2 {
-        local abs = cond("`fe'" == "fe1", "pid ao_proceso", "pid fy ry")
+        local abs = cond("`fe'" == "fe1", "pid ao_proceso", "pid uy")
         oe_es `y', g(g_main) rel(rel_main) absorb(`abs') cluster(pid) ///
             ylab("`ylab'") xlab("Years since first own vacancy shock") ///
             file("$oe_out/figures/oe_2sls_rf_es_`y'_`fe'.pdf")
