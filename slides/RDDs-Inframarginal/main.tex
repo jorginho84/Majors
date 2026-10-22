@@ -3596,8 +3596,7 @@ cohort is larger graduate at lower rates?
     We can control for PSU, NEM, sex and school type, which Design I cannot.
     \item \textbf{Application-portfolio fixed effects} $\phi_{ROL(i)}$: compare students who submitted the same list of programs (the ROL),
     which arguably holds fixed their preference for college and for this program.
-    \item \textbf{Timing idea}: if students know the program's historic mean of vacancies but not the year-to-year deviation when they apply,
-    the deviation is exogenous. \textbf{This does not hold as stated}: DEMRE publishes the offer of vacancies before applications, so we test it (last slide).
+    
 \end{itemize}
 \end{frame}
 
@@ -3667,6 +3666,31 @@ For inframarginal student $i$ in program $p$, admission year $t$ (the entering c
 
 \vspace{0.1cm}
 \parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS of graduation within 8 years ($\times100$) on $n_{pt}$ instrumented by $Z_{pt}$. All columns include program and year FE. SE clustered by program-year. \sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$. Full ladder of seven ROL definitions and the common-sample panel in the issue-\#8 tables.}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design V: results in logs}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.58\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_logs.tex}}
+\end{column}
+\begin{column}{0.40\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{3pt}
+    \item Same specification, with $\ln n_{pt}$ instrumented by $\ln Z_{pt}$. $Y_i$ is binary and stays in levels.
+    \item First stage: a 10\% increase in vacancies raises the entering cohort by about 7.8\% ($F>1{,}500$).
+    \item Program graduation \textbf{rises} by about 0.5--0.7 pp per 10\% more entrants (main column 3: 0.51 pp, mean $\approx$35\%), 1.2 pp with exact ROL. Same sign as in levels.
+    \item Any university and any higher education: positive without controls, close to zero and not significant with controls.
+    \item The placebo caveat of the next slide applies here too.
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.1cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS of graduation within 8 years ($\times100$) on $\ln n_{pt}$ instrumented by $\ln Z_{pt}$; divide by 10 for pp per 10\% more entrants. No program-year has $n_{pt}$ or $Z_{pt}\le 0$. All columns include program and year FE. SE clustered by program-year. \sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$. Code: \texttt{37b\_design5\_logs.do}.}
 \end{frame}
 
 %--------------------------------------------------------
