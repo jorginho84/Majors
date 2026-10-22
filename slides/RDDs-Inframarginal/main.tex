@@ -3576,6 +3576,121 @@ CS shows a rise in the municipal-school share of about 2 pp.
 \end{itemize}
 \end{frame}
 
+\subsection{Inframarginal Design No. 5}
+%=========================================================
+% DESIGN V: INDIVIDUAL-LEVEL INFRAMARGINAL, APPLICATION-PORTFOLIO FE (issue #8)
+% code/02_build/16, code/04_rdd/Inframarginals/36-38
+%=========================================================
+\begin{frame}{Design V: Design I at the individual level}
+\footnotesize
+\textbf{Question.} Same as Design I: among students who would have been admitted anyway, do those who enter when the
+cohort is larger graduate at lower rates?
+
+\vspace{0.12cm}
+\textbf{What changes relative to Design I.}
+\begin{itemize}
+    \item \textbf{Same variation}: changes over time in a program's vacancies $Z_{pt}$ around its historic mean, which move the size of the entering cohort $n_{pt}$.
+    \item \textbf{Individual outcomes}: one row per inframarginal student, $Y_i=1$ if $i$ graduates within 8 years.
+    We can control for PSU, NEM, sex and school type, which Design I cannot.
+    \item \textbf{Application-portfolio fixed effects} $\phi_{ROL(i)}$: compare students who submitted the same list of programs (the ROL),
+    which arguably holds fixed their preference for college and for this program.
+    \item \textbf{Timing idea}: if students know the program's historic mean of vacancies but not the year-to-year deviation when they apply,
+    the deviation is exogenous. \textbf{This does not hold as stated}: DEMRE publishes the offer of vacancies before applications, so we test it (last slide).
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design V: equations and sample}
+\scriptsize
+For inframarginal student $i$ in program $p$, admission year $t$ (the entering cohort of $p$ in $t$ is $n_{pt}$):
+\[
+\text{First stage:}\quad n_{pt} = \alpha_1 Z_{pt} + x_i'\alpha_2 + \psi_p + \psi_t + \psi_{ROL(i)} + \nu_{i}
+\]
+\[
+\text{Second stage:}\quad Y_i = \beta\, n_{pt} + x_i'\beta_2 + \phi_p + \phi_t + \phi_{ROL(i)} + \varepsilon_{i}
+\]
+\begin{itemize}
+    \item \textbf{Sample}: inframarginal students as in Design I ($Rank_{ipt}\le T_p$, $T_p$ = first enrolled cohort). One row per student: the most preferred inframarginal
+    application in the student's first inframarginal year (99\% of student-years have only one). \textbf{432,184 students, 1,307 programs, 8,218 program-years}, 2007--2016.
+    \item \textbf{Outcome}: graduation within 8 years from the program where the student first enrolled (main); any university; any higher-education institution. Results $\times100$.
+    \item \textbf{Controls $x_i$}: PSU language+math, NEM, female, private-paid and municipal school (with missing indicators). \emph{No} peer composition: it is a mechanism.
+    \item \textbf{Fixed effects}: program and year always (no specification without year FE). ROL FE under several definitions (next slide).
+    \item \textbf{Inference}: SE clustered by program-year, the level at which $Z_{pt}$ and $n_{pt}$ vary.
+    $\beta$: pp change in graduation per additional entering student induced by vacancies.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design V: how sparse is the ROL?}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.58\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_rol_sparsity.tex}}
+\end{column}
+\begin{column}{0.40\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{3pt}
+    \item The ROL is the ordered list of programs a student applied to. \textbf{The exact list is almost unique}: 80\% of students are alone in their group.
+    \item With program and ROL FE, only students whose group spans $\geq2$ years of the same program contribute variation in $Z$ (``Spans'' column).
+    \item So we report a ladder of coarser definitions. Main: \textbf{first preference + set of universities} (62\% contribute).
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.1cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} Main sample, 432,184 students. Singletons are dropped by the fixed effects. ``Spans $\geq$2 years'': share of students whose ROL $\times$ program group has the program in at least two years.}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design V: results}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.58\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_main.tex}}
+\end{column}
+\begin{column}{0.40\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{3pt}
+    \item Strong first stage: ten more vacancies bring about 8--9 more entrants ($F>350$).
+    \item Graduation from the program \textbf{rises} by about 0.06--0.09 pp per additional entrant, not falls. This is the sign Design I gives \emph{in levels}; column (1) reproduces it.
+    \item Portfolio FE do not move the estimate. On a common sample (the 84,087 students of column 4) the 2SLS is 0.085--0.095 under every ROL definition; the drift across definitions in the full sample comes from the change of sample.
+    \item Any university and any higher education: $+0.02$ to $+0.03$ pp.
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.1cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS of graduation within 8 years ($\times100$) on $n_{pt}$ instrumented by $Z_{pt}$. All columns include program and year FE. SE clustered by program-year. \sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$. Full ladder of seven ROL definitions and the common-sample panel in the issue-\#8 tables.}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design V: is the variation in $Z$ exogenous?}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.55\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_balance.tex}}
+\end{column}
+\begin{column}{0.43\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{3pt}
+    \item \textbf{Balance (Panel A)}: with more vacancies the inframarginal students are slightly stronger (PSU, NEM). Their predicted graduation rises 0.06--0.08 pp per ten vacancies, about 13\% of the reduced form. The controls absorb it.
+    \item \textbf{Placebo (Panel B)}: next year's vacancies do not predict this year's cohort size, but \textbf{predict this year's graduation as much as this year's vacancies do}.
+    \item Reading: programs that expand are also programs whose graduation was improving. With program FE in levels, that trend loads on $Z$. It matches the sign gap between Design I in levels (+) and in first differences ($-$).
+    \item Next: a specification that absorbs program trends.
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.1cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} Z in units of ten vacancies. Panel B uses cohorts with $Z_{p,t+1}$ observed. SE clustered by program-year.}
+\end{frame}
+
 \section{Appendix}
 
 \begin{frame}[label=nonharmonizedfields]{Non-harmonized field observations}
