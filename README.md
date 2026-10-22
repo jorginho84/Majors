@@ -9,7 +9,7 @@ Marginal benefits and marginal costs of higher-education capacity in Chile's cen
 Expanding a program's capacity has two sides, and the project estimates each one:
 
 1. **Marginal benefit (at the margin).** What does one more seat do for the student who gets it? A regression discontinuity design (RDD) around program-year admission cutoffs compares applicants just above and just below the cutoff.
-2. **Marginal cost (inframarginal students).** What happens to the students who would have been admitted anyway when capacity changes? A larger program changes class size and who the classmates are, which may affect students already in the program (congestion and peer composition). Four inframarginal designs study this.
+2. **Marginal cost (inframarginal students).** What happens to the students who would have been admitted anyway when capacity changes? A larger program changes class size and who the classmates are, which may affect students already in the program (congestion and peer composition). Five inframarginal designs study this.
 
 The long-run goal is to put the two together: estimate marginal benefit and marginal cost as flexible functions of program characteristics (selectivity, returns), then simulate a reallocation of enrollment across programs that equates the two. The target is a simple reallocation exercise, not a full structural model. This needs **program-level** estimates, not only aggregate coefficients.
 
@@ -29,10 +29,11 @@ Preliminary results, from the deck [`slides/RDDs-Inframarginal/main.tex`](slides
 | **II. Own sudden expansion** | Binary event: a selective program's large positive vacancy shock (top 20% of positive changes). DiD / event study / Callaway–Sant'Anna, plus the shock as an instrument. | Adds about 23 entrants and lowers entrant PSU by 5–9 points. The graduation effect reflects a pre-existing decline and disappears with university × year FE. |
 | **III. Entry of private universities (SUA, 2012)** | Incumbent programs more exposed to the 2012 entry of eight private universities (PSU-proximity-weighted exposure). | Weak: wrong-signed first stage, pre-trend rejected, not significant with region × year FE. |
 | **IV. Close competitors' expansions** | A program is treated once a close competitor (same region × broad field, entrant PSU within 50 points) has a sudden expansion. | Enrollment of the affected program rises by about 3 and entrants are weaker, with flat pre-trends. Inframarginal graduation at 8 years does not change. |
+| **V. Individual-level Design I (ROL FE)** | Design I's variation (yearly vacancy changes instrumenting cohort size) at the student level, with controls (PSU, NEM, sex, school type) and fixed effects for the student's application portfolio (ROL). 432,184 inframarginal students, SE clustered by program-year (issue #8). | Strong first stage (about 0.8–0.9 entrants per vacancy). Graduation from the program *rises* by 0.06–0.09 pp per entrant, which is Design I's result *in levels* (issue #7), not the first-difference −0.33 pp. ROL FE do not move the estimate on a common sample. Not identified as is: balance fails slightly and next year's vacancies predict this year's graduation as much as current vacancies, which points to within-program trends. A specification that absorbs trends is pending. |
 
 So far the evidence does not show a large cost of expansion for the students already in a program, which means the question of why capacity is not expanded is not answered by costs to inframarginal students alone.
 
-Open items include a log-log specification for Design I, a geographic-distance kernel in the Design III exposure measure, program-level estimates for all designs, a waiting-list measure of queue length, and labor-market outcomes (a data request to the Ministry of Labor is pending).
+The levels and log-log versions of Design I (issue #7) were run but are not in the deck; they give a precise zero for program graduation. Open items include a specification for Design V that absorbs program trends, a geographic-distance kernel in the Design III exposure measure, program-level estimates for all designs, a waiting-list measure of queue length, and labor-market outcomes (a data request to the Ministry of Labor is pending).
 
 ## Data
 
@@ -55,8 +56,8 @@ code/
   01_clean/                  # raw DEMRE/MINEDUC → .dta
   02_build/                  # cutoffs, running variable, outcomes, vacancies, admission rank, inframarginal samples
   04_rdd/                    # RDD estimation and figures
-    Inframarginals/          # Design I (31–33) and heterogeneity/graduation scripts
-  Vacancy_shocks/            # vacancy-shock panel, similarity, exposure (inputs to Designs II–IV)
+    Inframarginals/          # Design I (31–35), Design V (36–38) and heterogeneity/graduation scripts
+  Vacancy_shocks/            # vacancy-shock panel, similarity, exposure (inputs to Designs II–IV; Design V is built in 02_build/16)
   Own_expansion/             # Design II, selective-competitor Design IV, composition (see its README)
   Sua/                       # Design III, SUA entry (see its README); Sua/Cosine for the cosine exposure variant
   ado/                       # custom Stata programs (rd_plot)
