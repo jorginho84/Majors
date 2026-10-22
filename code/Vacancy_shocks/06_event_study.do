@@ -10,8 +10,8 @@
 *
 * Estimators:
 *   (A) Dynamic TWFE, never-treated and not-yet-treated units as implicit
-*       controls, with field-year and region-year FE and own shocks:
-*       y_kt = sum_{l != -1} b_l 1{t - g_k = l} + d own_cumshock
+*       controls, with field-year FE:
+*       y_kt = sum_{l != -1} b_l 1{t - g_k = l}
 *              + mu_k + a_{f(k),t} + g_{r(k),t} + e
 *       Event time binned at <= -5 and >= +4.
 *   (B) Callaway & Sant'Anna (csdid), controls = never-treated only.
@@ -102,7 +102,7 @@ foreach y in N_first lnN {
     /******************************************************************
     * (A) Dynamic TWFE
     ******************************************************************/
-    reghdfe `y' ev_* own_cumshock, absorb(pid fy ry) cluster(`cl')
+    reghdfe `y' ev_*, absorb(pid fy) cluster(`cl')
     test ev_m5 ev_m4 ev_m3 ev_m2
     local pA = r(p)
     post `P' ("`trt'") ("`y'") ("TWFE") (r(F)) (r(p))
@@ -206,7 +206,7 @@ foreach y in N_first lnN {
         legend(order(2 "TWFE" 4 "CS, never treated" 6 "CS, not yet treated") ///
             rows(1) size(small)) ///
         note("Pretrend p-values: TWFE `pAs'; CS never-treated `pBs'; CS not-yet-treated `pCs'." ///
-             "TWFE: program, field-year, region-year FE, own shocks; t = -1 omitted. CS: balanced panel.", ///
+             "TWFE: program, field-year FE; t = -1 omitted. CS: balanced panel.", ///
              size(vsmall)) ///
         graphregion(color(white)) plotregion(color(white))
     graph export "$vs_out/figures/vs_es_`y'_`trt'.pdf", replace

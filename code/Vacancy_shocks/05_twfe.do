@@ -5,7 +5,7 @@
 * cumulative exposure to competitor vacancy shocks, mirroring the
 * Design II (SUA entry) first-stage tables.
 *
-*   N_kt = pi * cumE^{w,f}_kt + delta * own_cumshock_kt
+*   N_kt = pi * cumE^{w,f}_kt
 *          + mu_k + alpha_{f(k),t} [+ gamma_{r(k),t}] + e_kt
 *
 * cumE is the time-varying analogue of E_p x Post_t in Design II. Market
@@ -106,11 +106,11 @@ end
 **********************************************************************/
 
 local cols
-foreach fe in f fr {
+foreach fe in b f {
     foreach f in broad isced generic {
-        local abs = cond("`fe'" == "f", "pid fy_`f'", "pid fy_`f' ry")
+        local abs = cond("`fe'" == "b", "pid ao_proceso", "pid fy_`f'")
         foreach w in tot tri gau {
-            fsreg N_first x_`w'_`f' own_cumshock, x(x_`w'_`f') absorb(`abs') ///
+            fsreg N_first x_`w'_`f', x(x_`w'_`f') absorb(`abs') ///
                 cluster(mkt_`f') prefix(`w'_`fe'_`f'_)
         }
     }
@@ -118,26 +118,26 @@ foreach fe in f fr {
 
 file open T using "$vs_out/tables/vs_fs_levels.tex", write replace
 file write T "\begin{tabular}{lcccccc}" _n "\toprule" _n
-file write T " & \multicolumn{3}{c}{Field \(\times\) year FE} & \multicolumn{3}{c}{\(+\) Region \(\times\) year FE} \\" _n
+file write T " & \multicolumn{3}{c}{Program and year FE} & \multicolumn{3}{c}{Program, field \(\times\) year FE} \\" _n
 file write T "\cmidrule(lr){2-4}\cmidrule(lr){5-7}" _n
 file write T "Exposure measure & Broad & ISCED-97 & Generic & Broad & ISCED-97 & Generic \\" _n "\midrule" _n
 foreach w in tot tri gau {
     local wl = cond("`w'" == "tot", "Total", cond("`w'" == "tri", "Triangular", "Gaussian"))
     file write T "\textit{`wl'}"
-    foreach fe in f fr {
+    foreach fe in b f {
         foreach f in broad isced generic {
             stars ``w'_`fe'_`f'_p' st
             file write T " & " %6.3f (``w'_`fe'_`f'_b') "`st'"
         }
     }
     file write T " \\" _n
-    foreach fe in f fr {
+    foreach fe in b f {
         foreach f in broad isced generic {
             file write T " & (" %5.3f (``w'_`fe'_`f'_se') ")"
         }
     }
     file write T " \\" _n "\quad Wald \(F\)"
-    foreach fe in f fr {
+    foreach fe in b f {
         foreach f in broad isced generic {
             file write T " & " %5.2f (``w'_`fe'_`f'_F')
         }
@@ -149,7 +149,7 @@ file write T "\midrule" _n
 foreach s in N np nc {
     local sl = cond("`s'" == "N", "Observations", cond("`s'" == "np", "Programs", "Markets"))
     file write T "`sl'"
-    foreach fe in f fr {
+    foreach fe in b f {
         foreach f in broad isced generic {
             file write T " & " %9.0fc (`tot_`fe'_`f'_`s'')
         }
@@ -157,8 +157,8 @@ foreach s in N np nc {
     file write T " \\" _n
 }
 file write T "Program FE & Yes & Yes & Yes & Yes & Yes & Yes \\" _n
-file write T "Field \(\times\) year FE & Yes & Yes & Yes & Yes & Yes & Yes \\" _n
-file write T "Region \(\times\) year FE & No & No & No & Yes & Yes & Yes \\" _n
+file write T "Year FE & Yes & Yes & Yes & No & No & No \\" _n
+file write T "Field \(\times\) year FE & No & No & No & Yes & Yes & Yes \\" _n
 file write T "\bottomrule" _n "\end{tabular}" _n
 file close T
 
@@ -167,11 +167,11 @@ file close T
 * 2. Logs: log N on log(cumE) with zero-exposure indicator
 **********************************************************************/
 
-foreach fe in f fr {
+foreach fe in b f {
     foreach f in broad isced generic {
-        local abs = cond("`fe'" == "f", "pid fy_`f'", "pid fy_`f' ry")
+        local abs = cond("`fe'" == "b", "pid ao_proceso", "pid fy_`f'")
         foreach w in tot tri gau {
-            fsreg lnN lx_`w'_`f' dx_`w'_`f' own_cumshock, x(lx_`w'_`f') absorb(`abs') ///
+            fsreg lnN lx_`w'_`f' dx_`w'_`f', x(lx_`w'_`f') absorb(`abs') ///
                 cluster(mkt_`f') prefix(`w'_`fe'_`f'_)
         }
     }
@@ -179,20 +179,20 @@ foreach fe in f fr {
 
 file open T using "$vs_out/tables/vs_fs_logs.tex", write replace
 file write T "\begin{tabular}{lcccccc}" _n "\toprule" _n
-file write T " & \multicolumn{3}{c}{Field \(\times\) year FE} & \multicolumn{3}{c}{\(+\) Region \(\times\) year FE} \\" _n
+file write T " & \multicolumn{3}{c}{Program and year FE} & \multicolumn{3}{c}{Program, field \(\times\) year FE} \\" _n
 file write T "\cmidrule(lr){2-4}\cmidrule(lr){5-7}" _n
 file write T "Exposure measure & Broad & ISCED-97 & Generic & Broad & ISCED-97 & Generic \\" _n "\midrule" _n
 foreach w in tot tri gau {
     local wl = cond("`w'" == "tot", "Total", cond("`w'" == "tri", "Triangular", "Gaussian"))
     file write T "\textit{`wl'}"
-    foreach fe in f fr {
+    foreach fe in b f {
         foreach f in broad isced generic {
             stars ``w'_`fe'_`f'_p' st
             file write T " & " %6.3f (``w'_`fe'_`f'_b') "`st' (" %5.3f (``w'_`fe'_`f'_se') ")"
         }
     }
     file write T " \\" _n "\quad \(F\)"
-    foreach fe in f fr {
+    foreach fe in b f {
         foreach f in broad isced generic {
             file write T " & " %5.2f (``w'_`fe'_`f'_F')
         }
@@ -204,7 +204,7 @@ file write T "\midrule" _n
 foreach s in N np {
     local sl = cond("`s'" == "N", "Observations", "Programs")
     file write T "`sl'"
-    foreach fe in f fr {
+    foreach fe in b f {
         foreach f in broad isced generic {
             file write T " & " %9.0fc (`tot_`fe'_`f'_`s'')
         }
@@ -220,13 +220,13 @@ file close T
 **********************************************************************/
 
 foreach spec in lev log {
-    foreach fe in f fr {
+    foreach fe in b f {
         foreach f in broad isced generic {
-            local abs = cond("`fe'" == "f", "pid fy_`f'", "pid fy_`f' ry")
+            local abs = cond("`fe'" == "b", "pid ao_proceso", "pid fy_`f'")
             foreach w in tot trikd gaukd {
-                if "`spec'" == "lev" fsreg N_first x_`w'_`f' own_cumshock, x(x_`w'_`f') ///
+                if "`spec'" == "lev" fsreg N_first x_`w'_`f', x(x_`w'_`f') ///
                     absorb(`abs') cluster(mkt_`f') prefix(`w'_`fe'_`f'_)
-                else fsreg lnN lx_`w'_`f' dx_`w'_`f' own_cumshock, x(lx_`w'_`f') ///
+                else fsreg lnN lx_`w'_`f' dx_`w'_`f', x(lx_`w'_`f') ///
                     absorb(`abs') cluster(mkt_`f') prefix(`w'_`fe'_`f'_)
             }
         }
@@ -234,26 +234,26 @@ foreach spec in lev log {
 
     file open T using "$vs_out/tables/vs_fs_`=cond("`spec'"=="lev","levels","logs")'_kd.tex", write replace
     file write T "\begin{tabular}{lcccccc}" _n "\toprule" _n
-    file write T " & \multicolumn{3}{c}{Field \(\times\) year FE} & \multicolumn{3}{c}{\(+\) Region \(\times\) year FE} \\" _n
+    file write T " & \multicolumn{3}{c}{Program and year FE} & \multicolumn{3}{c}{Program, field \(\times\) year FE} \\" _n
     file write T "\cmidrule(lr){2-4}\cmidrule(lr){5-7}" _n
     file write T "Exposure measure & Broad & ISCED-97 & Generic & Broad & ISCED-97 & Generic \\" _n "\midrule" _n
     foreach w in tot trikd gaukd {
         local wl = cond("`w'" == "tot", "Total", cond("`w'" == "trikd", "Triangular KD", "Gaussian KD"))
         file write T "\textit{`wl'}"
-        foreach fe in f fr {
+        foreach fe in b f {
             foreach f in broad isced generic {
                 stars ``w'_`fe'_`f'_p' st
                 file write T " & " %6.3f (``w'_`fe'_`f'_b') "`st'"
             }
         }
         file write T " \\" _n
-        foreach fe in f fr {
+        foreach fe in b f {
             foreach f in broad isced generic {
                 file write T " & (" %5.3f (``w'_`fe'_`f'_se') ")"
             }
         }
         file write T " \\" _n "\quad Wald \(F\)"
-        foreach fe in f fr {
+        foreach fe in b f {
             foreach f in broad isced generic {
                 file write T " & " %5.2f (``w'_`fe'_`f'_F')
             }
@@ -265,14 +265,15 @@ foreach spec in lev log {
     foreach s in N np nc {
         local sl = cond("`s'" == "N", "Observations", cond("`s'" == "np", "Programs", "Markets"))
         file write T "`sl'"
-        foreach fe in f fr {
+        foreach fe in b f {
             foreach f in broad isced generic {
                 file write T " & " %9.0fc (`gaukd_`fe'_`f'_`s'')
             }
         }
         file write T " \\" _n
     }
-    file write T "Region \(\times\) year FE & No & No & No & Yes & Yes & Yes \\" _n
+    file write T "Year FE & Yes & Yes & Yes & No & No & No \\" _n
+    file write T "Field \(\times\) year FE & No & No & No & Yes & Yes & Yes \\" _n
     file write T "\bottomrule" _n "\end{tabular}" _n
     file close T
 }
@@ -286,12 +287,12 @@ foreach f in broad isced {
             quietly _pctile `e16' if ao_proceso == 2016, p(`q')
             local c`q' = r(r1)
         }
-        fsreg N_first x_`w'_`f' own_cumshock, x(x_`w'_`f') absorb(pid fy_`f' ry) ///
+        fsreg N_first x_`w'_`f', x(x_`w'_`f') absorb(pid fy_`f') ///
             cluster(mkt_`f') prefix(t0`w'`f'_)
-        fsreg N_first x_`w'_`f' own_cumshock if `e16' <= `c99' | missing(`e16'), x(x_`w'_`f') ///
-            absorb(pid fy_`f' ry) cluster(mkt_`f') prefix(t1`w'`f'_)
-        fsreg N_first x_`w'_`f' own_cumshock if `e16' <= `c95' | missing(`e16'), x(x_`w'_`f') ///
-            absorb(pid fy_`f' ry) cluster(mkt_`f') prefix(t2`w'`f'_)
+        fsreg N_first x_`w'_`f' if `e16' <= `c99' | missing(`e16'), x(x_`w'_`f') ///
+            absorb(pid fy_`f') cluster(mkt_`f') prefix(t1`w'`f'_)
+        fsreg N_first x_`w'_`f' if `e16' <= `c95' | missing(`e16'), x(x_`w'_`f') ///
+            absorb(pid fy_`f') cluster(mkt_`f') prefix(t2`w'`f'_)
         drop `e16'
     }
 }
@@ -335,10 +336,10 @@ file close T
 
 local qs "M_broad_2016 > 0 & !missing(M_broad_2016)"
 foreach w in tri gau {
-    fsreg N_first q_`w'_broad D_mkt_broad own_cumshock if `qs', x(q_`w'_broad) ///
-        absorb(pid fy_broad ry) cluster(mkt_broad) prefix(L`w'_)
-    fsreg lnN lq_`w'_broad dq_`w'_broad D_mkt_broad own_cumshock if `qs', x(lq_`w'_broad) ///
-        absorb(pid fy_broad ry) cluster(mkt_broad) prefix(G`w'_)
+    fsreg N_first q_`w'_broad D_mkt_broad if `qs', x(q_`w'_broad) ///
+        absorb(pid fy_broad) cluster(mkt_broad) prefix(L`w'_)
+    fsreg lnN lq_`w'_broad dq_`w'_broad D_mkt_broad if `qs', x(lq_`w'_broad) ///
+        absorb(pid fy_broad) cluster(mkt_broad) prefix(G`w'_)
 }
 
 file open T using "$vs_out/tables/vs_fs_q.tex", write replace
@@ -382,15 +383,15 @@ file close T
 
 /**********************************************************************
 * 4. Heterogeneity by incumbent selectivity (Broad)
-*    A: exposure, field-year and region-year FE
+*    A: exposure, field-year FE
 *    B: Q, market-year FE, markets with a shock
 **********************************************************************/
 
 forvalues g = 1/3 {
     foreach w in tri gau {
-        fsreg N_first x_`w'_broad own_cumshock if psu_group == `g', x(x_`w'_broad) ///
-            absorb(pid fy_broad ry) cluster(mkt_broad) prefix(A`g'`w'_)
-        capture noisily fsreg N_first q_`w'_broad own_cumshock if psu_group == `g' & `qs', ///
+        fsreg N_first x_`w'_broad if psu_group == `g', x(x_`w'_broad) ///
+            absorb(pid fy_broad) cluster(mkt_broad) prefix(A`g'`w'_)
+        capture noisily fsreg N_first q_`w'_broad if psu_group == `g' & `qs', ///
             x(q_`w'_broad) absorb(pid my_broad) cluster(mkt_broad) prefix(B`g'`w'_)
         if _rc {
             foreach s in b se F p N np nc {
@@ -442,28 +443,26 @@ file close T
 
 
 /**********************************************************************
-* 5. Cosine exposure: 5 measures x 3 FE sets x 2 samples
+* 5. Cosine exposure: 5 measures x 2 FE sets x 2 samples
 **********************************************************************/
 
 foreach s in all m10 {
     local sfx = cond("`s'" == "m10", "_m10", "")
     local cnd = cond("`s'" == "m10", "if min10", "")
     foreach d in psu psuR psuRF psu_pR psu_pRF {
-        fsreg N_first z_cos_`d'`sfx' own_cumshock `cnd', x(z_cos_`d'`sfx') ///
+        fsreg N_first z_cos_`d'`sfx' `cnd', x(z_cos_`d'`sfx') ///
             absorb(pid ao_proceso) cluster(pid) prefix(c`s'1`d'_)
-        fsreg N_first z_cos_`d'`sfx' own_cumshock `cnd', x(z_cos_`d'`sfx') ///
+        fsreg N_first z_cos_`d'`sfx' `cnd', x(z_cos_`d'`sfx') ///
             absorb(pid fy_broad) cluster(pid) prefix(c`s'2`d'_)
-        fsreg N_first z_cos_`d'`sfx' own_cumshock `cnd', x(z_cos_`d'`sfx') ///
-            absorb(pid fy_broad ry) cluster(pid) prefix(c`s'3`d'_)
     }
 }
 
 file open T using "$vs_out/tables/vs_fs_cosine.tex", write replace
-file write T "\begin{tabular}{lcccccc}" _n "\toprule" _n
-file write T " & \multicolumn{3}{c}{Full sample} & \multicolumn{3}{c}{\(\bar N^{\mathrm{first}}_{k}\geq10\)} \\" _n
-file write T "\cmidrule(lr){2-4}\cmidrule(lr){5-7}" _n
-file write T "Exposure measure & \shortstack{(1)\\\(+\) year} & \shortstack{(2)\\\(+\) field\(\times\)year} & \shortstack{(3)\\\(+\) region\(\times\)year}"
-file write T " & \shortstack{(4)\\\(+\) year} & \shortstack{(5)\\\(+\) field\(\times\)year} & \shortstack{(6)\\\(+\) region\(\times\)year} \\" _n "\midrule" _n
+file write T "\begin{tabular}{lccccc}" _n "\toprule" _n
+file write T " & \multicolumn{2}{c}{Full sample} & \multicolumn{2}{c}{\(\bar N^{\mathrm{first}}_{k}\geq10\)} \\" _n
+file write T "\cmidrule(lr){2-3}\cmidrule(lr){4-5}" _n
+file write T "Exposure measure & \shortstack{(1)\\Program\\+ year} & \shortstack{(2)\\+ field\(\times\)year}"
+file write T " & \shortstack{(3)\\Program\\+ year} & \shortstack{(4)\\+ field\(\times\)year} \\" _n "\midrule" _n
 foreach d in psu psuR psuRF psu_pR psu_pRF {
     local dl = cond("`d'" == "psu", "PSU bins", ///
                cond("`d'" == "psuR", "PSU bins \(\times\) region", ///
@@ -472,20 +471,20 @@ foreach d in psu psuR psuRF psu_pR psu_pRF {
                     "PSU bins \(+\) region \(+\) field"))))
     file write T "`dl'"
     foreach s in all m10 {
-        forvalues c = 1/3 {
+        forvalues c = 1/2 {
             stars `c`s'`c'`d'_p' st
             file write T " & " %6.3f (`c`s'`c'`d'_b') "`st'"
         }
     }
     file write T " \\" _n
     foreach s in all m10 {
-        forvalues c = 1/3 {
+        forvalues c = 1/2 {
             file write T " & (" %5.3f (`c`s'`c'`d'_se') ")"
         }
     }
     file write T " \\" _n "\quad Wald \(F\)"
     foreach s in all m10 {
-        forvalues c = 1/3 {
+        forvalues c = 1/2 {
             file write T " & " %5.2f (`c`s'`c'`d'_F')
         }
     }
@@ -497,7 +496,7 @@ foreach st in N np {
     local sl = cond("`st'" == "N", "Observations", "Programs")
     file write T "`sl'"
     foreach s in all m10 {
-        forvalues c = 1/3 {
+        forvalues c = 1/2 {
             file write T " & " %9.0fc (`c`s'`c'psu_`st'')
         }
     }
@@ -514,8 +513,8 @@ file close T
 foreach t in main p90 p75 within nosud lev ind adm {
     local sfx = cond("`t'" == "main", "", "_`t'")
     foreach w in tot gau gaukd {
-        fsreg N_first x_`w'_broad`sfx' own_cumshock, x(x_`w'_broad`sfx') ///
-            absorb(pid fy_broad ry) cluster(mkt_broad) prefix(r`t'`w'_)
+        fsreg N_first x_`w'_broad`sfx', x(x_`w'_broad`sfx') ///
+            absorb(pid fy_broad) cluster(mkt_broad) prefix(r`t'`w'_)
     }
 }
 
