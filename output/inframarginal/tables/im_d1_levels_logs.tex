@@ -1,0 +1,31 @@
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{2}{c}{Levels} & \multicolumn{2}{c}{Log--log} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+ & (1) & (2) & (3) & (4) \\
+\midrule
+First stage: \(N\) on \(Z\) (levels), \(\ln N\) on \(\ln Z\) (logs) &  0.851\sym{***} &  0.861\sym{***} &  0.784\sym{***} &  0.832\sym{***} \\
+ & (0.091) & (0.072) & (0.034) & (0.029) \\
+Kleibergen--Paap F &   87.8 &  144.3 &  538.1 &  848.7 \\
+\addlinespace
+\multicolumn{5}{l}{Graduation from the program, 8y (\(\times 100\))} \\
+\quad Reduced form &   0.052 &   0.031 &   3.055 &   1.066 \\
+ & ( 0.046) & ( 0.040) & ( 2.806) & ( 2.427) \\
+\quad \textbf{2SLS} &   0.061 &   0.036 &   3.897 &   1.282 \\
+ & ( 0.049) & ( 0.044) & ( 3.647) & ( 2.934) \\
+\addlinespace
+\multicolumn{5}{l}{Secondary outcomes, 2SLS (\(\times 100\))} \\
+\quad Graduation from any university, 8y &   0.030\sym{*} &   0.038\sym{**} &   2.571\sym{**} &   3.752\sym{***} \\
+ & ( 0.016) & ( 0.017) & ( 1.289) & ( 1.385) \\
+\quad Graduation from any HE, 8y &   0.029\sym{*} &   0.038\sym{**} &   2.230\sym{*} &   3.599\sym{***} \\
+ & ( 0.016) & ( 0.018) & ( 1.278) & ( 1.384) \\
+\addlinespace
+Observations (program-years) &  6,350 &  6,349 &  6,350 &  6,349 \\
+Programs &  1,079 &  1,079 &  1,079 &  1,079 \\
+Mean program graduation, 8y (\%) & \multicolumn{4}{c}{ 36.9} \\
+\midrule
+Program FE & X & X & X & X \\
+Year FE & X & & X & \\
+University \(\times\) year FE & & X & & X \\
+\bottomrule
+\end{tabular}

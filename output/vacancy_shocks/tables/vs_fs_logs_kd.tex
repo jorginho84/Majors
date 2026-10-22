@@ -1,24 +1,25 @@
 \begin{tabular}{lcccccc}
 \toprule
- & \multicolumn{3}{c}{Field \(\times\) year FE} & \multicolumn{3}{c}{\(+\) Region \(\times\) year FE} \\
+ & \multicolumn{3}{c}{Program and year FE} & \multicolumn{3}{c}{Program, field \(\times\) year FE} \\
 \cmidrule(lr){2-4}\cmidrule(lr){5-7}
 Exposure measure & Broad & ISCED-97 & Generic & Broad & ISCED-97 & Generic \\
 \midrule
-\textit{Total} &  0.021 &  0.026 & -0.019 &  0.008 &  0.032\sym{*} & -0.009 \\
- & (0.020) & (0.024) & (0.030) & (0.013) & (0.016) & (0.030) \\
-\quad Wald \(F\) &  1.07 &  1.12 &  0.38 &  0.40 &  3.73 &  0.10 \\
+\textit{Total} &  0.021 &  0.023 &  0.039 &  0.034 &  0.042 & -0.011 \\
+ & (0.025) & (0.032) & (0.031) & (0.021) & (0.026) & (0.033) \\
+\quad Wald \(F\) &  0.69 &  0.49 &  1.52 &  2.47 &  2.63 &  0.11 \\
 \addlinespace
-\textit{Triangular KD} &  0.001 &  0.007 & -0.037 & -0.004 &  0.013 & -0.028 \\
- & (0.015) & (0.017) & (0.027) & (0.016) & (0.015) & (0.028) \\
-\quad Wald \(F\) &  0.01 &  0.19 &  1.88 &  0.07 &  0.80 &  1.05 \\
+\textit{Triangular KD} &  0.002 &  0.007 & -0.002 &  0.013 &  0.020 & -0.030 \\
+ & (0.016) & (0.019) & (0.026) & (0.017) & (0.019) & (0.028) \\
+\quad Wald \(F\) &  0.01 &  0.14 &  0.01 &  0.59 &  1.15 &  1.16 \\
 \addlinespace
-\textit{Gaussian KD} &  0.015 &  0.015 &  0.004 &  0.005 &  0.013 &  0.008 \\
- & (0.013) & (0.016) & (0.023) & (0.011) & (0.015) & (0.023) \\
-\quad Wald \(F\) &  1.36 &  0.87 &  0.03 &  0.22 &  0.75 &  0.13 \\
+\textit{Gaussian KD} &  0.015 &  0.009 &  0.033 &  0.024\sym{*} &  0.026 &  0.009 \\
+ & (0.015) & (0.020) & (0.031) & (0.014) & (0.018) & (0.026) \\
+\quad Wald \(F\) &  0.96 &  0.20 &  1.11 &  2.89 &  2.02 &  0.13 \\
 \midrule
-Observations &     8,865 &     8,863 &     8,614 &     8,865 &     8,863 &     8,614 \\
-Programs &       975 &       975 &       947 &       975 &       975 &       947 \\
-Markets &       133 &       219 &       629 &       133 &       219 &       629 \\
-Region \(\times\) year FE & No & No & No & Yes & Yes & Yes \\
+Observations &     8,865 &     8,865 &     8,865 &     8,865 &     8,863 &     8,614 \\
+Programs &       975 &       975 &       975 &       975 &       975 &       947 \\
+Markets &       133 &       219 &       656 &       133 &       219 &       629 \\
+Year FE & Yes & Yes & Yes & No & No & No \\
+Field \(\times\) year FE & No & No & No & Yes & Yes & Yes \\
 \bottomrule
 \end{tabular}

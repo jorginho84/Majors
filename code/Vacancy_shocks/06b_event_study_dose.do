@@ -8,7 +8,7 @@
 *
 *   y_kt = b_{-5} sum_{s >= t+5} E_ks + sum_{l=-4..-2} b_l E_{k,t-l}
 *        + sum_{l=0..3} b_l E_{k,t-l} + b_{+4} sum_{s <= t-4} E_ks
-*        + d own_cumshock + mu_k + a_{f(k),t} [+ g_{r(k),t}] + e_kt
+*        + mu_k + a_{f(k),t} [+ g_{r(k),t}] + e_kt
 *
 * E_{k,t+1} is omitted, so b_l is the cumulative effect at event time l
 * of 10 pp of exposure received at event time 0, relative to l = -1.
@@ -36,7 +36,7 @@ local W tot gau gaukd trikd
 
 use "$processed/vs_panel_exposure.dta", clear
 keep if est_sample
-keep pid ao_proceso N_first lnN own_cumshock mkt_broad field region ///
+keep pid ao_proceso N_first lnN mkt_broad field region ///
     E_tot_broad E_gau_broad E_gaukd_broad E_trikd_broad
 gen byte orig = 1
 
@@ -89,11 +89,11 @@ postfile `P' str8 w str8 y str3 fe byte smp int rel double b se using ///
 foreach smp in 0 1 {
     local ifs = cond(`smp' == 1, "if ao_proceso <= 2012", "")
     foreach y in N_first lnN {
-        foreach fe in f fr {
-            local abs = cond("`fe'" == "f", "pid fy", "pid fy ry")
+        foreach fe in b f {
+            local abs = cond("`fe'" == "b", "pid ao_proceso", "pid fy")
             foreach w of local W {
                 reghdfe `y' `w'_m5 `w'_m4 `w'_m3 `w'_m2 `w'_p0 `w'_p1 `w'_p2 `w'_p3 `w'_p4 ///
-                    own_cumshock `ifs', absorb(`abs') cluster(mkt_broad)
+                    `ifs', absorb(`abs') cluster(mkt_broad)
                 test `w'_m5 `w'_m4 `w'_m3 `w'_m2
                 local pp = r(p)
                 lincom (`w'_p0 + `w'_p1 + `w'_p2 + `w'_p3) / 4
@@ -131,8 +131,8 @@ gen double x = rel + cond(w == "tot", -0.2, cond(w == "gau", 0, 0.2))
 
 foreach y in N_first lnN {
     local ylab = cond("`y'" == "lnN", "Log first-year enrollment", "First-year enrollment")
-    foreach fe in f fr {
-        local felab = cond("`fe'" == "f", "program and field-year FE", "program, field-year and region-year FE")
+    foreach fe in b f {
+        local felab = cond("`fe'" == "b", "program and year FE", "program, field-year FE")
         local pt  = string(`r_`y'_`fe'_tot_pp', "%5.3f")
         local pg  = string(`r_`y'_`fe'_gau_pp', "%5.3f")
         local pk  = string(`r_`y'_`fe'_gaukd_pp', "%5.3f")
@@ -148,7 +148,7 @@ foreach y in N_first lnN {
             xtitle("Years since exposure") ytitle("`ylab' per 10 pp of exposure") ///
             legend(order(2 "Total" 4 "Gaussian" 6 "Gaussian KD") rows(1) size(small)) ///
             note("Pretrend p-values: Total `pt'; Gaussian `pg'; Gaussian KD `pk'." ///
-                 "Distributed-lag event study, binned endpoints, t = -1 omitted; `felab', own shocks.", ///
+                 "Distributed-lag event study, binned endpoints, t = -1 omitted; `felab'.", ///
                  size(vsmall)) ///
             graphregion(color(white)) plotregion(color(white))
         graph export "$vs_out/figures/vs_esd_`y'_`fe'.pdf", replace
@@ -173,7 +173,7 @@ foreach smp in 0 1 {
     foreach w of local W {
         file write T "`wlab_`w''"
         foreach y in N_first lnN {
-            foreach fe in f fr {
+            foreach fe in b f {
                 stars `r_`y'_`fe'_`w'`ss'_p' s
                 local fmt = cond("`y'" == "lnN", "%6.4f", "%6.3f")
                 file write T " & " `fmt' (`r_`y'_`fe'_`w'`ss'_b') "`s'"
@@ -181,14 +181,14 @@ foreach smp in 0 1 {
         }
         file write T " \\" _n
         foreach y in N_first lnN {
-            foreach fe in f fr {
+            foreach fe in b f {
                 local fmt = cond("`y'" == "lnN", "%6.4f", "%6.3f")
                 file write T " & (" `fmt' (`r_`y'_`fe'_`w'`ss'_se') ")"
             }
         }
         file write T " \\" _n
         foreach y in N_first lnN {
-            foreach fe in f fr {
+            foreach fe in b f {
                 file write T " & [" %5.3f (`r_`y'_`fe'_`w'`ss'_pp') "]"
             }
         }
@@ -196,7 +196,7 @@ foreach smp in 0 1 {
     }
     file write T "Observations"
     foreach y in N_first lnN {
-        foreach fe in f fr {
+        foreach fe in b f {
             file write T " & " %9.0fc (`r_`y'_`fe'_tot`ss'_N')
         }
     }
@@ -204,8 +204,7 @@ foreach smp in 0 1 {
     if `smp' == 0 file write T "\midrule" _n
 }
 file write T "\midrule" _n
-file write T "Field-year FE & Yes & Yes & Yes & Yes \\" _n
-file write T "Region-year FE & No & Yes & No & Yes \\" _n
+file write T "Field-year FE & No & Yes & No & Yes \\" _n
 file write T "\bottomrule" _n "\end{tabular}" _n
 file close T
 

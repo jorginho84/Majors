@@ -1,0 +1,56 @@
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{2}{c}{Expansions (\(\Delta Z>0\))} & \multicolumn{2}{c}{Contractions (\(\Delta Z<0\))} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+Comparison programs (\(\Delta Z=0\)) & Same year & Same univ.\ \(\times\) year & Same year & Same univ.\ \(\times\) year \\
+\midrule
+\multicolumn{5}{l}{\textit{Panel A. First stage: \(\Delta N\), entrants}} \\
+\quad \(ATT^o\) &  6.388\sym{***} &  6.306\sym{***} & -6.722\sym{***} & -6.099\sym{***} \\
+ & ( 0.568) & ( 0.602) & ( 0.476) & ( 0.516) \\
+\quad \(ACRT^o\) (per seat) &  0.663\sym{***} &  0.630\sym{***} & -0.641\sym{***} & -0.469\sym{***} \\
+ & ( 0.106) & ( 0.118) & ( 0.076) & ( 0.107) \\
+\quad \(ACRT^o\), spline with knot at median &  0.728\sym{***} &  0.661\sym{***} & -0.595\sym{***} & -0.406\sym{***} \\
+ & ( 0.069) & ( 0.082) & ( 0.066) & ( 0.097) \\
+\quad TWFE slope (per seat) &  0.756\sym{***} &  0.855\sym{***} & -0.689\sym{***} & -0.659\sym{***} \\
+ & ( 0.065) & ( 0.081) & ( 0.040) & ( 0.045) \\
+\addlinespace
+\multicolumn{5}{l}{\textit{Panel B. Reduced form: program graduation, 8y (pp)}} \\
+\quad \(ATT^o\) &   1.786\sym{***} &   1.901\sym{***} &  -0.637 &   0.265 \\
+ & (  0.540) & (  0.638) & (  0.598) & (  0.694) \\
+\quad \(ACRT^o\) (per seat) &  -0.046 &   0.082 &   0.085 &   0.038 \\
+ & (  0.097) & (  0.123) & (  0.107) & (  0.135) \\
+\quad \(ACRT^o\), spline with knot at median &   0.001 &  -0.004 &   0.131 &   0.123 \\
+ & (  0.109) & (  0.130) & (  0.102) & (  0.132) \\
+\quad TWFE slope (per seat) &   0.040 &   0.014 &  -0.000 &   0.083 \\
+ & (  0.037) & (  0.050) & (  0.048) & (  0.055) \\
+\addlinespace
+\multicolumn{5}{l}{\textit{Panel C. Per entrant: RF / FS (pp of program graduation)}} \\
+\quad \(\mathbf{ACRT^o_{RF}/ACRT^o_{FS}}\) &  -0.069 &   0.130 &  -0.133 &  -0.080 \\
+ & (  0.152) & (  0.216) & (  0.174) & (  0.310) \\
+\quad \(ACRT^o\) ratio, knot at median &   0.002 &  -0.007 &  -0.220 &  -0.303 \\
+ & (  0.149) & (  0.198) & (  0.176) & (  0.358) \\
+\quad \(ATT^o_{RF}/ATT^o_{FS}\) &   0.280\sym{***} &   0.301\sym{***} &   0.095 &  -0.043 \\
+ & (  0.087) & (  0.098) & (  0.091) & (  0.114) \\
+\quad TWFE ratio (= 2SLS on this sample) &   0.052 &   0.016 &   0.000 &  -0.125 \\
+ & (  0.050) & (  0.060) & (  0.070) & (  0.084) \\
+\addlinespace
+\multicolumn{5}{l}{\textit{Panel D. Per entrant: graduation from any university (pp)}} \\
+\quad \(\mathbf{ACRT^o_{RF}/ACRT^o_{FS}}\) &   0.094 &   0.056 &   0.038 &   0.218 \\
+ & (  0.107) & (  0.159) & (  0.133) & (  0.225) \\
+\quad TWFE ratio (= 2SLS on this sample) &   0.051\sym{*} &   0.038 &  -0.019 &  -0.002 \\
+ & (  0.029) & (  0.032) & (  0.040) & (  0.053) \\
+\addlinespace
+\multicolumn{5}{l}{\textit{Panel E. Pre-trend: same estimator on \(\Delta y_{t-1}\) (pp)}} \\
+\quad \(ATT^o\) &  -0.693 &  -0.816 &  -1.275\sym{*} &  -0.441 \\
+ & (  0.565) & (  0.931) & (  0.761) & (  1.031) \\
+\quad \(ACRT^o\) (per seat) &  -0.049 &   0.028 &  -0.230\sym{*} &  -0.301 \\
+ & (  0.122) & (  0.210) & (  0.131) & (  0.221) \\
+\quad TWFE slope (per seat) &  -0.008 &  -0.054 &  -0.144\sym{**} &  -0.116\sym{*} \\
+ & (  0.046) & (  0.060) & (  0.061) & (  0.067) \\
+\addlinespace
+\midrule
+Treated program-years &  2,174 &  1,979 &  1,346 &  1,289 \\
+Comparison program-years &  2,831 &  2,089 &  2,831 &  1,977 \\
+Mean dose (seats) &    9.2 &    9.1 &    9.5 &    9.5 \\
+\bottomrule
+\end{tabular}

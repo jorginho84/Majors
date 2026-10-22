@@ -17,7 +17,7 @@
 *     g_p first treatment year, Post_pt = 1{t >= g_p} (absorbing).
 *   Variants: "seats" (dlog V_k only, top 20%) and "sim" (dlog w only).
 *
-* Models (as Design II), control Own_pt = own_cumshock:
+* Models (as Design II), no own-shock control:
 *   (1) y = b Post + d Own + mu_p + l_t
 *   (2) y = b Post + d Own + mu_p + l_{f(p)t} + l_{r(p)t}
 *   Event study with (2)'s FE; Callaway-Sant'Anna (never / not yet).
@@ -42,7 +42,7 @@ local h = 50
 **********************************************************************/
 
 use pid code_h ao_proceso mkt_broad field region V_dem psu_first N_first lnN ///
-    own_cumshock est_sample entrant_2012 using "$processed/vs_panel_exposure.dta", clear
+    est_sample entrant_2012 using "$processed/vs_panel_exposure.dta", clear
 xtset pid ao_proceso
 gen double S_l1 = L.psu_first
 gen double S_l2 = L2.psu_first
@@ -176,11 +176,11 @@ label var N_first "First-year enrollment"
 label var lnN "Log first-year enrollment"
 foreach t in dle dlV dlw {
     foreach y of local ylist {
-        quietly reghdfe `y' post_`t' own_cumshock, absorb(pid ao_proceso) cluster(mkt_broad)
+        quietly reghdfe `y' post_`t', absorb(pid ao_proceso) cluster(mkt_broad)
         oe_stars `=2 * ttail(e(df_r), abs(_b[post_`t'] / _se[post_`t']))'
         local b1_`t'_`y' = string(_b[post_`t'], "%7.3f") + "`r(stars)'"
         local s1_`t'_`y' = "(" + string(_se[post_`t'], "%6.3f") + ")"
-        quietly reghdfe `y' post_`t' own_cumshock, absorb(pid fy ry) cluster(mkt_broad)
+        quietly reghdfe `y' post_`t', absorb(pid fy) cluster(mkt_broad)
         oe_stars `=2 * ttail(e(df_r), abs(_b[post_`t'] / _se[post_`t']))'
         local b2_`t'_`y' = string(_b[post_`t'], "%7.3f") + "`r(stars)'"
         local s2_`t'_`y' = "(" + string(_se[post_`t'], "%6.3f") + ")"
@@ -190,8 +190,8 @@ foreach t in dle dlV dlw {
 
 foreach y in N_first c_psu_mean {
     local ylab : variable label `y'
-    oe_es `y', g(g_dle) rel(rel_dle) absorb(pid fy ry) cluster(mkt_broad) ///
-        controls(own_cumshock) ylab("`ylab'") ///
+    oe_es `y', g(g_dle) rel(rel_dle) absorb(pid fy) cluster(mkt_broad) ///
+        ylab("`ylab'") ///
         xlab("Years since first jump in exposure to a competitor") ///
         file("$vs_out/figures/vs_bin_es_`y'.pdf")
     local csnv_`y' = string(r(attCSnv), "%7.3f")

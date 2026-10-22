@@ -159,16 +159,16 @@ foreach w in tot tri gau {
 }
 foreach y in N_first `cvars' {
     foreach w in tot tri gau {
-        foreach fe in f fr {
-            local abs = cond("`fe'" == "f", "pid fy", "pid fy ry")
-            quietly reghdfe `y' x_`w' own_cumshock, absorb(`abs') cluster(mkt_broad)
+        foreach fe in b f {
+            local abs = cond("`fe'" == "b", "pid ao_proceso", "pid fy")
+            quietly reghdfe `y' x_`w', absorb(`abs') cluster(mkt_broad)
             oe_coef x_`w' vs_`y'_`w'_`fe'_
         }
     }
 }
 foreach y in c_psu_mean c_psu_last {
-    oe_es `y', g(g_mkt) rel(rel_mkt) absorb(pid fy ry) cluster(mkt_broad) ///
-        controls(own_cumshock) ylab("`lab_`y''") ///
+    oe_es `y', g(g_mkt) rel(rel_mkt) absorb(pid fy) cluster(mkt_broad) ///
+        ylab("`lab_`y''") ///
         xlab("Years since first shock in market") ///
         file("$oe_out/figures/oe_comp_vs_es_`y'.pdf")
 }
@@ -187,22 +187,24 @@ foreach d in sua vs {
         local ks tot tri gau
         local nrow N_first
     }
+    local fes = cond("`d'" == "sua", "f fr", "b f")
     file open T using "$oe_out/tables/oe_comp_`d'.tex", write replace
     file write T "\begin{tabular}{lcccccc}" _n "\toprule" _n
-    file write T " & \multicolumn{3}{c}{Field \(\times\) year FE} & \multicolumn{3}{c}{\(+\) Region \(\times\) year FE} \\" _n
+    if "`d'" == "sua" file write T " & \multicolumn{3}{c}{Field \(\times\) year FE} & \multicolumn{3}{c}{\(+\) Region \(\times\) year FE} \\" _n
+    else file write T " & \multicolumn{3}{c}{Program and year FE} & \multicolumn{3}{c}{Program, field \(\times\) year FE} \\" _n
     file write T "\cmidrule(lr){2-4}\cmidrule(lr){5-7}" _n
     file write T "Outcome & Total & Triangular & Gaussian & Total & Triangular & Gaussian \\" _n "\midrule" _n
     foreach y in `nrow' `cvars' {
         local ylab = cond("`y'" == "`nrow'", "`lab_N'", "`lab_`y''")
         file write T "`ylab'"
-        foreach fe in f fr {
+        foreach fe of local fes {
             foreach k of local ks {
                 oe_stars ``d'_`y'_`k'_`fe'_p'
                 file write T " & " %7.3f (``d'_`y'_`k'_`fe'_b') "`r(stars)'"
             }
         }
         file write T " \\" _n
-        foreach fe in f fr {
+        foreach fe of local fes {
             foreach k of local ks {
                 file write T " & (" %6.3f (``d'_`y'_`k'_`fe'_se') ")"
             }
@@ -212,7 +214,7 @@ foreach d in sua vs {
     }
     local k1 : word 1 of `ks'
     file write T "\midrule" _n "Observations"
-    foreach fe in f fr {
+    foreach fe of local fes {
         foreach k of local ks {
             file write T " & " %6.0fc (``d'_c_psu_mean_`k1'_`fe'_N')
         }

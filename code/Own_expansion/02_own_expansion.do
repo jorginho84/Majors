@@ -11,7 +11,7 @@
 *
 * Models:
 *   (1) TWFE   y_pt = b Post_pt + mu_p + a_t + e
-*   (2) TWFE   y_pt = b Post_pt + mu_p + a_{f(p),t} + g_{r(p),t} + e
+*   (2) TWFE   y_pt = b Post_pt + mu_p + d_{u(p),t} + e   (u = university)
 *   (3) Event study, dynamic TWFE with (2)'s FE, and Callaway-Sant'Anna
 *       (never treated; not yet treated), balanced panel.
 *   SE clustered by program.
@@ -79,6 +79,7 @@ label var post_main "Post first own vacancy shock"
 
 egen long fy = group(field ao_proceso)
 egen long ry = group(region ao_proceso)
+egen long uy = group(sigla_universidad ao_proceso)
 bys pid: gen byte nyrs = _N
 gen byte balanced = nyrs == 10
 
@@ -177,16 +178,16 @@ foreach s in sel all {
         post `P' ("`s'") ("`y'") ("fe1") (_b[post_main]) (_se[post_main]) ///
             (2 * ttail(e(df_r), abs(_b[post_main] / _se[post_main]))) (e(N)) (`ym')
 
-        quietly reghdfe `y' post_main `cond', absorb(pid fy ry) cluster(pid)
+        quietly reghdfe `y' post_main `cond', absorb(pid uy) cluster(pid)
         post `P' ("`s'") ("`y'") ("fe2") (_b[post_main]) (_se[post_main]) ///
             (2 * ttail(e(df_r), abs(_b[post_main] / _se[post_main]))) (e(N)) (`ym')
     }
 }
 
-* sensitivity to the shock threshold, selective sample, full FE
+* sensitivity to the shock threshold, selective sample, program + university x year FE
 foreach t in p75 p90 {
     foreach y in V_dem N_first lnN c_psu_mean c_psu_last c_priv {
-        quietly reghdfe `y' post_`t' if selective, absorb(pid fy ry) cluster(pid)
+        quietly reghdfe `y' post_`t' if selective, absorb(pid uy) cluster(pid)
         post `P' ("sel") ("`y'") ("`t'") (_b[post_`t']) (_se[post_`t']) ///
             (2 * ttail(e(df_r), abs(_b[post_`t'] / _se[post_`t']))) (e(N)) (.)
     }
@@ -197,7 +198,7 @@ preserve
 keep if selective
 foreach y in V_dem N_first lnN c_psu_mean c_psu_last c_priv c_nem_mean {
     local ylab : variable label `y'
-    oe_es `y', g(g_main) rel(rel_main) absorb(pid fy ry) cluster(pid) ///
+    oe_es `y', g(g_main) rel(rel_main) absorb(pid uy) cluster(pid) ///
         ylab("`ylab'") xlab("Years since first own vacancy shock") ///
         file("$oe_out/figures/oe_es_`y'_sel.pdf")
     post `P' ("sel") ("`y'") ("CSnv") (r(attCSnv)) (r(seCSnv)) ///
@@ -211,7 +212,7 @@ restore
 * event studies, all programs: enrollment only
 foreach y in N_first lnN {
     local ylab : variable label `y'
-    oe_es `y', g(g_main) rel(rel_main) absorb(pid fy ry) cluster(pid) ///
+    oe_es `y', g(g_main) rel(rel_main) absorb(pid uy) cluster(pid) ///
         ylab("`ylab'") xlab("Years since first own vacancy shock") ///
         file("$oe_out/figures/oe_es_`y'_all.pdf")
 }
@@ -307,7 +308,7 @@ foreach tab in enroll comp {
     file close T
 }
 
-* (b) sensitivity to the shock threshold, selective, full FE
+* (b) sensitivity to the shock threshold, selective, program + university x year FE
 file open T using "$oe_out/tables/oe_threshold_sens.tex", write replace
 file write T "\begin{tabular}{lccc}" _n "\toprule" _n
 file write T "Outcome & Top 25\% & Top 20\% (main) & Top 10\% \\" _n "\midrule" _n
