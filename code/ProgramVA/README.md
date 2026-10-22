@@ -1,0 +1,37 @@
+# Program value-added (issue #9)
+
+Mountjoy & Hickman (2021), "The Returns to College(s)", adapted to the DEMRE deferred acceptance.
+
+**Idea.** Compare students who were admitted to the same set of options but ended up in different programs. Under DA, a student's assignment is the top-ranked program in their ROL where they are *feasible* (score ≥ cutoff). So:
+
+- **portfolio** = cohort × the unordered set of feasible ROL programs;
+- **treatment variation** = the order of the ROL inside that set.
+
+Crossing a cutoff changes the portfolio, so the RD variation is absorbed by the portfolio FE. VA is identified within portfolios, from variation disjoint from the RD.
+
+## Run order (from project root, on the server)
+
+| Script | Does | Output |
+|---|---|---|
+| `01_build_feasibility.do` | Weighted score for every ROL entry, feasibility, validation, portfolios, treatments (assigned / enrolled), controls, graduation outcomes | `pva_students_2007_2016.dta`, `pva_applications_2007_2016.dta`, `output/tables/pva_feasibility_validation.csv` |
+| `01b_build_income_rank.do` | Main outcome: Mi Futuro income rank of the program the student graduates from within 8 years (0 if no title) | adds `inc_rank`, `grad_any_8y` to `pva_students_2007_2016.dta`; `pva_mifuturo_index.dta` |
+| `02_estimate_va.do` | Identifying sample, largest connected set, ladder raw → typical → baseline → main, balance test, centered VA with full vcov, signal/noise SD, EB | `pva_program_va.dta`, `pva_univ_va.dta`, `output/tables/pva_dispersion.csv` |
+| `03_va_correlates.do` | VA vs average PSU, field, vacancies (level, growth, evolution by VA tercile) | `output/tables/pva_correlates.csv`, `pva_field.csv`, `pva_vacancies_by_tercile_*.csv`, `output/figures/pva_*.pdf` |
+
+## Definitions
+
+- **Feasible at j**: status ∈ {24, 25, 26}. If j has a waiting list, the score must also be ≥ the first-round cutoff (`cutoffs.dta`); if it has none, every eligible applicant is feasible.
+- **Score**: official `PUNTAJE` when > 0, otherwise recomputed from `weights.dta`, using the best of current and previous-year PSU. The weights are fractions in some years and percents in others, so the scale is detected from the weights themselves.
+- **Versions**:
+  - `itt`: assigned program, `port_bin` (main).
+  - `enr`: enrolled program from Formulario D, which must be on the ROL. The portfolio adds that program, which covers waitlist calls.
+  - `ter`: assigned program, with a portfolio that also includes the applied-but-infeasible programs.
+- **Programs** are harmonized 5-digit DEMRE codes (4-digit pre-2012 codes are converted as in `02_build/16`).
+- **Outcome (main)** `inc_rank`: percentile (1–100) among the sample's graduates of the Mi Futuro income index of the program of the student's first undergraduate title within 8 years (entered in t or later). It is 0 for students with no title. The index is log mean income in the 4th year after the title (bracket midpoint), demeaned by reference year and averaged over 2017–2024.
+  - Mi Futuro's unit is institution × carrera genérica. The title's `codigo_unico` is mapped to it through `area_generica` in the raw titulados files.
+  - Fallbacks when that cell has no income: national mean of the carrera genérica, then institution mean.
+  - The raw files "2010–2015" duplicate "2018–2023" and are dropped.
+  - Source: `data/MINEDUC/Mifuturo/08_mifuturo_supply.dta`, a copy of `~/Documents/mifuturo/data/` built by `cuposBEA/01_code/02c_mifuturo_supply_data.do`.
+  - Placeholder until individual earnings are available.
+- **Outcome (secondary)** `grad_any_8y`: any undergraduate title within 8 years.
+- **VA** is relative to the enrollment-weighted mean over the connected set.
