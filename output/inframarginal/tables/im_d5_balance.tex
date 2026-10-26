@@ -1,7 +1,6 @@
 \begin{tabular}{lccc}
 \toprule
  & Mean & (1) & (2) \\
-ROL FE & & -- & Top 1 + univ. \\
 \midrule
 \multicolumn{4}{l}{\textit{Panel A. Balance: covariate on \(Z_{pt}\) (per 10 vacancies)}} \\
 PSU language+math & 612.19 &   0.218\sym{***} &   0.279\sym{***} \\
@@ -19,11 +18,21 @@ Applications in the ROL &   5.04 &   0.002 &  -0.002 \\
 Predicted graduation (\(\times 100\)) &  34.55 &   0.064\sym{***} &   0.076\sym{***} \\
  & & ( 0.010) & ( 0.009) \\
 \addlinespace
-\multicolumn{4}{l}{\textit{Panel B. Placebo: next year's vacancies \(Z_{p,t+1}\) (per 10)}} \\
-First stage, \(n_{pt}\) &  &   0.239 &   0.207 \\
+\multicolumn{4}{l}{\textit{Panel B. Placebo: \(Z_{pt}\) and \(Z_{p,t+1}\) in the same regression (per 10)}} \\
+\multicolumn{4}{l}{First stage, \(n_{pt}\)} \\
+\quad \(Z_{pt}\) &  &   8.487\sym{***} &   8.938\sym{***} \\
+ & & ( 0.414) & ( 0.390) \\
+\quad \(Z_{p,t+1}\) &  &   0.239 &   0.207 \\
  & & ( 0.355) & ( 0.331) \\
-Graduation from the program (\(\times 100\)) &  &   0.377\sym{*} &   0.317 \\
+\multicolumn{4}{l}{Graduation from the program (\(\times 100\))} \\
+\quad \(Z_{pt}\) &  &   0.295 &   0.319 \\
+ & & ( 0.268) & ( 0.325) \\
+\quad \(Z_{p,t+1}\) &  &   0.377\sym{*} &   0.317 \\
  & & ( 0.206) & ( 0.232) \\
 Students (Panel B) &  &   351,840 &   277,210 \\
+\midrule
+Program FE & & Yes & Yes \\
+Year FE & & Yes & Yes \\
+ROL FE (top 1 + univ.) & & No & Yes \\
 \bottomrule
 \end{tabular}

@@ -109,8 +109,7 @@ local lab_yhat   "Predicted graduation (\(\times 100\))"
 
 file open T using "$im_out/tables/im_d5_balance.tex", write replace
 file write T "\begin{tabular}{lccc}" _n "\toprule" _n
-file write T " & Mean & (1) & (2) \\" _n
-file write T "ROL FE & & -- & Top 1 + univ. \\" _n "\midrule" _n
+file write T " & Mean & (1) & (2) \\" _n "\midrule" _n
 file write T "\multicolumn{4}{l}{\textit{Panel A. Balance: covariate on \(Z_{pt}\) (per 10 vacancies)}} \\" _n
 foreach x in `xs' yhat {
     file write T "`lab_`x''" " & " %6.2f (`m_`x'')
@@ -125,25 +124,33 @@ foreach x in `xs' yhat {
     file write T " \\" _n
 }
 file write T "\addlinespace" _n
-file write T "\multicolumn{4}{l}{\textit{Panel B. Placebo: next year's vacancies \(Z_{p,t+1}\) (per 10)}} \\" _n
+file write T "\multicolumn{4}{l}{\textit{Panel B. Placebo: \(Z_{pt}\) and \(Z_{p,t+1}\) in the same regression (per 10)}} \\" _n
 foreach dv in N_total_enter y_program {
     local dl = cond("`dv'" == "N_total_enter", "First stage, \(n_{pt}\)", "Graduation from the program (\(\times 100\))")
-    file write T "`dl' & "
-    foreach k in 1 2 {
-        stars `L_`dv'_`k'_p' s
-        file write T " & " %7.3f (`L_`dv'_`k'_b') "`s'"
+    file write T "\multicolumn{4}{l}{`dl'} \\" _n
+    foreach c in C L {
+        local cl = cond("`c'" == "C", "\quad \(Z_{pt}\)", "\quad \(Z_{p,t+1}\)")
+        file write T "`cl' & "
+        foreach k in 1 2 {
+            stars ``c'_`dv'_`k'_p' s
+            file write T " & " %7.3f (``c'_`dv'_`k'_b') "`s'"
+        }
+        file write T " \\" _n " &"
+        foreach k in 1 2 {
+            file write T " & (" %6.3f (``c'_`dv'_`k'_se') ")"
+        }
+        file write T " \\" _n
     }
-    file write T " \\" _n " &"
-    foreach k in 1 2 {
-        file write T " & (" %6.3f (`L_`dv'_`k'_se') ")"
-    }
-    file write T " \\" _n
 }
 file write T "Students (Panel B) & "
 foreach k in 1 2 {
     file write T " & " %9.0fc (`L_y_program_`k'_N')
 }
-file write T " \\" _n "\bottomrule" _n "\end{tabular}" _n
+file write T " \\" _n "\midrule" _n
+file write T "Program FE & & Yes & Yes \\" _n
+file write T "Year FE & & Yes & Yes \\" _n
+file write T "ROL FE (top 1 + univ.) & & No & Yes \\" _n
+file write T "\bottomrule" _n "\end{tabular}" _n
 file close T
 
 di as result "38_design5_balance.do finished."

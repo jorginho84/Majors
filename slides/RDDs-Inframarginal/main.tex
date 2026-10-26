@@ -4059,6 +4059,31 @@ For inframarginal student $i$ in program $p$, admission year $t$ (the entering c
 \parbox{0.97\textwidth}{\tiny \textit{Notes:} Z in units of ten vacancies. Panel B uses cohorts with $Z_{p,t+1}$ observed. SE clustered by program-year.}
 \end{frame}
 
+%--------------------------------------------------------
+% code/04_rdd/Inframarginals/39_design5_trends.do
+\begin{frame}{Design V: main estimates with program-specific trends}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.58\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_trends.tex}}
+\end{column}
+\begin{column}{0.40\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{3pt}
+    \item The first stage survives the trends (0.75--0.78, F $>$ 300).
+    \item \textbf{Program graduation}: the positive effect disappears once program trends are absorbed, with Top 1 ROL ($-0.0001$) and exact ROL ($0.0003$, ns). The levels estimate was picking up program trends.
+    \item \textbf{Any university / any HE}: the effect stays positive and grows, 0.0005 per entrant (Top 1) and 0.0012 (exact).
+    \item Reading: a larger cohort does not change graduation from the program, but raises graduation somewhere in the system.
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.1cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS per entrant; outcomes are 0/1. Trends are program-specific linear trends in the cohort year. Columns (3)--(4) on the exact-ROL non-singleton sample. SE clustered by program-year.}
+\end{frame}
+
 \section{Appendix}
 
 \begin{frame}[label=nonharmonizedfields]{Non-harmonized field observations}
