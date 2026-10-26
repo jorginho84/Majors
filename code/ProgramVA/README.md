@@ -13,10 +13,18 @@ Crossing a cutoff changes the portfolio, so the RD variation is absorbed by the 
 
 | Script | Does | Output |
 |---|---|---|
+| `00_va_helpers.do` | Programs shared by 02 and 04 (controls, identifying sample, connected set, VA with centred vcov, signal/noise) | — |
 | `01_build_feasibility.do` | Weighted score for every ROL entry, feasibility, validation, portfolios, treatments (assigned / enrolled), controls, graduation outcomes | `pva_students_2007_2016.dta`, `pva_applications_2007_2016.dta`, `output/tables/pva_feasibility_validation.csv` |
 | `01b_build_income_rank.do` | Main outcome: Mi Futuro income rank of the program the student graduates from within 8 years (0 if no title) | adds `inc_rank`, `grad_any_8y` to `pva_students_2007_2016.dta`; `pva_mifuturo_index.dta` |
+| `01c_build_vacancies_2007_2025.do` | Regular vacancies (1st + 2nd semester) from DEMRE Oferta Académica 2007–2025 (2017–2025 from Dropbox BEA) | `pva_vacancies_2007_2025.dta` |
 | `02_estimate_va.do` | Identifying sample, largest connected set, ladder raw → typical → baseline → main, balance test, centered VA with full vcov, signal/noise SD, EB | `pva_program_va.dta`, `pva_univ_va.dta`, `output/tables/pva_dispersion.csv` |
 | `03_va_correlates.do` | VA vs average PSU, field, vacancies (level, growth, evolution by VA tercile) | `output/tables/pva_correlates.csv`, `pva_field.csv`, `pva_vacancies_by_tercile_*.csv`, `output/figures/pva_*.pdf` |
+
+| `04_diagnostics_figures.do` | Balance figures, VA histogram, binned correlates, institution share, vacancies by VA decile, split-sample reliability and stability, sensitivity to controls | `output/figures/ProgramVA/`, `output/tables/pva_inst_share.csv`, `pva_split_sample.csv`, `pva_vacancies_by_decile*.csv` |
+
+`run_all.sh [first_script]` runs the chain from a given script and stops on the first `r()` error in a log.
+
+Deck: first section of `slides/RDDs-Inframarginal/main.tex` (Step 0).
 
 ## Definitions
 
