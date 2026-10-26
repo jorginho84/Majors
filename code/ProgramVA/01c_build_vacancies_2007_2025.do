@@ -16,6 +16,7 @@
 * to data/DEMRE/Postulacion with the same names as 2007-2016.
 *
 * Output: $processed/pva_vacancies_2007_2025.dta (code_h x ao_proceso)
+*         $processed/pva_program_names.dta (code_h, prog_name)
 **********************************************************************/
 
 clear all
@@ -41,18 +42,35 @@ forvalues y = 2007/2025 {
         firstrow clear allstring
     rename *, upper
     capture rename CODIGO_CARRERA CODIGO
-    keep CODIGO VACANTES_1SEM VACANTES_2SEM
+    capture rename NOMBRE_CARRERA CARRERA
+    keep CODIGO CARRERA VACANTES_1SEM VACANTES_2SEM
     destring CODIGO VACANTES_1SEM VACANTES_2SEM, replace force
     drop if missing(CODIGO)
     gen double vac = cond(missing(VACANTES_1SEM), 0, VACANTES_1SEM) + ///
                      cond(missing(VACANTES_2SEM), 0, VACANTES_2SEM)
     gen int ao_proceso = `y'
-    keep CODIGO ao_proceso vac
+    keep CODIGO CARRERA ao_proceso vac
     if `y' > 2007 append using `vac'
     save `vac', replace
 }
 
 harmonize_code CODIGO code_h
+
+* program names (with accents): most recent year in which the code appears
+preserve
+    gsort code_h -ao_proceso
+    bysort code_h: keep if _n == 1
+    rename CARRERA prog_name
+    keep code_h prog_name
+    replace prog_name = strtrim(itrim(prog_name))
+    * some years are double-encoded (UTF-8 read as Windows-1252):
+    * "INGENIERÃA" -> "INGENIERÍA"
+    replace prog_name = ustrto(prog_name, "windows-1252", 1) ///
+        if ustrregexm(prog_name, "Ã|Â|â")
+    replace prog_name = ustrtitle(lower(prog_name), "es")
+    save "$processed/pva_program_names.dta", replace
+restore
+
 collapse (sum) vac, by(code_h ao_proceso)
 replace vac = . if vac <= 0
 label var vac "Regular vacancies (1st + 2nd semester), Oferta Academica"

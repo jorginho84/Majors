@@ -10,9 +10,11 @@
 *   C. Distribution of VA estimates (histogram)
 *   D. Correlates: binned scatter + fitted line (raw mean vs VA)
 *   E. Institution share of the VA signal (between-group signal variance)
-*   F. Regular vacancies 2007-2025 by VA decile
-*   G. Split-sample reliability (odd/even cohorts) and stability
-*      (2007-2011 vs 2012-2016); sensitivity to controls
+*   F. Regular vacancies 2007-2025 by VA decile (deciles of programs,
+*      equal number of programs; top 5% shown separately)
+*   H. Mean VA by institution
+*   I. Examples: names of the top-decile programs (tex tables)
+*   (split-sample reliability, stability, sensitivity: see 04b)
 *
 * Inputs:  $processed/pva_program_va_correlates.dta, pva_univ_va.dta,
 *          pva_students_2007_2016.dta, pva_vacancies_2007_2025.dta
@@ -73,8 +75,31 @@ merge 1:1 code_h using `vm', nogen
 tempfile vchar
 save `vchar'
 
+* program names (with accents) from the Oferta Academica; campus from the
+* applications (most recent year in which the code appears)
+capture program drop harmonize_code
+program define harmonize_code
+    args in out
+    tempvar s
+    gen `s' = strtrim(string(`in', "%12.0f"))
+    gen long `out' = `in'
+    replace `out' = real(substr(`s', 1, length(`s')-2) + "0" + ///
+        substr(`s', length(`s')-1, 2)) if length(`s') == 4
+end
+use ao_proceso codigo_carrera sede_carrera using ///
+    "$processed/applications.dta", clear
+harmonize_code codigo_carrera code_h
+gsort code_h -ao_proceso
+bysort code_h: keep if _n == 1
+rename sede_carrera campus
+keep code_h campus
+merge 1:1 code_h using "$processed/pva_program_names.dta", nogen
+tempfile names
+save `names'
+
 use "$processed/pva_program_va_correlates.dta", clear
 keep if version == "itt" & !missing(v_inc_main)
+merge 1:1 code_h using `names', keep(1 3) nogen
 merge 1:1 code_h using `inst',  keep(1 3) nogen
 merge 1:1 code_h using `comp',  keep(1 3) nogen
 merge 1:1 code_h using `vchar', keep(1 3) nogen
@@ -267,9 +292,23 @@ graph export "$fig/pva_inst_share.pdf", replace
 * F. Regular vacancies 2007-2025 by VA decile
 **********************************************************************/
 
+* classification: programs with at least `nmin' students in the identifying
+* sample. Robust SEs are too small for tiny programs (n < 20: the SD of the
+* estimates is about 3 times the reported SE), so EB does not shrink them
+local nmin 20
 use "$processed/pva_program_va_figs.dta", clear
-xtile dec = v_inc_eb [aw = n_obs], n(10)
-keep code_h dec n_obs
+xtile dec = v_inc_eb if n_obs >= `nmin', n(10)
+xtile p20 = v_inc_eb if n_obs >= `nmin', n(20)
+gen byte top5 = p20 == 20
+tab dec, missing
+quietly count if !missing(dec)
+local nc = r(N)
+quietly count if dec == 10
+local n10 = r(N)
+quietly count if top5 & !missing(dec)
+di as result "Programs with n >= `nmin': `nc'; top decile: `n10'; top 5%: " r(N)
+keep if !missing(dec)
+keep code_h dec top5 n_obs
 tempfile decs
 save `decs'
 
@@ -282,6 +321,15 @@ preserve
 restore
 keep if _merge == 3
 drop _merge
+
+* the top 5% enters as a 11th group (a subset of the top decile)
+preserve
+    keep if top5
+    replace dec = 11
+    tempfile t5
+    save `t5'
+restore
+append using `t5'
 
 * F1. total regular vacancies by decile, 2012 = 100
 preserve
@@ -297,8 +345,9 @@ preserve
     }
     twoway `plots' ///
         (connected idx ao_proceso if dec == 1, lcolor(maroon) mcolor(maroon) msize(small)) ///
-        (connected idx ao_proceso if dec == 10, lcolor(navy) mcolor(navy) lwidth(thick) msize(small)), ///
-        legend(order(10 "Top VA decile" 9 "Bottom VA decile" 1 "Deciles 2-9") rows(1) size(small)) ///
+        (connected idx ao_proceso if dec == 10, lcolor(navy) mcolor(navy) lwidth(thick) msize(small)) ///
+        (connected idx ao_proceso if dec == 11, lcolor(orange) mcolor(orange) lwidth(thick) msize(small) msymbol(D)), ///
+        legend(order(10 "Top VA decile" 11 "Top 5%" 9 "Bottom VA decile" 1 "Deciles 2-9") rows(2) size(small)) ///
         xline(2012, lcolor(gs10) lpattern(dot)) yline(100, lcolor(gs10)) ///
         xlabel(2007(2)2025, labsize(small)) xtitle("Admission year") ///
         ytitle("Total regular vacancies (2012 = 100)", size(small)) `gopt'
@@ -312,7 +361,7 @@ preserve
     bysort code_h: egen double l12 = max(l12_aux)
     gen double dl = lvac - l12
     keep if !missing(dl)
-    collapse (mean) dl (count) nprog = dl [aw = n_obs], by(dec ao_proceso)
+    collapse (mean) dl (count) nprog = dl, by(dec ao_proceso)
     export delimited using "$output/tables/pva_vacancies_by_decile_within.csv", replace
     local plots ""
     forvalues d = 2/9 {
@@ -320,8 +369,9 @@ preserve
     }
     twoway `plots' ///
         (connected dl ao_proceso if dec == 1, lcolor(maroon) mcolor(maroon) msize(small)) ///
-        (connected dl ao_proceso if dec == 10, lcolor(navy) mcolor(navy) lwidth(thick) msize(small)), ///
-        legend(order(10 "Top VA decile" 9 "Bottom VA decile" 1 "Deciles 2-9") rows(1) size(small)) ///
+        (connected dl ao_proceso if dec == 10, lcolor(navy) mcolor(navy) lwidth(thick) msize(small)) ///
+        (connected dl ao_proceso if dec == 11, lcolor(orange) mcolor(orange) lwidth(thick) msize(small) msymbol(D)), ///
+        legend(order(10 "Top VA decile" 11 "Top 5%" 9 "Bottom VA decile" 1 "Deciles 2-9") rows(2) size(small)) ///
         xline(2012, lcolor(gs10) lpattern(dot)) yline(0, lcolor(gs10)) ///
         xlabel(2007(2)2025, labsize(small)) xtitle("Admission year") ///
         ytitle("Mean log vacancies relative to 2012", size(small)) `gopt'
@@ -329,104 +379,96 @@ preserve
 restore
 
 /**********************************************************************
-* G. Split-sample reliability, stability, sensitivity to controls
+* H. Mean VA by institution
 **********************************************************************/
 
-use "$processed/pva_students_2007_2016.dta", clear
-pva_controls
-gen long S = S_itt
-gen long P = port_bin
-keep if !missing(S, P)
-gen byte h_oddeven   = mod(ao_proceso, 2)
-gen byte h_earlylate = ao_proceso >= 2012
-tempfile stud
-save `stud'
-
-tempname pr
-postfile `pr' str10 split double(sd_sig0 sd_sig1 cov01 corr01 corr_pred) long K ///
-    using "$processed/pva_split_sample.dta", replace
-foreach split in oddeven earlylate {
-    forvalues h = 0/1 {
-        use `stud', clear
-        keep if h_`split' == `h'
-        id_sample n_feas
-        capture frame drop fr
-        frame put S, into(fr)
-        frame fr {
-            bysort S: gen long n_obs = _N
-            bysort S: keep if _n == 1
-            sort S
-        }
-        va_reg inc_rank, s(S) tag(h) frame(fr) absorb(P) controls
-        frame fr {
-            rename (v_h se_h n_obs) (v`h' se`h' n`h')
-            tempfile r`h'
-            save `r`h''
-        }
-    }
-    use `r0', clear
-    merge 1:1 S using `r1', keep(3) nogen
-    keep if !missing(v0, v1)
-    gen double w = min(n0, n1)
-    * signal variance in each half from the noise correction, and the
-    * cross-half covariance (an estimate of the signal variance that is
-    * free of estimation noise if VA is stable)
-    va_disp v0 se0 w
-    local s0 = r(sd_signal)
-    local h0 = r(sd_hat)
-    va_disp v1 se1 w
-    local s1 = r(sd_signal)
-    local h1 = r(sd_hat)
-    quietly corr v0 v1 [aw = w], covariance
-    local c01 = r(cov_12)
-    quietly corr v0 v1 [aw = w]
-    local r01 = r(rho)
-    * correlation implied by a stable VA: signal over total in each half
-    local rp = (`s0' * `s1') / (`h0' * `h1')
-    post `pr' ("`split'") (`s0') (`s1') (`c01') (`r01') (`rp') (_N)
-    di as result "`split': corr " %5.3f `r01' "  implied by stable VA " %5.3f `rp' ///
-        "  cov " %7.2f `c01' "  (signal var halves " %7.2f `s0'^2 ", " %7.2f `s1'^2 ")"
-
-    * binned scatter
-    local K = _N
-    xtile bin = v0 [aw = w], n(20)
-    quietly reg v1 v0 [aw = w], robust
-    local b = _b[v0]
-    local se = _se[v0]
-    local sb : display %4.2f `b'
-    local ss : display %4.2f `se'
-    local sc : display %4.2f `r01'
-    local sp : display %4.2f `rp'
-    preserve
-        collapse (mean) v0 v1 [aw = w], by(bin)
-        local t0 = cond("`split'" == "oddeven", "odd cohorts", "2007-2011")
-        local t1 = cond("`split'" == "oddeven", "even cohorts", "2012-2016")
-        twoway (scatter v1 v0, mcolor(navy)) (lfit v1 v0, lcolor(navy)) ///
-               (function y = x, range(v0) lcolor(gs10) lpattern(dash)), ///
-            legend(off) xtitle("VA estimated on `t0'", size(small)) ///
-            ytitle("VA estimated on `t1'", size(small)) ///
-            note("Programs in both halves: `K' (20 bins). Program-level slope `sb' (`ss'); corr `sc', implied by a stable VA `sp'.", size(vsmall)) `gopt'
-        graph export "$fig/pva_split_`split'.pdf", replace
-    restore
-}
-postclose `pr'
-use "$processed/pva_split_sample.dta", clear
-list, noobs
-export delimited using "$output/tables/pva_split_sample.csv", replace
-
-* sensitivity to controls: typical controls and baseline vs main
+* same classification sample as F and I: programs with >= 20 students
 use "$processed/pva_program_va_figs.dta", clear
-xtile bin = v_inc_main [aw = n_obs], n(20)
-collapse (mean) v_inc_main v_inc_typ v_inc_base v_inc_raw [aw = n_obs], by(bin)
-twoway (scatter v_inc_raw v_inc_main, msymbol(Oh) mcolor(gs9)) ///
-       (scatter v_inc_typ v_inc_main, msymbol(Th) mcolor(maroon)) ///
-       (scatter v_inc_base v_inc_main, msymbol(O) mcolor(navy)) ///
-       (function y = x, range(v_inc_main) lcolor(gs10) lpattern(dash)), ///
-    legend(order(1 "No controls" 2 "Typical controls" 3 "Portfolio FE only") ///
-        rows(1) size(small)) ///
-    xtitle("Main VA (portfolio FE + controls)", size(small)) ///
-    ytitle("Alternative estimate", size(small)) ///
-    note("20 bins of main VA, enrollment weighted.", size(vsmall)) `gopt'
-graph export "$fig/pva_sensitivity_controls.pdf", replace
+keep if univ != "" & n_obs >= 20
+gen double wv = n_obs * v_inc_main
+collapse (sum) wv sw = n_obs (p10) lo = v_inc_main (p90) hi = v_inc_main ///
+    (count) np = code_h, by(univ)
+gen double mva = wv / sw
+gsort -mva
+gen int ord = _n
+list univ np mva lo hi, noobs
+export delimited univ np sw mva lo hi using "$output/tables/pva_mean_va_by_institution.csv", replace
+local lab ""
+forvalues i = 1/`=_N' {
+    local lab `lab' `i' "`=univ[`i']' (`=np[`i']')"
+}
+twoway (rspike lo hi ord, horizontal lcolor(gs11) lwidth(medthick)) ///
+       (scatter ord mva, msymbol(O) mcolor(navy) msize(medsmall)), ///
+    yscale(reverse) ylabel(`lab', angle(0) labsize(vsmall) nogrid) ytitle("") ///
+    xline(0, lcolor(gs10)) ///
+    xtitle("Mean program VA on income rank (students-weighted), points", size(small)) ///
+    legend(order(2 "Mean VA" 1 "10th-90th percentile of programs") rows(1) size(small)) ///
+    note("Programs with 20+ students; number in parentheses. VA relative to the enrollment-weighted mean.", size(vsmall)) ///
+    graphregion(color(white)) xsize(6.5) ysize(7)
+graph export "$fig/pva_mean_va_institution.pdf", replace
+
+/**********************************************************************
+* I. Examples: the top 10% of programs (names)
+**********************************************************************/
+
+use "$processed/pva_program_va_figs.dta", clear
+keep if n_obs >= 20
+xtile dec = v_inc_eb, n(10)
+keep if dec == 10
+di as result _n "=== Top decile of programs with n >= 20 (by EB VA): " _N " programs ==="
+di as text "By field:"
+tab field
+di as text "By institution (top 12 by number of programs):"
+preserve
+    contract univ
+    gsort -_freq
+    list in 1/12, noobs
+restore
+
+* clean strings for LaTeX
+foreach v in prog_name campus {
+    replace `v' = ustrregexra(`v', "[^\p{L}0-9 ,.()/-]", "")
+    replace `v' = strtrim(itrim(`v'))
+}
+replace campus = ustrtitle(lower(campus), "es")
+replace campus = regexr(campus, "^(Campus|Sede) ", "")
+* the applications file drops the "ñ" of Viña del Mar
+replace campus = subinstr(campus, "Via Del Mar", "Viña del Mar", .)
+gen strL pname = usubstr(prog_name, 1, 44) + cond(ustrlen(prog_name) > 44, ".", "")
+gen strL cname = usubstr(campus, 1, 14) + cond(ustrlen(campus) > 14, ".", "")
+replace field = subinstr(field, "&", "\&", .)
+
+capture program drop write_tex
+program define write_tex
+    args file
+    file open fh using "`file'", write replace text
+    forvalues i = 1/`=_N' {
+        local a = pname[`i']
+        local b = cname[`i']
+        local c = univ[`i']
+        local d = field[`i']
+        local e : display %5.1f v_inc_eb[`i']
+        local f : display %4.0f n_obs[`i']
+        file write fh "`a' & `b' & `c' & `d' & `e' & `f' \\" _n
+    }
+    file close fh
+end
+
+* (a) the 12 programs with the highest EB VA
+gsort -v_inc_eb
+preserve
+    keep in 1/12
+    write_tex "$output/tables/pva_top_programs.tex"
+    list pname cname univ field v_inc_eb n_obs, noobs
+restore
+
+* (b) the 12 largest programs of the top decile
+gsort -n_obs
+preserve
+    keep in 1/12
+    gsort -v_inc_eb
+    write_tex "$output/tables/pva_top_programs_large.tex"
+    list pname cname univ field v_inc_eb n_obs, noobs
+restore
 
 log close

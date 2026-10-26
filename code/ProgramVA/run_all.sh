@@ -2,7 +2,7 @@
 # Program VA pipeline (issue #9). Run from project root on the server.
 # Usage: bash code/ProgramVA/run_all.sh [first_script]   (default: start at 01)
 # Stata batch exit codes are unreliable: stop on the first r(...) error in a log.
-scripts="01_build_feasibility 01b_build_income_rank 01c_build_vacancies_2007_2025 02_estimate_va 03_va_correlates 04_diagnostics_figures"
+scripts="01_build_feasibility 01b_build_income_rank 01c_build_vacancies_2007_2025 02_estimate_va 03_va_correlates 04_diagnostics_figures 04b_split_sample"
 start=${1:-01_build_feasibility}
 go=0
 for s in $scripts; do

@@ -409,6 +409,58 @@ Share of the VA signal variance that lies between groups: institution \textbf{25
 \end{frame}
 
 %--------------------------------------------------------
+\begin{frame}{Mean VA by institution}
+\begin{columns}
+\column{0.55\textwidth}
+\includegraphics[width=\linewidth]{../../output/figures/ProgramVA/pva_mean_va_institution.pdf}
+\column{0.45\textwidth}
+\footnotesize
+\begin{itemize}
+    \setlength{\itemsep}{5pt}
+    \item Dot: student-weighted mean of the VA of the institution's programs. Bar: 10th--90th percentile of its programs.
+    \item Highest: UAI, UANDE, UDD (private, Santiago). Lowest: UMCE, UDA, UAH, ULS, UTFSM. The spread of the means ($\approx$ 25 points) is much smaller than the spread of programs within institutions.
+    \item Within every institution, programs span a wide range: most of the VA variation is \emph{between programs of the same institution} (75\% of the signal variance).
+\end{itemize}
+\end{columns}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Examples: top 10\% of programs by VA}
+\scriptsize
+\textbf{Highest VA} (programs with $\geq$20 students in the identifying sample)
+
+\vspace{0.1cm}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llllrr}
+\toprule
+Program & Campus & Univ. & Field & VA (EB) & Students \\
+\midrule
+\input{../../output/tables/pva_top_programs.tex}
+\bottomrule
+\end{tabular}}
+\end{frame}
+
+\begin{frame}{Examples: largest programs in the top 10\%}
+\scriptsize
+\textbf{The 12 largest programs of the top decile}, sorted by VA
+
+\vspace{0.1cm}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llllrr}
+\toprule
+Program & Campus & Univ. & Field & VA (EB) & Students \\
+\midrule
+\input{../../output/tables/pva_top_programs_large.tex}
+\bottomrule
+\end{tabular}}
+
+\vspace{0.2cm}
+\footnotesize
+Top decile: 131 programs with $\geq$20 students. Among those with a field, 44\% are Health (Medicine, Nursing, Pharmacy), 22\% Technology (Industrial Civil Engineering) and 18\% Business (Commercial Engineering).
+Caveat: VA is on the Mi Futuro income rank of the program of graduation, so programs with high-earning credentials rank high partly by construction.
+\end{frame}
+
+%--------------------------------------------------------
 \begin{frame}{Vacancies 2007--2025 by VA decile}
 \begin{columns}
 \column{0.5\textwidth}
@@ -419,9 +471,10 @@ Share of the VA signal variance that lies between groups: institution \textbf{25
 \vspace{0.1cm}
 \footnotesize
 \begin{itemize}
-    \item Regular vacancies from DEMRE's Oferta Acad\'emica, 2007--2025. 2012 is the base because the new universities enter DEMRE that year, so it is the first year in which all VA programs exist.
-    \item \textbf{Left (within program):} between 2012 and 2025, top-decile programs grow by 17 log points and the 9th decile by 22. Deciles 1--8 end between $-3$ and $+14$ (bottom decile: $+4$). The top decile starts growing earlier, from 2015 on.
-    \item \textbf{Right (totals):} totals mix the 2012 entry of new universities (top-decile programs are over-represented among them) with growth. Read the left panel.
+    \item Regular vacancies (Oferta Acad\'emica), 2007--2025. Base 2012: the new universities enter DEMRE that year, so it is the first year in which all VA programs exist.
+    \item Deciles of \emph{programs} (equal number of programs) by EB VA, among the 1,318 programs with $\geq$20 students in the identifying sample (robust SEs understate the noise of smaller programs). Top decile: 131 programs; top 5\%: 65.
+    \item \textbf{Left (within program):} from 2012 to 2025 the top decile grows by 17 log points and the top 5\% by 18. Deciles 1--9 end between $-7$ and $+9$. The divergence starts in 2015--16.
+    \item \textbf{Right (totals)} also mixes entry and exit of programs; the 2012 jump reflects the entry of new universities.
 \end{itemize}
 \end{frame}
 
@@ -433,7 +486,7 @@ Share of the VA signal variance that lies between groups: institution \textbf{25
     \item The DEMRE assignment makes the Mountjoy--Hickman design feasible: 77\% of assigned students have two or more feasible programs, and the ROL order generates within-portfolio variation.
     \item Within portfolios, observable selection disappears (balance), and controls no longer matter.
     \item VA varies substantially across programs (signal SD 8.9 rank points), much less than raw outcomes, and is only weakly related to selectivity. Field accounts for a third of it, the institution for a quarter.
-    \item The two highest VA deciles expanded their vacancies the most after 2012 (+17 and +22 log points), but the gradient across the other deciles is not monotone.
+    \item After 2012, the top VA decile expanded its vacancies clearly more than the rest (+17 log points by 2025, against $-7$ to $+9$ for deciles 1--9).
     \item \textbf{Next:} validate VA against the RD at each cutoff (forecast-bias test). Then use the VA classification to study what happens to marginal and inframarginal students when high-return programs expand.
 \end{enumerate}
 \end{frame}
