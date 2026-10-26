@@ -29,7 +29,7 @@ Deck: first section of `slides/RDDs-Inframarginal/main.tex` (Step 0).
 ## Definitions
 
 - **Feasible at j**: status ∈ {24, 25, 26}. If j has a waiting list, the score must also be ≥ the first-round cutoff (`cutoffs.dta`); if it has none, every eligible applicant is feasible.
-- **Score**: official `PUNTAJE` when > 0, otherwise recomputed from `weights.dta`, using the best of current and previous-year PSU. The weights are fractions in some years and percents in others, so the scale is detected from the weights themselves.
+- **Score**: official `PUNTAJE` when > 0, otherwise recomputed from `weights.dta`, using the best of current and previous-year PSU. The weights are fractions (sum ≈ 1) in every year; the scale is still detected from the weights themselves. `02_build/01–02` divide by 100 instead, which gives scores of ~6 when the official score is missing (not fixed).
 - **Versions**:
   - `itt`: assigned program, `port_bin` (main).
   - `enr`: enrolled program from Formulario D, which must be on the ROL. The portfolio adds that program, which covers waitlist calls.

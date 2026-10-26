@@ -101,7 +101,9 @@ rename t_codigo_carrera codigo_carrera
 replace has_waiting_list = 0 if missing(has_waiting_list)
 
 * weighted score, current and previous year. weights.dta stores weights
-* as fractions (sum ~1) in some years and percents (sum ~100) in others;
+* as fractions (sum ~1) in every year (w_scale below is 1 for all rows;
+* 02_build/01 and 02 divide by 100 and get scores of ~6). The scale is
+* still detected from the weights, so the code is safe either way;
 * the scale is read from the weights themselves
 gen double w_scale = cond(w_gpa + w_rank + w_reading + w_math > 1.5, 100, 1)
 tab ao_proceso w_scale
