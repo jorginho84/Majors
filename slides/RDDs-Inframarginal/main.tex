@@ -65,6 +65,9 @@
 \textbf{Motivating question.} Why don't we increase capacity in high-return programs?
 
 \vspace{0.3cm}
+\textbf{Step 0.} We first identify \emph{which} programs have high returns, with a program value-added estimated from students admitted to the same set of programs (first section).
+
+\vspace{0.3cm}
 Expanding a program's capacity has two sides, and we study each one:
 \begin{itemize}
     \setlength{\itemsep}{6pt}
@@ -147,6 +150,365 @@ program is much more selective than the next-best option.
 
 \begin{frame}{Outline}
 \tableofcontents
+\end{frame}
+
+%------------------------------------------------
+\section{Step 0: Which programs have high returns? Program value-added}
+
+\begin{frame}{Why this step}
+\small
+\textbf{The question of the paper.} What happens if \emph{high-return} programs expand their vacancies?
+\begin{itemize}
+    \setlength{\itemsep}{4pt}
+    \item For the \textbf{marginal} applicant who gets the extra seat (RDD at the cutoff).
+    \item For the \textbf{inframarginal} students who would have been admitted anyway (Designs I--V).
+\end{itemize}
+
+\vspace{0.2cm}
+\textbf{This step is an input, not a main result.} To ask that question we first need to know \emph{which} programs have high returns.
+Raw outcome comparisons do not tell us: PSU, NEM and family background sort students across programs.
+
+\vspace{0.2cm}
+\textbf{What we do.} We estimate a value-added (VA) for every program and use its distribution to classify programs into high- and low-return.
+We adapt Mountjoy \& Hickman (2021, ``The Returns to College(s)'') to the Chilean centralized admission system.
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Identification: same admission set, different program}
+\small
+\textbf{Mountjoy \& Hickman (Texas).} Compare students who were \emph{admitted to the same set of colleges} but enrolled in different ones.
+
+\vspace{0.2cm}
+\textbf{Adaptation to DEMRE's deferred acceptance.} A student is assigned to the top-ranked program in her ROL where she is \emph{feasible} (score $\geq$ cutoff).
+\begin{itemize}
+    \setlength{\itemsep}{4pt}
+    \item \textbf{Portfolio} $A_i$ = cohort $\times$ the \emph{unordered} set of feasible ROL programs.
+    \item \textbf{Treatment variation} = the \emph{order} of the ROL within that set. Two students feasible at $\{j,k\}$ end up in $j$ or $k$ only because of how they ranked them.
+    \item Crossing a cutoff changes $A_i$, so the RD variation is absorbed: VA uses variation that is disjoint from the RD.
+\end{itemize}
+\[
+Y_i=\sum_j v_j\,\mathbf{1}[S_i=j]+\phi_{A_i}+g(\text{PSU},\text{NEM},\text{rank})+X_i'\beta+\varepsilon_i
+\]
+\scriptsize
+\textbf{Key assumption:} within a portfolio, the ROL order is unrelated to potential outcomes. $S_i$: program assigned by DEMRE.
+$v_j$ is relative to the enrollment-weighted mean. Robust SE; signal SD $=\sqrt{\mathrm{Var}(\hat v)-\overline{SE^2}}$; Empirical Bayes shrinkage.
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Data and variables}
+\small
+\begin{itemize}
+    \setlength{\itemsep}{4pt}
+    \item \textbf{Applications} (Formulario C), cohorts 2007--2016: full ROL, status, scores. Program weights and cutoffs.
+    We recompute the weighted score for \emph{every} ROL entry (DEMRE's score is 0 below the assigned preference).
+    \item \textbf{Outcome: income rank.} Percentile (1--100), among graduates, of the Mi Futuro income of the program of the student's
+    first title within 8 years (switchers included). \textbf{0 if no title.}
+    \begin{itemize}
+        \item Mi Futuro: mean income in the 4th year after the title, institution $\times$ \emph{carrera gen\'erica}, reference years 2017--2024.
+        \item Placeholder until individual wages are available. Secondary outcome: any title within 8 years.
+    \end{itemize}
+    \item \textbf{Controls:} cubics in PSU (L--M), NEM and ranking; sex; school dependency.
+    \item \textbf{Program characteristics:} entrants' PSU, NEM, school type and sex; field (SIES); regular vacancies 2007--2025 (Oferta Acad\'emica).
+\end{itemize}
+
+\vspace{0.1cm}
+\footnotesize
+\textbf{Caveat.} At the program level the outcome partly embeds the program's own (raw) Mi Futuro income, so VA here measures value-added on the
+\emph{expected earnings of the credential}. Individual wages will remove this.
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Feasibility and sample}
+\centering
+\scriptsize
+\begin{tabular}{lr}
+\toprule
+ & \\
+\midrule
+Student-cohorts in the applications data, 2007--2016 & 1,106,223 \\
+\quad assigned to a program by DEMRE & 806,522 \\
+\quad enrolled (Formulario D) & 631,915 \\
+\midrule
+Recomputed score $=$ official score ($\pm1$ point), where both exist & 98.2\% \\
+Assigned program $=$ top-ranked feasible program & 100\% \\
+\midrule
+Assigned students with $\geq 2$ feasible ROL programs & 76.6\% \\
+\quad 2 / 3 / 4+ feasible programs & 24\% / 22\% / 31\% \\
+Distinct portfolios & 486,333 \\
+\midrule
+\textbf{Identifying sample} ($\geq$2 options, $\geq$2 students, variation in $S$) & \textbf{146,959} \\
+\quad programs (largest connected set) & 1,665 of 1,669 \\
+\quad universities & 33 \\
+\midrule
+Students with any title within 8 years & 62.5\% \\
+Titles matched to a Mi Futuro cell (exact / field mean / institution) & 90\% / 7\% / 3\% \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.2cm}
+\footnotesize
+Feasible at $j$: eligible (status 24/25/26) and score $\geq$ cutoff if $j$ is oversubscribed; any eligible applicant otherwise.
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Balance: portfolios absorb selection on observables}
+\begin{columns}
+\column{0.52\textwidth}
+\includegraphics[width=\linewidth]{../../output/figures/ProgramVA/pva_balance_univ.pdf}
+\column{0.48\textwidth}
+\includegraphics[width=\linewidth]{../../output/figures/ProgramVA/pva_balance_programs.pdf}
+
+\vspace{0.1cm}
+\footnotesize
+Covariate-predicted income rank on program (university) dummies.
+\begin{itemize}
+    \item Across programs, its SD falls from \textbf{11.8} to \textbf{0.9} points with portfolio FE.
+    \item Correlation with raw means: 0.75 $\rightarrow$ 0.00.
+\end{itemize}
+Students with the same feasible set have the same predicted outcome wherever they end up.
+\end{columns}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Distribution of program VA}
+\begin{columns}
+\column{0.55\textwidth}
+\includegraphics[width=\linewidth]{../../output/figures/ProgramVA/pva_va_histogram.pdf}
+\column{0.45\textwidth}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+Signal SD (income rank points, enrollment weighted)
+
+\vspace{0.1cm}
+\begin{tabular}{lcc}
+\toprule
+ & Program & Univ. \\
+\midrule
+Raw means & 18.2 & 12.0 \\
+Typical ctrls. & 14.1 & 7.4 \\
+Portfolio FE & 9.0 & 4.7 \\
+\textbf{Main} (FE+ctrls.) & \textbf{8.9} & \textbf{4.5} \\
+\midrule
+Main / raw & 0.49 & 0.37 \\
+Corr(VA, raw) & 0.84 & 0.35 \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.2cm}
+Half of the raw dispersion across programs survives; controls on top of the portfolio FE barely move it.
+\end{columns}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Diagnostics: what the VA literature checks}
+\scriptsize
+Angrist, Hull \& Walters (Handbook of the Economics of Education, ``Methods for measuring school effectiveness''); Mountjoy \& Hickman (2021).
+
+\vspace{0.15cm}
+\begin{tabular}{p{4.2cm}p{4.1cm}l}
+\toprule
+Diagnostic & What it tests & Status \\
+\midrule
+Balance on covariate-predicted outcome & Selection on observables within portfolio & Done (previous slide) \\
+Sensitivity to controls & Do extra controls move VA? & Done \\
+Split-sample reliability (odd vs.\ even cohorts) & Is the signal variance real? & Done \\
+Stability (2007--11 vs.\ 2012--16) & Drift of VA over time & Done \\
+\textbf{Forecast-bias test with RD offers} & Bias from unobservables: does $\Delta\hat v$ predict the RD effect one-for-one? & Pending \\
+Over-identification across cutoffs & Same, many quasi-experiments & Pending \\
+Homogeneity across portfolios (MH) & Pooling assumption & Proposed \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.2cm}
+The RD test is the natural bridge to the rest of the paper: under unbiased VA, the RD at $j$'s cutoff should equal $\hat v_j-\sum_k w_{jk}\hat v_k$ over the fallback programs.
+
+\vspace{0.1cm}
+\textbf{Open point} (Angrist et al.\ 2015): a test with one degree of freedom ``might accept the null if $\rho_z=\psi_z$ on average across lotteries, even while deviations from equality might be large and statistically significant for specific lotteries''. What we need is heterogeneity at the program level, so the test must be built cutoff by cutoff.
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Diagnostics: sensitivity and reliability}
+\begin{columns}
+\column{0.33\textwidth}
+\includegraphics[width=\linewidth]{../../output/figures/ProgramVA/pva_sensitivity_controls.pdf}
+\column{0.33\textwidth}
+\includegraphics[width=\linewidth]{../../output/figures/ProgramVA/pva_split_oddeven.pdf}
+\column{0.33\textwidth}
+\includegraphics[width=\linewidth]{../../output/figures/ProgramVA/pva_split_earlylate.pdf}
+\end{columns}
+
+\vspace{0.2cm}
+\footnotesize
+\textbf{Left:} adding controls to the portfolio FE barely moves VA (``Portfolio FE only'' on the 45$^\circ$ line); without portfolio FE, typical controls leave large gaps.
+\textbf{Middle:} odd vs.\ even cohorts. Correlation 0.60, against 0.63 implied by a stable VA given estimation noise. The cross-half covariance (79.0) matches the noise-corrected signal variance (79.2), so the signal is real.
+\textbf{Right:} 2007--11 vs.\ 2012--16. Correlation 0.54 (0.65 if stable): the implied correlation of true VA across periods is about 0.84, so there is some drift.
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Correlates of VA: selectivity}
+\begin{columns}
+\column{0.5\textwidth}
+\includegraphics[width=\linewidth]{../../output/figures/ProgramVA/pva_bin_psu_mean.pdf}
+\column{0.5\textwidth}
+\includegraphics[width=\linewidth]{../../output/figures/ProgramVA/pva_bin_nem_mean.pdf}
+\end{columns}
+\vspace{0.1cm}
+\footnotesize
+Raw income rank rises steeply with entrants' PSU (corr 0.72; +22.5 points per 100 PSU points). VA rises much less (corr 0.26; +4.4 points per 100 PSU points):
+most of the raw selectivity gradient is selection.
+\end{frame}
+
+\begin{frame}{Correlates of VA: who enrolls}
+\begin{columns}
+\column{0.5\textwidth}
+\includegraphics[width=\linewidth]{../../output/figures/ProgramVA/pva_bin_sh_priv.pdf}
+\column{0.5\textwidth}
+\includegraphics[width=\linewidth]{../../output/figures/ProgramVA/pva_bin_sh_female.pdf}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Correlates of VA: vacancies}
+\begin{columns}
+\column{0.5\textwidth}
+\includegraphics[width=\linewidth]{../../output/figures/ProgramVA/pva_bin_lvac_mean.pdf}
+\column{0.5\textwidth}
+\includegraphics[width=\linewidth]{../../output/figures/ProgramVA/pva_bin_dlvac_1225.pdf}
+\end{columns}
+\vspace{0.1cm}
+\footnotesize
+Larger programs have higher VA. This holds conditional on field and PSU: $+2.2$ rank points per log point of vacancies (SE 1.1).
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Field and institution}
+\begin{columns}
+\column{0.45\textwidth}
+\scriptsize
+Mean VA by field (EB, rank points)
+
+\vspace{0.1cm}
+\begin{tabular}{lrr}
+\toprule
+Field & VA & Programs \\
+\midrule
+Business & $+5.8$ & 123 \\
+Health & $+4.7$ & 233 \\
+Technology & $+0.9$ & 404 \\
+Law & $-1.6$ & 37 \\
+Social Sciences & $-1.9$ & 154 \\
+Basic Sciences & $-2.6$ & 103 \\
+Agriculture & $-3.4$ & 33 \\
+Humanities & $-5.8$ & 31 \\
+Arts \& Architecture & $-6.7$ & 82 \\
+Education & $-6.9$ & 239 \\
+\bottomrule
+\end{tabular}
+\column{0.55\textwidth}
+\includegraphics[width=\linewidth]{../../output/figures/ProgramVA/pva_inst_share.pdf}
+
+\scriptsize
+Share of the VA signal variance that lies between groups: institution \textbf{25\%} (40\% for raw means), field 37\%, institution $\times$ field 64\%.
+\end{columns}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Mean VA by institution}
+\begin{columns}
+\column{0.55\textwidth}
+\includegraphics[width=\linewidth]{../../output/figures/ProgramVA/pva_mean_va_institution.pdf}
+\column{0.45\textwidth}
+\footnotesize
+\begin{itemize}
+    \setlength{\itemsep}{5pt}
+    \item Dot: student-weighted mean of the VA of the institution's programs. Bar: 10th--90th percentile of its programs.
+    \item Highest: UAI, UANDE, UDD (private, Santiago). Lowest: UMCE, UDA, UAH, ULS, UTFSM. The spread of the means ($\approx$ 25 points) is much smaller than the spread of programs within institutions.
+    \item Within every institution, programs span a wide range: most of the VA variation is \emph{between programs of the same institution} (75\% of the signal variance).
+\end{itemize}
+\end{columns}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Examples: top 10\% of programs by VA}
+\scriptsize
+\textbf{Highest VA} (programs with $\geq$20 students in the identifying sample)
+
+\vspace{0.1cm}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llllrr}
+\toprule
+Program & Campus & Univ. & Field & VA (EB) & Students \\
+\midrule
+\input{../../output/tables/pva_top_programs.tex}
+\bottomrule
+\end{tabular}}
+\end{frame}
+
+\begin{frame}{Examples: largest programs in the top 10\%}
+\scriptsize
+\textbf{The 12 largest programs of the top decile}, sorted by VA
+
+\vspace{0.1cm}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llllrr}
+\toprule
+Program & Campus & Univ. & Field & VA (EB) & Students \\
+\midrule
+\input{../../output/tables/pva_top_programs_large.tex}
+\bottomrule
+\end{tabular}}
+
+\vspace{0.2cm}
+\footnotesize
+Top decile: 131 programs with $\geq$20 students. Among those with a field, 44\% are Health (Medicine, Nursing, Pharmacy), 22\% Technology (Industrial Civil Engineering) and 18\% Business (Commercial Engineering).
+Caveat: VA is on the Mi Futuro income rank of the program of graduation, so programs with high-earning credentials rank high partly by construction.
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Vacancies 2007--2025 by VA decile}
+\begin{columns}
+\column{0.5\textwidth}
+\includegraphics[width=\linewidth]{../../output/figures/ProgramVA/pva_vacancies_decile_within.pdf}
+\column{0.5\textwidth}
+\includegraphics[width=\linewidth]{../../output/figures/ProgramVA/pva_vacancies_decile_total.pdf}
+\end{columns}
+\vspace{0.1cm}
+\footnotesize
+\begin{itemize}
+    \item Regular vacancies (Oferta Acad\'emica), 2007--2025. Base 2012: the new universities enter DEMRE that year, so it is the first year in which all VA programs exist.
+    \item Deciles of \emph{programs} (equal number of programs) by EB VA, among the 1,318 programs with $\geq$20 students in the identifying sample (robust SEs understate the noise of smaller programs). Top decile: 131 programs; top 5\%: 65.
+    \item \textbf{Left (within program):} from 2012 to 2025 the top decile grows by 17 log points and the top 5\% by 18. Deciles 1--9 end between $-7$ and $+9$. The divergence starts in 2015--16.
+    \item \textbf{Right (totals)} also mixes entry and exit of programs; the 2012 jump reflects the entry of new universities.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Vacancies by VA decile: levels}
+\begin{columns}
+\column{0.5\textwidth}
+\includegraphics[width=\linewidth]{../../output/figures/ProgramVA/pva_vacancies_decile_levels_box.pdf}
+\column{0.5\textwidth}
+\includegraphics[width=\linewidth]{../../output/figures/ProgramVA/pva_vacancies_decile_levels_bar.pdf}
+\end{columns}
+\vspace{0.1cm}
+\footnotesize
+\begin{itemize}
+    \item \textbf{Left:} regular vacancies per program in 2012 (log scale). High-VA programs are larger: median 70 seats in the top decile against 45 in deciles 1--2. The distributions overlap widely.
+    \item \textbf{Right:} mean vacancies per program, 2012 and 2025, on the balanced panel (programs with vacancies in both years). The top decile starts larger (90 vs.\ 52--63 in deciles 1--5) and adds the most seats: $+22$ per program, against $0$ to $+8$ in deciles 1--7.
+    \item Same classification as the previous slide: 1,318 programs with $\geq$20 students; deciles of programs by EB VA.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Step 0: take-aways}
+\small
+\begin{enumerate}
+    \setlength{\itemsep}{5pt}
+    \item The DEMRE assignment makes the Mountjoy--Hickman design feasible: 77\% of assigned students have two or more feasible programs, and the ROL order generates within-portfolio variation.
+    \item Within portfolios, observable selection disappears (balance), and controls no longer matter.
+    \item VA varies substantially across programs (signal SD 8.9 rank points), much less than raw outcomes, and is only weakly related to selectivity. Field accounts for a third of it, the institution for a quarter.
+    \item After 2012, the top VA decile expanded its vacancies clearly more than the rest (+17 log points by 2025, against $-7$ to $+9$ for deciles 1--9).
+    \item \textbf{Next:} validate VA against the RD cutoff by cutoff (forecast-bias test with program-level heterogeneity). Then use the VA classification to study what happens to marginal and inframarginal students when high-return programs expand.
+\end{enumerate}
 \end{frame}
 
 %------------------------------------------------
@@ -3715,6 +4077,31 @@ For inframarginal student $i$ in program $p$, admission year $t$ (the entering c
 
 \vspace{0.1cm}
 \parbox{0.97\textwidth}{\tiny \textit{Notes:} Z in units of ten vacancies. Panel B uses cohorts with $Z_{p,t+1}$ observed. SE clustered by program-year.}
+\end{frame}
+
+%--------------------------------------------------------
+% code/04_rdd/Inframarginals/39_design5_trends.do
+\begin{frame}{Design V: main estimates with program-specific trends}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.58\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_trends.tex}}
+\end{column}
+\begin{column}{0.40\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{3pt}
+    \item The first stage survives the trends (0.75--0.78, F $>$ 300).
+    \item \textbf{Program graduation}: the positive effect disappears once program trends are absorbed, with Top 1 ROL ($-0.0001$) and exact ROL ($0.0003$, ns). The levels estimate was picking up program trends.
+    \item \textbf{Any university / any HE}: the effect stays positive and grows, 0.0005 per entrant (Top 1) and 0.0012 (exact).
+    \item Reading: a larger cohort does not change graduation from the program, but raises graduation somewhere in the system.
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.1cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS per entrant; outcomes are 0/1. Trends are program-specific linear trends in the cohort year. Columns (3)--(4) on the exact-ROL non-singleton sample. SE clustered by program-year.}
 \end{frame}
 
 \section{Appendix}
