@@ -1,0 +1,119 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{setspace}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{pgfgantt}
+\usepackage{natbib}
+\usepackage[hidelinks]{hyperref}
+
+\setstretch{1.15}
+\setlength{\parskip}{0.7em}
+\setlength{\parindent}{0pt}
+\pagestyle{plain}
+
+\begin{document}
+
+\begin{center}
+{\Large\bfseries ¿Pueden más cupos en carreras de alto retorno\\ mejorar el empleo de los jóvenes?}\\[0.6em]
+{\large Propuesta de investigación presentada al Ministerio del Trabajo y Previsión Social}\\[1em]
+Andrés Barrios\textsuperscript{1} \quad Emilio Borghesan\textsuperscript{2} \quad Agustín Díaz\textsuperscript{3} \quad Jorge Rodríguez\textsuperscript{1}\\[2pt]
+{\small\textsuperscript{1}Universidad de los Andes \quad \textsuperscript{2}University of Michigan \quad \textsuperscript{3}Banco Central de Chile}\\[2pt]
+{\small Octubre de 2026}
+\end{center}
+
+\section*{Resumen}
+
+El desempleo en Chile sube y el empleo formal cae. La educación superior sigue protegiendo frente al desempleo, pero no todas las carreras llevan al mismo resultado laboral. Esta propuesta busca responder si sería posible mejorar el mercado laboral de los jóvenes a través de la política de educación superior, ampliando los cupos en las carreras que mejor los insertan en empleos formales y bien remunerados, y por qué hoy esos cupos no crecen lo suficiente. Para ello se vincularán los registros de admisión, matrícula y titulación con los registros de la AFC y del Seguro de Cesantía. El proyecto dura tres años: dos de investigación y uno de publicación y difusión. Entrega dos informes de avance (meses 12 y 24) y un informe final (mes 36), y contempla seminarios con el Ministerio y documentos de política con recomendaciones concretas.
+
+\section{El problema: un mercado laboral que no absorbe a los jóvenes}
+
+El mercado laboral chileno atraviesa un deterioro que ya no parece solo coyuntural. En el trimestre junio--agosto de 2026 la tasa de desocupación llegó a 9,6\%, un punto porcentual más que un año antes. Por primera vez desde 2021 el empleo cae: hay 81 mil ocupados menos que hace doce meses, y toda esa caída corresponde a empleo formal (88 mil puestos menos), mientras el empleo informal se mantiene \citep{ine2026b}. Entre los jóvenes de 15 a 24 años la desocupación alcanza 22,8\%, más de dos veces la tasa nacional.
+
+La educación superior protege, pero cada vez menos y de forma desigual. Las personas con educación superior tienen menos desempleo (8,3\%) que quienes tienen educación secundaria o menos (10,6\%), pero el desempleo subió en todos los niveles; entre los titulados universitarios llegó a 8,4\%, frente a 7,2\% un año antes. Al mismo tiempo, Chile expandió su sistema de manera muy rápida: la matrícula total pasó de cerca de 986 mil estudiantes en 2010 a 1,46 millones en 2025, y hoy 26\% de los adultos tiene educación superior completa. En ese proceso el premio salarial de tener un título bajó, aunque sigue siendo alto: según la OCDE, quienes tienen educación superior ganan 112\% más que quienes terminaron la enseñanza media, frente a 54\% en promedio en la OCDE \citep{oecd2025}. Solo 13\% de los estudiantes se titula en el tiempo teórico de su carrera, frente a 43\% en la OCDE \citep{oecd2025}.
+
+Lo que decide el resultado laboral ya no es solo tener un título, sino qué carrera se estudia, en qué institución y si se logra terminar. La evidencia chilena muestra diferencias grandes de ingresos entre carreras que reciben estudiantes parecidos \citep{hastings2013,rodriguez2016}. Si algunas carreras insertan sistemáticamente mejor a los jóvenes en empleos formales y estables, la cantidad de cupos que ofrecen es una palanca de política con efectos sobre el empleo.
+
+\section{La pregunta de investigación}
+
+La pregunta central de este proyecto es si es posible mejorar los resultados laborales de los jóvenes mediante la política de educación superior, ampliando los cupos en las carreras de mayor retorno. Responderla exige primero identificar qué carreras conducen a mejores resultados laborales, entendidos como más meses de empleo formal, mayor estabilidad, menos períodos de cesantía y mejores remuneraciones, una vez que se descuenta que a algunas carreras llegan estudiantes que ya eran más aventajados. Exige también saber qué gana un joven que obtiene un cupo adicional en una de esas carreras, y qué les ocurre a los estudiantes que ya estaban cuando la carrera amplía su matrícula, pues un curso más grande podría empeorar su experiencia.
+
+Detrás de esto hay una pregunta sobre el funcionamiento del mercado. Si una carrera tiene muy buenos resultados y más postulantes que cupos, uno esperaría que su oferta creciera. Que no lo haga con suficiente fuerza puede deberse a límites de capacidad, como la falta de docentes, infraestructura o campos clínicos; a los incentivos de las instituciones, que compiten por prestigio y pueden preferir mantener pocos cupos aunque se pierdan oportunidades \citep{epple2006,blair2021}; a reglas de financiamiento y regulación que no premian ampliar la oferta donde más se necesita; o a información incompleta, ya que ni los jóvenes ni las instituciones conocen bien los resultados laborales de cada carrera, y la demanda no siempre apunta hacia donde están los mejores retornos. El proyecto no parte de la conclusión de que existe una falla de mercado. Mide cuánto valdría ampliar cupos y cuál sería el costo para quienes ya estudian, para que la discusión de política se haga con cifras.
+
+Las respuestas tienen consecuencias directas para varias decisiones públicas. Informan dónde conviene incentivar mayor oferta, por carrera, región y tipo de institución. Permiten entregar a jóvenes y familias información sobre resultados laborales reales, con estabilidad y cesantía, y no solo ingresos promedio. Identifican qué trayectorias de egreso y deserción tienen más riesgo de cesantía prolongada, lo que sirve para orientar la capacitación y la intermediación laboral. Y muestran cómo se usa el Seguro de Cesantía según la formación previa de las personas.
+
+\section{Cómo lo vamos a estudiar}
+
+El enfoque es el mismo en todos los componentes: comparar jóvenes que son muy parecidos y que difieren solo por una razón fuera de su control, de modo de aislar el efecto de la carrera o del cupo. Para medir cuánto vale cada carrera, comparamos a jóvenes que podían ingresar al mismo conjunto de carreras y que terminaron en carreras distintas solo por el orden en que las listaron al postular \citep{mountjoy2021}. Para medir qué gana quien obtiene un cupo, comparamos a quienes quedaron apenas sobre y apenas bajo el puntaje de corte de admisión, una comparación casi tan limpia como la de un sorteo \citep{hastings2013,zimmerman2014,black2023}. Para medir qué les pasa a quienes ya estaban, aprovechamos los cambios de cupos de un año a otro y las ampliaciones repentinas de oferta, y los comparamos con carreras similares que no cambiaron. Finalmente, con estas estimaciones simulamos qué ocurriría con el empleo si una parte de los cupos se reasignara hacia carreras de mayor retorno; es un ejercicio simple y transparente, no un modelo complejo. Todas las estimaciones se harán por carrera y no solo en promedio, porque lo que sirve a la política pública es saber dónde ampliar.
+
+\section{Datos}
+
+El proyecto depende de vincular tres registros administrativos sobre las mismas personas. Los dos primeros ya están en poder del equipo: los datos de admisión del DEMRE, con postulaciones, preferencias, puntajes, puntajes de corte y vacantes por carrera y año entre 2007 y 2016, y los registros del MINEDUC y el SIES, que indican en qué carrera e institución se matricula cada joven, su permanencia y su titulación hasta 2024. El tercero es el que se solicita al Ministerio del Trabajo: los registros de la AFC y del Seguro de Cesantía de las personas que postularon entre 2007 y 2016, desde su ingreso a la educación superior hasta el dato más reciente disponible. Interesan las cotizaciones mensuales, la remuneración imponible, el tipo de contrato, las fechas de inicio y término de cada relación laboral, y las solicitudes y pagos de prestaciones del Seguro de Cesantía y del Fondo de Cesantía Solidario.
+
+Con estos datos se podrá medir cuánto tardan los jóvenes en encontrar su primer empleo formal, cuánto duran sus empleos y qué proporción es con contrato indefinido, con qué frecuencia y por cuánto tiempo quedan sin empleo formal, cómo evolucionan sus remuneraciones durante los primeros diez años de su trayectoria, y en qué regiones y sectores trabajan. Hoy, en cambio, el valor de una carrera solo puede aproximarse con los ingresos promedio publicados para titulados, que no dicen nada sobre estabilidad ni cesantía.
+
+La vinculación se haría con el identificador de cada persona, sin que el equipo acceda a nombres ni RUT. Proponemos dos alternativas: que el Ministerio de Educación entregue al Ministerio del Trabajo un listado de identificadores y este devuelva la base ya unida y anonimizada, o que el trabajo se realice dentro de un entorno seguro del propio Ministerio. Los datos de admisión no están disponibles en el Banco Central, por lo que la unión debe hacerse en una institución que pueda recibir ambas bases. Estamos abiertos a la modalidad que prefiera el Ministerio, y solicitamos además una contraparte técnica que resuelva dudas sobre las bases y revise los informes antes de su difusión.
+
+Una limitación debe tenerse presente. Los registros de la AFC cubren a los trabajadores dependientes del sector privado, y no incluyen empleo público, trabajo independiente ni empleo informal. Como hoy el empleo por cuenta propia crece mientras cae el asalariado privado, no aparecer en la AFC puede significar desempleo, informalidad, trabajo independiente, empleo público o migración. Para acotar este problema se cruzará con otras fuentes cuando estén disponibles, como cotizaciones previsionales y registros tributarios de honorarios, y se mostrarán los resultados con y sin ellas.
+
+\section{Productos y calendario}
+
+El proyecto dura tres años: los dos primeros se dedican a la investigación y el tercero a la publicación y difusión de los resultados. Además de los tres informes, el equipo realizará seminarios con el Ministerio y otras instituciones públicas, y preparará documentos de política que resuman los resultados y sus implicancias para quienes toman decisiones.
+
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.1cm}>{\centering\arraybackslash}p{1.6cm}>{\raggedright\arraybackslash}X}
+\toprule
+\textbf{Producto} & \textbf{Plazo} & \textbf{Contenido} \\
+\midrule
+Informe de avance 1 & Mes 12 & Base vinculada, descripción de las trayectorias laborales de los titulados y primera medición del valor laboral de las carreras. \\
+Informe de avance 2 & Mes 24 & Efecto de un cupo adicional sobre empleo, estabilidad y remuneraciones; efectos sobre quienes ya estaban; resultados por carrera y región. \\
+Informe final & Mes 36 & Ejercicio de reasignación de cupos, recomendaciones de política y resumen ejecutivo para tomadores de decisión. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{center}
+\begin{ganttchart}[
+  hgrid, vgrid={dotted},
+  x unit=0.8cm, y unit title=0.6cm, y unit chart=0.62cm,
+  title height=1, title label font=\scriptsize\bfseries,
+  bar label font=\scriptsize,
+  bar/.append style={fill=black!55,draw=black},
+  milestone/.append style={fill=black,draw=black},
+  bar height=0.55,
+  canvas/.append style={draw=black!40},
+  ]{1}{12}
+  \gantttitle{Año 1: investigación}{4}
+  \gantttitle{Año 2: investigación}{4}
+  \gantttitle{Año 3: publicación}{4} \\
+  \gantttitlelist{1,...,12}{1} \\
+  \ganttbar{Convenio y acceso a los datos}{1}{2} \\
+  \ganttbar{Vinculación y construcción de la base}{2}{4} \\
+  \ganttbar{Valor laboral de cada carrera}{3}{5} \\
+  \ganttmilestone{Informe de avance 1}{4} \\
+  \ganttbar{Efecto de un cupo adicional}{4}{7} \\
+  \ganttbar{Efecto sobre quienes ya estaban}{5}{8} \\
+  \ganttbar{Simulación de reasignación de cupos}{7}{8} \\
+  \ganttmilestone{Informe de avance 2}{8} \\
+  \ganttbar{Artículo científico y revisión}{9}{12} \\
+  \ganttbar{Seminarios y difusión de resultados}{10}{12} \\
+  \ganttbar{Informe final y documento de política}{11}{12} \\
+  \ganttmilestone{Informe final}{12}
+\end{ganttchart}
+
+{\footnotesize Carta Gantt, por trimestre desde el inicio del proyecto. Los rombos marcan la entrega de cada informe.}
+\end{center}
+
+La entrega de los datos es la condición crítica del cronograma: el primer informe supone contar con la base vinculada entre los meses 6 y 10. Si el acceso se retrasa, el resto se desplaza en la misma medida.
+
+\bibliographystyle{apalike}
+\bibliography{referencias}
+
+\end{document}
