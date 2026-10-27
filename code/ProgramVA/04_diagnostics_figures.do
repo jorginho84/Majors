@@ -11,7 +11,8 @@
 *   D. Correlates: binned scatter + fitted line (raw mean vs VA)
 *   E. Institution share of the VA signal (between-group signal variance)
 *   F. Regular vacancies 2007-2025 by VA decile (deciles of programs,
-*      equal number of programs; top 5% shown separately)
+*      equal number of programs; top 5% shown separately); levels in
+*      2012 and 2025 by decile
 *   H. Mean VA by institution
 *   I. Examples: names of the top-decile programs (tex tables)
 *   (split-sample reliability, stability, sensitivity: see 04b)
@@ -376,6 +377,45 @@ preserve
         xlabel(2007(2)2025, labsize(small)) xtitle("Admission year") ///
         ytitle("Mean log vacancies relative to 2012", size(small)) `gopt'
     graph export "$fig/pva_vacancies_decile_within.pdf", replace
+restore
+
+* F3. levels: distribution of vacancies per program in 2012, and mean
+* vacancies per program in 2012 and 2025 on the balanced panel (programs
+* with vacancies in both years, so entry does not move the 2025 level)
+label define declab 1 "1" 2 "2" 3 "3" 4 "4" 5 "5" 6 "6" 7 "7" 8 "8" ///
+    9 "9" 10 "10" 11 "Top 5%"
+label values dec declab
+preserve
+    keep if ao_proceso == 2012 & vac > 0 & !missing(vac)
+    graph box vac, over(dec, label(labsize(small))) yscale(log) ///
+        ylabel(10 25 50 100 250 500 1000, angle(0) nogrid labsize(small)) ///
+        box(1, color(navy%60)) marker(1, msize(vsmall) mcolor(gs10)) ///
+        ytitle("Regular vacancies per program, 2012 (log scale)", size(small)) ///
+        b1title("VA decile", size(small)) ///
+        note("Programs with >= 20 students in the identifying sample.", size(vsmall)) ///
+        graphregion(color(white)) plotregion(color(white))
+    graph export "$fig/pva_vacancies_decile_levels_box.pdf", replace
+restore
+preserve
+    keep if inlist(ao_proceso, 2012, 2025) & vac > 0 & !missing(vac)
+    keep code_h dec ao_proceso vac
+    reshape wide vac, i(code_h dec) j(ao_proceso)
+    keep if !missing(vac2012, vac2025)
+    collapse (mean) vac2012 vac2025 (median) med2012 = vac2012 ///
+        med2025 = vac2025 (count) nprog = vac2012, by(dec)
+    gen double dvac = vac2025 - vac2012
+    list, noobs
+    export delimited using "$output/tables/pva_vacancies_by_decile_levels.csv", replace
+    graph bar vac2012 vac2025, over(dec, label(labsize(small))) ///
+        bar(1, color(gs11)) bar(2, color(navy)) ///
+        blabel(bar, format(%3.0f) size(vsmall)) ///
+        legend(order(1 "2012" 2 "2025") rows(1) size(small)) ///
+        ytitle("Mean regular vacancies per program", size(small)) ///
+        b1title("VA decile", size(small)) ///
+        ylabel(, angle(0) nogrid labsize(small)) ///
+        note("Balanced panel: programs with vacancies in 2012 and 2025.", size(vsmall)) ///
+        graphregion(color(white)) plotregion(color(white))
+    graph export "$fig/pva_vacancies_decile_levels_bar.pdf", replace
 restore
 
 /**********************************************************************

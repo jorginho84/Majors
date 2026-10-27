@@ -21,6 +21,7 @@ Crossing a cutoff changes the portfolio, so the RD variation is absorbed by the 
 | `03_va_correlates.do` | VA vs average PSU, field, vacancies (level, growth, evolution by VA tercile) | `output/tables/pva_correlates.csv`, `pva_field.csv`, `pva_vacancies_by_tercile_*.csv`, `output/figures/pva_*.pdf` |
 | `04_diagnostics_figures.do` | Balance figures, VA histogram, binned correlates, institution share, vacancies by VA decile and top 5% (2007–2025), mean VA by institution, names of top-decile programs | `output/figures/ProgramVA/`, `output/tables/pva_inst_share.csv`, `pva_vacancies_by_decile*.csv`, `pva_mean_va_by_institution.csv`, `pva_top_programs*.tex` |
 | `04b_split_sample.do` | Split-sample reliability (odd/even cohorts), stability (2007–11 vs 2012–16), sensitivity to controls. Slow (~40 min) | `pva_split_*.pdf`, `pva_sensitivity_controls.pdf`, `output/tables/pva_split_sample.csv` |
+| `05_forecast_bias.do` | Forecast-bias test against the RD at each oversubscribed cutoff (AHPW 2017): 2SLS of Y on VA of the assigned program, instruments Z × 10 bins of the predicted jump v̂_j − v̂_k, Hansen J, omnibus test, placebo on predicted outcome. Cross-fit VA (random student halves) and full-sample VA, EB and unshrunk; also cutoffs with large j and k. Per-cutoff local-linear RDs. ~1.5 h | `output/tables/pva_forecast_bias.csv/.tex`, `pva_forecast_bias_cutoffs.csv`, `pva_forecast_bias_*.pdf` |
 
 `run_all.sh [first_script]` runs the chain from a given script and stops on the first `r()` error in a log.
 

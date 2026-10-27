@@ -313,14 +313,17 @@ Balance on covariate-predicted outcome & Selection on observables within portfol
 Sensitivity to controls & Do extra controls move VA? & Done \\
 Split-sample reliability (odd vs.\ even cohorts) & Is the signal variance real? & Done \\
 Stability (2007--11 vs.\ 2012--16) & Drift of VA over time & Done \\
-\textbf{Forecast-bias test with RD offers} & Bias from unobservables: does $\Delta\hat v$ predict the RD effect one-for-one? & Next step \\
-Over-identification across cutoffs & Same, many quasi-experiments & Next step \\
+\textbf{Forecast-bias test with RD offers} & Bias from unobservables: does $\Delta\hat v$ predict the RD effect one-for-one? & Pending \\
+Over-identification across cutoffs & Same, many quasi-experiments & Pending \\
 Homogeneity across portfolios (MH) & Pooling assumption & Proposed \\
 \bottomrule
 \end{tabular}
 
 \vspace{0.2cm}
 The RD test is the natural bridge to the rest of the paper: under unbiased VA, the RD at $j$'s cutoff should equal $\hat v_j-\sum_k w_{jk}\hat v_k$ over the fallback programs.
+
+\vspace{0.1cm}
+\textbf{Open point} (Angrist et al.\ 2015): a test with one degree of freedom ``might accept the null if $\rho_z=\psi_z$ on average across lotteries, even while deviations from equality might be large and statistically significant for specific lotteries''. What we need is heterogeneity at the program level, so the test must be built cutoff by cutoff.
 \end{frame}
 
 %--------------------------------------------------------
@@ -479,6 +482,23 @@ Caveat: VA is on the Mi Futuro income rank of the program of graduation, so prog
 \end{frame}
 
 %--------------------------------------------------------
+\begin{frame}{Vacancies by VA decile: levels}
+\begin{columns}
+\column{0.5\textwidth}
+\includegraphics[width=\linewidth]{../../output/figures/ProgramVA/pva_vacancies_decile_levels_box.pdf}
+\column{0.5\textwidth}
+\includegraphics[width=\linewidth]{../../output/figures/ProgramVA/pva_vacancies_decile_levels_bar.pdf}
+\end{columns}
+\vspace{0.1cm}
+\footnotesize
+\begin{itemize}
+    \item \textbf{Left:} regular vacancies per program in 2012 (log scale). High-VA programs are larger: median 70 seats in the top decile against 45 in deciles 1--2. The distributions overlap widely.
+    \item \textbf{Right:} mean vacancies per program, 2012 and 2025, on the balanced panel (programs with vacancies in both years). The top decile starts larger (90 vs.\ 52--63 in deciles 1--5) and adds the most seats: $+22$ per program, against $0$ to $+8$ in deciles 1--7.
+    \item Same classification as the previous slide: 1,318 programs with $\geq$20 students; deciles of programs by EB VA.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
 \begin{frame}{Step 0: take-aways}
 \small
 \begin{enumerate}
@@ -487,7 +507,7 @@ Caveat: VA is on the Mi Futuro income rank of the program of graduation, so prog
     \item Within portfolios, observable selection disappears (balance), and controls no longer matter.
     \item VA varies substantially across programs (signal SD 8.9 rank points), much less than raw outcomes, and is only weakly related to selectivity. Field accounts for a third of it, the institution for a quarter.
     \item After 2012, the top VA decile expanded its vacancies clearly more than the rest (+17 log points by 2025, against $-7$ to $+9$ for deciles 1--9).
-    \item \textbf{Next:} validate VA against the RD at each cutoff (forecast-bias test). Then use the VA classification to study what happens to marginal and inframarginal students when high-return programs expand.
+    \item \textbf{Next:} validate VA against the RD cutoff by cutoff (forecast-bias test with program-level heterogeneity). Then use the VA classification to study what happens to marginal and inframarginal students when high-return programs expand.
 \end{enumerate}
 \end{frame}
 
