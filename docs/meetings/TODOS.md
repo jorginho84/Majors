@@ -1,11 +1,17 @@
 # Project to-dos
 
 ## Open
-- [ ] Send the labor market data request to the Ministry of Labor — created 2026-10-15 · status: In progress · missing: letter drafted, not yet sent
+- [ ] Send the labor market data request to the Ministry of Labor; review and submit the application — created 2026-10-15 · status: In progress · missing: draft proposal in `docs/mintrab/` (untracked), not yet sent; aim at 3+ years of coverage
 - [ ] Share the GitHub repo link with the full team — created 2026-10-15 · status: Not started
 - [ ] Add a geographic-distance kernel to the Design III exposure measure — created 2026-10-15 · status: Not started
 - [ ] Revisit the RDD framing to align with the high-return program narrative — created 2026-10-15 · status: Not started
 - [ ] Review a Chris Walters-style reallocation paper — created 2026-10-15 · status: Not started
+- [ ] Run placebo checks on the characteristics of inframarginal students (PSU and SES vs. Z; completion on leads/lags t−3 to t+3) — created 2026-10-27 · issues #8, #10 · status: In progress · done: PSU/NEM balance (2026-10-20) and Z_t+1 lead placebo (2026-10-26, `38_design5_balance.do`) · missing: SES check, leads/lags t−3 to t+3
+- [ ] Try alternative ROL groupings for Design V: OECD field (broad and sub-areas), university × field, field × selectivity bracket — created 2026-10-27 · issue #8 · status: Not started
+- [ ] Re-run the value-added figures with institution-only fixed effects — created 2026-10-27 · issue #9 · status: Not started
+- [ ] Add a motivating figure: program returns vs. average change in program size over 10–15 years — created 2026-10-27 · issue #9 · status: Not started
+- [ ] Validate program VA within the RD bandwidth against RD jumps (tax-authority earnings as a possible source) — created 2026-10-27 · issue #9 · status: Not started
+- [ ] Look up and compare the Mata–Viera value-added paper — created 2026-10-27 · status: Not started
 
 ## Done
 - [x] Try a log-log specification for Design I (done as first differences of logs) — created 2026-10-15 · done 2026-10-19 · status: Done; slide "Design I: first differences of logs" (`35_design1_dlogs.do`). The levels with program FE and log-log version (issue #7) was dropped and its script and table removed.
