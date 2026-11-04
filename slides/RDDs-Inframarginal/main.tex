@@ -178,20 +178,38 @@ We adapt Mountjoy \& Hickman (2021, ``The Returns to College(s)'') to the Chilea
 \small
 \textbf{Mountjoy \& Hickman (Texas).} Compare students who were \emph{admitted to the same set of colleges} but enrolled in different ones.
 
-\vspace{0.2cm}
+\vspace{0.3cm}
 \textbf{Adaptation to DEMRE's deferred acceptance.} A student is assigned to the top-ranked program in her ROL where she is \emph{feasible} (score $\geq$ cutoff).
 \begin{itemize}
-    \setlength{\itemsep}{4pt}
+    \setlength{\itemsep}{6pt}
     \item \textbf{Portfolio} $A_i$ = cohort $\times$ the \emph{unordered} set of feasible ROL programs.
     \item \textbf{Treatment variation} = the \emph{order} of the ROL within that set. Two students feasible at $\{j,k\}$ end up in $j$ or $k$ only because of how they ranked them.
     \item Crossing a cutoff changes $A_i$, so the RD variation is absorbed: VA uses variation that is disjoint from the RD.
 \end{itemize}
+
+\vspace{0.3cm}
+\textbf{Key assumption:} within a portfolio, the ROL order is unrelated to potential outcomes.
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Value-added model: equation and notation}
+\small
 \[
 Y_i=\sum_j v_j\,\mathbf{1}[S_i=j]+\phi_{A_i}+g(\text{PSU},\text{NEM},\text{rank})+X_i'\beta+\varepsilon_i
 \]
-\scriptsize
-\textbf{Key assumption:} within a portfolio, the ROL order is unrelated to potential outcomes. $S_i$: program assigned by DEMRE.
-$v_j$ is relative to the enrollment-weighted mean. Robust SE; signal SD $=\sqrt{\mathrm{Var}(\hat v)-\overline{SE^2}}$; Empirical Bayes shrinkage.
+\vspace{-0.1cm}
+\begin{itemize}
+    \setlength{\itemsep}{3pt}
+    \item $i$: student; $j$: program.
+    \item $Y_i$: outcome, the income rank of $i$'s title (0 if no title).
+    \item $S_i$: program assigned by DEMRE. $\mathbf{1}[S_i=j]=1$ only for the assigned program.
+    \item $v_j$: \textbf{value-added of program $j$}, the parameter of interest. Gain in $Y$ from being assigned to $j$ instead of the average program, for students with the same portfolio and controls. Normalized to an enrollment-weighted mean of 0.
+    \item $\phi_{A_i}$: portfolio fixed effect, common to students with the same cohort and feasible set.
+    \item $g(\cdot)$: cubics in PSU (L--M), NEM and high-school ranking score. $X_i$: sex and school dependency. $\varepsilon_i$: error.
+\end{itemize}
+\vspace{0.1cm}
+\footnotesize
+\textbf{Inference.} Robust SE; signal SD $=\sqrt{\mathrm{Var}(\hat v)-\overline{SE^2}}$; Empirical Bayes shrinkage.
 \end{frame}
 
 %--------------------------------------------------------
