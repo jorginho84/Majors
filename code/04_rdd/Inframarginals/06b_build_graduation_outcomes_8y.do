@@ -206,7 +206,8 @@ else {
 
         foreach f of local files {
             local fl = lower("`f'")
-            if regexm("`fl'", "\.csv$") {
+            * El año debe ir aislado: "20240628_..._2007" no es el de 2024
+            if regexm("`fl'", "\.csv$") & regexm("_`fl'_", "[^0-9]`y'[^0-9]") {
                 local file "`f'"
                 continue, break
             }

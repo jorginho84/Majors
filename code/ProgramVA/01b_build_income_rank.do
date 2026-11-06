@@ -90,12 +90,17 @@ tempfile xw
 local first 1
 forvalues y = 2007/2024 {
     local files : dir "$tit_raw" files "*`y'*.csv"
-    local file : word 1 of `files'
+    * El año debe ir aislado: "20240628_..._2007" no es el de 2024
+    local file ""
+    foreach f of local files {
+        if regexm("_`=lower("`f'")'_", "[^0-9]`y'[^0-9]") & "`file'" == "" local file "`f'"
+    }
     if "`file'" == "" continue
     import delimited "$tit_raw/`file'", clear varnames(1) encoding(UTF-8) ///
         bindquote(strict) stringcols(_all)
     rename *, lower
     capture rename area_carrera_generica area_generica
+    capture rename area_carrera_generica_n area_generica   // extracción 20240628
     keep codigo_unico area_generica
     contract codigo_unico area_generica, freq(nf)
     if !`first' append using `xw'
