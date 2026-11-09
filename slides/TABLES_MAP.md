@@ -17,27 +17,27 @@ the four orphan files in `output/tables/` (committed in a91f9e5 with no generati
 
 | Deck line | Frame | Producer | Status |
 |---|---|---|---|
-| 61 | Data and sample | mixed: `02_build/03_build_outcomes.do:56-58`, `04_rdd/01_rdd_enrollment.do:39-61`, orphan `output/tables/sample_overview_bw25.tex`, `descriptive_outcomes_bw25.tex` | partial; 786,071 students and 11,789 program-years have **no producer** |
-| 347 | Target enrollment by field | `04_rdd/03_rdd_heterogeneity_field.do:56-150` | writes .tex |
-| 386 | Univ & HE enrollment by field | same | Est/SE/N ok; **Baseline column: no producer** |
-| 447 | Target graduation by field | `04_rdd/07_rdd_graduation_by_field.do:75-160` | writes .tex |
-| 490 | Univ & HE graduation by field | same | **Baseline column: no producer** |
+| 61 | Data and sample | `04_rdd/23_data_sample_table.do` (2026-11-09) | `output/tables/data_sample_overview.tex` (`\input`) |
+| 347 | Target enrollment by field | estimates `04_rdd/03_rdd_heterogeneity_field.do`; table `04_rdd/22_rdd_by_field_tables.do` (2026-11-09) | `output/tables/rdd_field_enroll_target.tex` (`\input`) |
+| 386 | Univ & HE enrollment by field | same; baseline = mean below the cutoff within the bandwidth, computed in 22 | `output/tables/rdd_field_enroll_unihe.tex` (`\input`) |
+| 447 | Target graduation by field | estimates `04_rdd/07_rdd_graduation_by_field.do`; table 22 | `output/tables/rdd_field_grad_target.tex` (`\input`) |
+| 490 | Univ & HE graduation by field | same; baseline computed in 22 | `output/tables/rdd_field_grad_unihe.tex` (`\input`) |
+| appendix (`nonharmonizedfields`) | RD observations without a harmonized field | `04_rdd/23_data_sample_table.do` | `output/tables/data_nonharmonized_fields.tex` (`\input`) |
 | 621 | Delta selectivity definitions | static text | nothing to generate |
 | Design I (2026-10-06) | Univ. selectivity, first cohort | — | **no producer** (script 23 reads a .dta nothing builds; script 26 could do it with the `_first_enroll` panel) |
 | Design I (2026-10-06) | Univ. selectivity, minimum cohort | `Inframarginals/26_...:183-422` | csv/dta |
-| 1922, 1971 | SUA samples and exposure | `Sua/03c_...:228-270, 486, 662` | log only |
-| 2156 | SUA levels first stage | `Sua/04_sua_levels_first_stages.do:109-722` | log only |
+| `SUA exposure: samples and descriptive statistics` | SUA samples and exposure (panels A, B) | `Sua/03c_sua_exposure_enrollment_descriptives.do` (section 13, 2026-11-09) | `output/tables/sua_samples_panel{A,B}.tex` (`\input`) |
+| `sua-first-stage` | SUA levels first stage | `Sua/04g_sua_first_stages_restricted_samples.do` (full sample, 2026-11-09; same estimates as `04_sua_levels_first_stages.do`) | `output/tables/sua_fs_lvl_full.tex` (`\input`) |
 | appendix (`sua-fs-{lvl,log}-{entrant,positive}`) | SUA levels and log first stages, entrant regions only / positive exposure only | `Sua/04g_sua_first_stages_restricted_samples.do` | `output/tables/sua_fs_{lvl,log}_{entrant,positive}.tex` (`\input`) |
 | Design V (2026-10-20, issue #8) | ROL sparsity; compact results (no ROL, top 1 + univ., program set, exact); balance; distributed lag; trends | `Inframarginals/36_design5_diagnostic.do` (`im_d5_rol_sparsity.tex`), `37_design5_main.do` (`im_d5_main.tex`, full ladder `im_d5_{program,uni,he}.tex`), `37b_design5_logs.do` (`im_d5_logs.tex`, logs version), `40_design5_placebo.do` (`im_d5_placebo_balance.tex`, replaces 38's `im_d5_balance.tex`; distributed-lag figures `im_d5_leadlag_{fs,grad}.pdf`; `im_d5_placebo_tplus1.tex` and `im_d5_placebo_leadlag.tex` are written but not in the deck), `39_design5_trends.do` (`im_d5_trends.tex`, trends only). Appendix: `42_design5_balance_rolgroups.do` (`im_d5_balance_rolgroups.tex`), `41_design5_rol_groupings.do` (`im_d5_rolgroups.tex`; with argument `trend`, run by `41b_design5_rol_groupings_trends.do`: `im_d5_rolgroups_trends.tex`) | writes .tex (`\input`) |
 | appendix (`sua-es-{lvl,log}-{entrant,positive}`) | SUA levels and log event studies, same samples | `Sua/05_...do entrant\|positive`, `Sua/05a_...do entrant\|positive` | `output/sua_{event_study_exposure_comparison,log_event_study}_{baseline,regionyear}_{entrant,positive}.png`; pretrend p-values typed in the frame notes |
 | `sua-kd-first-stage`, `sua-kd-log-first-stage` | SUA first stages with kernel-weighted denominator (levels, logs) | `Sua/Sua kernel weights/04i_sua_kernelden_first_stage_tables.do` (needs `03d`) | `output/tables/sua_fs_{lvl,log}_kd.tex` (`\input`) |
 | appendix (`sua-kd-event-studies`, `sua-kd-log-event-studies`) | KD event studies | `Sua/05_...do kd`, `Sua/05a_...do kd` | `output/sua_{event_study_exposure_comparison,log_event_study}_{baseline,regionyear}_kd.png`; pretrend p-values typed in the frame notes |
-| 2393 | SUA log first stage | `Sua/04b_sua_log_first_stages.do` | log only |
-| 2770 | SUA similarity first stage | logs: `Sua/04e_...:495-675` | **levels columns: no producer** |
-| 2883 | SUA selectivity heterogeneity | `Sua/04f_...:310-732` | log only |
-| 3169, 3208 | Cosine samples and exposure | `Sua/Cosine/Cosine_Exposure_Descriptive_Statistics.do` | log only; full-sample column needs a second run (`minimum_enrollment_2011 0`) |
-| 3374 | Cosine first stage | `Sua/Cosine/03_cosine_estimate_first_stages.do:517-700` | log only |
-| 3598 | Non-harmonized fields | `02_build/05_build_field.do:403-418` | log only; Years column and 0.095% done by hand |
+| `sua-log-first-stage` | SUA log first stage | `Sua/04g_...` (full sample; same as `04b_sua_log_first_stages.do`) | `output/tables/sua_fs_log_full.tex` (`\input`) |
+| `sua-similarity-first-stage` (appendix) | SUA similarity first stage, levels and logs | `Sua/04e_sua_similarity_log_test.do` (levels added in section 12b, 2026-11-09) | `output/tables/sua_similarity_fs.tex` (`\input`) |
+| `sua-selectivity-heterogeneity`, `sua-q-heterogeneity` | SUA exposure and Q heterogeneity by selectivity | `Sua/04f_sua_Exposure_Q_Selectivity_FirstStages.do` (section 15, 2026-11-09) | `output/tables/sua_selectivity_{exposure,q}.tex` (`\input`) |
+| `Cosine exposure: samples and descriptive statistics` | Cosine samples and exposure (panels A, B), full and N_2011>=10 | `Sua/Cosine/03_cosine_estimate_first_stages.do` (section 6b, 2026-11-09) | `output/tables/cosine_samples_panel{A,B}.tex` (`\input`) |
+| `cosine-first-stage` | Cosine first stage | `Sua/Cosine/03_cosine_estimate_first_stages.do` (section 16) | `output/tables/cosine_fs.tex` (`\input`) |
 
 | Design II frames | Own sudden expansions: thresholds, TWFE/CS, composition, threshold robustness | `Own_expansion/02_own_expansion.do` (needs `01`, `Vacancy_shocks/03`) | `output/own_expansion/tables/oe_{thresholds,twfe_enroll,twfe_comp,threshold_sens}.tex` (`\input`); figures `oe_dV_hist_sel`, `oe_es_*_sel` |
 | Design IV, selective vs selective | Exposure moments, levels/log first stages, composition, event study | `Own_expansion/03_selective_competitors.do` (needs `02`) | `output/own_expansion/tables/oe_sel_{exposure_moments,fs_N_first,fs_lnN,composition}.tex` (`\input`); figure `oe_sel_es_N_first` |

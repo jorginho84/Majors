@@ -61,6 +61,8 @@ INPUT
 OUTPUT
 
     $output/sua_selectivity_first_stages.csv
+    $output/tables/sua_selectivity_exposure.tex  (deck, exposure, region-year)
+    $output/tables/sua_selectivity_q.tex         (deck appendix, Q, within-market)
 *******************************************************************************/
 
 clear all
@@ -852,3 +854,75 @@ list ///
         (family == "Q" & spec == "Within-mkt"), ///
     noobs clean
 
+
+
+/*******************************************************************************
+15. LATEX TABLES FOR THE DECK
+    exposure (region-year spec)  -> $output/tables/sua_selectivity_exposure.tex
+    Q (within-market spec)       -> $output/tables/sua_selectivity_q.tex
+*******************************************************************************/
+
+capture program drop stars
+program define stars
+    args p name
+    local s ""
+    if `p' < 0.10 local s "^{*}"
+    if `p' < 0.05 local s "^{**}"
+    if `p' < 0.01 local s "^{***}"
+    c_local `name' "`s'"
+end
+
+foreach fam in Exposure Q {
+
+    local spec  = cond("`fam'" == "Exposure", "Region-year", "Within-mkt")
+    local file  = cond("`fam'" == "Exposure", "sua_selectivity_exposure", "sua_selectivity_q")
+    local title = cond("`fam'" == "Exposure", "SUA exposure", "Conditional similarity \(Q\)")
+
+    use `results', clear
+    keep if family == "`fam'" & spec == "`spec'"
+    assert _N == 6
+    forvalues r = 1/6 {
+        local m = cond(measure[`r'] == "Triangular", "tri", "gau")
+        local g = sel_group[`r']
+        foreach v in beta se pvalue fst_F obs programs markets {
+            local `v'_`g'_`m' = `v'[`r']
+        }
+    }
+
+    file open T using "$output/tables/`file'.tex", write replace
+    file write T "\begin{tabular}{lcccccc}" _n "\toprule" _n
+    file write T "& \multicolumn{2}{c}{PSU \(<550\)} & \multicolumn{2}{c}{PSU \(550\)--\(649\)} & \multicolumn{2}{c}{PSU \(\geq650\)} \\" _n
+    file write T "\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}" _n
+    file write T "& Tri. & Gau. & Tri. & Gau. & Tri. & Gau. \\" _n "\midrule" _n
+    file write T "\multicolumn{7}{l}{\textit{`title'}} \\" _n "\addlinespace[2pt]" _n "Coefficient"
+    forvalues g = 1/3 {
+        foreach m in tri gau {
+            stars `pvalue_`g'_`m'' st
+            file write T " & \(" %5.2f (`beta_`g'_`m'') "`st'\)"
+        }
+    }
+    file write T " \\" _n
+    forvalues g = 1/3 {
+        foreach m in tri gau {
+            file write T " & \((" %4.2f (`se_`g'_`m'') ")\)"
+        }
+    }
+    file write T " \\" _n "\(F\)-statistic"
+    forvalues g = 1/3 {
+        foreach m in tri gau {
+            file write T " & " %5.2f (`fst_F_`g'_`m'')
+        }
+    }
+    file write T " \\" _n
+    foreach v in obs programs markets {
+        local vl = cond("`v'" == "obs", "Observations", cond("`v'" == "programs", "Programs", "Clusters"))
+        file write T "`vl'"
+        forvalues g = 1/3 {
+            file write T " & \multicolumn{2}{c}{" %9.0fc (``v'_`g'_tri') "}"
+        }
+        file write T " \\" _n
+    }
+    file write T "\bottomrule" _n "\end{tabular}" _n
+    file close T
+    display "Table written: $output/tables/`file'.tex"
+}

@@ -34,11 +34,13 @@ MODELS
 
 Standard errors are clustered by the pre-treatment market.
 
-The full-sample estimates are also computed and listed in the log, as a check
-that they reproduce the main first-stage tables of the deck.
+The full-sample estimates are also computed; they are the deck's main
+first-stage tables (levels and logs), written as sua_fs_{lvl,log}_full.tex.
 
 OUTPUTS
 
+    $output/tables/sua_fs_lvl_full.tex      (main, levels)
+    $output/tables/sua_fs_log_full.tex      (main, logs)
     $output/tables/sua_fs_lvl_entrant.tex
     $output/tables/sua_fs_lvl_positive.tex
     $output/tables/sua_fs_log_entrant.tex
@@ -256,7 +258,7 @@ end
 
 foreach model of local models {
 
-    foreach sample in entrant positive {
+    foreach sample in full entrant positive {
 
         use `all_results', clear
         keep if model == "`model'" & sample == "`sample'"
@@ -304,18 +306,23 @@ foreach model of local models {
                     file write T " & " %5.2f (`F_`w'_`fe'_`f'')
                 }
             }
-            file write T " \\" _n "`count_label'"
-            foreach fe of local fe_codes {
-                foreach f of local field_codes {
-                    file write T " & " %9.0fc (``count_var'_`w'_`fe'_`f'')
-                }
-            }
             file write T " \\" _n
+            * full sample: the deck's main tables, no per-measure count row
+            if "`sample'" != "full" {
+                file write T "`count_label'"
+                foreach fe of local fe_codes {
+                    foreach f of local field_codes {
+                        file write T " & " %9.0fc (``count_var'_`w'_`fe'_`f'')
+                    }
+                }
+                file write T " \\" _n
+            }
             if "`w'" != "gau" file write T "\addlinespace" _n
         }
 
         file write T "\midrule" _n
-        foreach s in N programs markets regions {
+        local footer = cond("`sample'" == "full", "N programs markets", "N programs markets regions")
+        foreach s of local footer {
             local sl = cond("`s'" == "N", "Observations", ///
                 cond("`s'" == "programs", "Programs", ///
                 cond("`s'" == "markets", "Markets", "Regions")))

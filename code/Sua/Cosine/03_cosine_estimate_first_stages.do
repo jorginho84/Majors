@@ -26,6 +26,7 @@ The minimum-enrollment restriction changes only the regression sample.
 Exposure measures and their original scaling are not reconstructed.
 
 Run the revised 05d construction file before this file.
+Writes the deck table $output/tables/cosine_fs.tex (section 16).
 *******************************************************************************/
 
 clear all
@@ -329,6 +330,101 @@ list ///
         tag_program == 1 & ///
         sample_min10 == 0, ///
     noobs clean
+
+
+/*******************************************************************************
+6b. DECK TABLE "Cosine exposure: samples and descriptive statistics"
+    Panel A: analytical samples; Panel B: raw exposure moments across
+    programs (unweighted, zeros included), full and N_2011 >= 10 samples.
+    Mean PSU 2011 is rebuilt from the 2011 PSU vectors (bin midpoints,
+    weighted by students), as Cosine_Exposure_Descriptive_Statistics.do.
+    -> $output/tables/cosine_samples_panelA.tex, cosine_samples_panelB.tex
+*******************************************************************************/
+
+preserve
+    use codigo_unico psu_bin_lower psu_bin_upper N_cell ///
+        using "$processed/program_geo_psu_vectors_2011.dta", clear
+    drop if missing(codigo_unico, psu_bin_lower, psu_bin_upper, N_cell)
+    gen double wpsu = (psu_bin_lower + psu_bin_upper) / 2 * N_cell
+    collapse (sum) n_psu = N_cell wpsu, by(codigo_unico)
+    gen double mean_psu_2011 = wpsu / n_psu
+    keep codigo_unico mean_psu_2011
+    tempfile psu2011
+    save `psu2011'
+restore
+
+preserve
+    gen double n_pre = N_firstyear if inrange(ao_proceso, 2007, 2011)
+    bysort codigo_unico: egen double mean_pre = mean(n_pre)
+    merge m:1 codigo_unico using `psu2011', keep(master match) nogen
+    foreach s in full min10 {
+        local cnd = cond("`s'" == "full", "1", "sample_min10 == 1")
+        quietly count if `cnd'
+        local A_obs_`s' = r(N)
+        quietly count if tag_program == 1 & `cnd'
+        local A_prog_`s' = r(N)
+        quietly distinct cod_inst if `cnd'
+        local A_univ_`s' = r(ndistinct)
+        quietly summarize enroll_2011 if tag_program == 1 & `cnd'
+        local A_tot_`s' = r(sum)
+        local A_m11_`s' = r(mean)
+        quietly summarize mean_pre if tag_program == 1 & `cnd'
+        local A_mpre_`s' = r(mean)
+        quietly summarize mean_psu_2011 if tag_program == 1 & `cnd'
+        local A_psu_`s' = r(mean)
+        foreach x in psu psu_reg psu_addreg psu_regfld psu_addregfld {
+            quietly summarize exp_`x' if tag_program == 1 & `cnd'
+            local B_m_`x'_`s'  = r(mean)
+            local B_sd_`x'_`s' = r(sd)
+            local nn = r(N)
+            quietly count if exp_`x' == 0 & tag_program == 1 & `cnd'
+            local B_z_`x'_`s' = 100 * r(N) / `nn'
+        }
+    }
+restore
+
+file open T using "$output/tables/cosine_samples_panelA.tex", write replace
+file write T "\begin{tabular}{lrr}" _n "\toprule" _n
+file write T "Variable & Full sample & \(N^{\mathrm{first}}_{p,2011}\geq10\) \\" _n "\midrule" _n
+local lab_prog "Programs"
+local lab_obs  "Program-year observations"
+local lab_univ "Incumbent universities"
+local lab_tot  "Total first-year enrollment, 2011"
+local lab_m11  "Mean enrollment per program, 2011"
+local lab_mpre "Mean annual enrollment, 2007--2011"
+local lab_psu  "Mean PSU score, 2011"
+foreach v in prog obs univ tot m11 mpre psu {
+    file write T "`lab_`v''"
+    foreach s in full min10 {
+        if inlist("`v'", "m11", "mpre", "psu") file write T " & " %5.1f (`A_`v'_`s'')
+        else file write T " & " %9.0fc (`A_`v'_`s'')
+    }
+    file write T " \\" _n
+}
+file write T "\bottomrule" _n "\end{tabular}" _n
+file close T
+
+local lab_psu           "PSU bins"
+local lab_psu_reg       "PSU bins \(\times\) campus region"
+local lab_psu_addreg    "PSU bins \(+\) campus region"
+local lab_psu_regfld    "PSU bins \(\times\) campus region \(\times\) Broad field"
+local lab_psu_addregfld "PSU bins \(+\) campus region \(+\) Broad field"
+file open T using "$output/tables/cosine_samples_panelB.tex", write replace
+file write T "\begin{tabular}{lrrrrrr}" _n "\toprule" _n
+file write T "& \multicolumn{3}{c}{Full sample} & \multicolumn{3}{c}{\(N^{\mathrm{first}}_{p,2011}\geq10\)} \\" _n
+file write T "\cmidrule(lr){2-4}\cmidrule(lr){5-7}" _n
+file write T "Exposure measure & Mean & Std. dev. & Share zero & Mean & Std. dev. & Share zero \\" _n "\midrule" _n
+foreach x in psu psu_reg psu_addreg psu_regfld psu_addregfld {
+    if "`x'" == "psu_regfld" file write T "\addlinespace[0.04cm]" _n
+    file write T "`lab_`x''"
+    foreach s in full min10 {
+        file write T " & " %6.4f (`B_m_`x'_`s'') " & " %6.4f (`B_sd_`x'_`s'') " & " %4.1f (`B_z_`x'_`s'') "\%"
+    }
+    file write T " \\" _n
+}
+file write T "\bottomrule" _n "\end{tabular}" _n
+file close T
+display "Tables written: cosine_samples_panelA.tex, cosine_samples_panelB.tex"
 
 
 /*******************************************************************************
@@ -926,3 +1022,88 @@ display ""
 display "============================================================"
 display " COSINE FIRST-STAGE ESTIMATIONS COMPLETED"
 display "============================================================"
+
+/*******************************************************************************
+16. LATEX TABLE FOR THE DECK ("Cosine exposure: first-stage results")
+    -> $output/tables/cosine_fs.tex
+*******************************************************************************/
+
+use `results', clear
+forvalues r = 1/`=_N' {
+    local k "`=sample[`r']'_`=spec[`r']'_`=exposure[`r']'"
+    foreach v in beta se wald_F p N programs {
+        local `v'_`k' = `v'[`r']
+    }
+}
+
+capture program drop stars
+program define stars
+    args p name
+    local s ""
+    if `p' < 0.10 local s "^{*}"
+    if `p' < 0.05 local s "^{**}"
+    if `p' < 0.01 local s "^{***}"
+    c_local `name' "`s'"
+end
+
+local lab_psu          "PSU bins"
+local lab_psureg       "PSU bins \(\times\) region"
+local lab_psuregfld    "PSU bins \(\times\) region \(\times\) field"
+local lab_psuaddreg    "PSU bins \(+\) region"
+local lab_psuaddregfld "PSU bins \(+\) region \(+\) field"
+
+file open T using "$output/tables/cosine_fs.tex", write replace
+file write T "\begin{tabular}{lcccccc}" _n "\toprule" _n
+file write T "& \multicolumn{3}{c}{Full sample} & \multicolumn{3}{c}{\(N^{\mathrm{first}}_{p,2011}\geq10\)} \\" _n
+file write T "\cmidrule(lr){2-4}\cmidrule(lr){5-7}" _n
+* line break inside \shortstack built from char(92): Stata collapses a
+* literal double backslash followed by another backslash
+file write T "Exposure measure"
+local c 0
+foreach s in full min10 {
+    foreach h in "\(+\) year" "\(+\) field\(\times\)year" "\(+\) region\(\times\)year" {
+        local ++c
+        local cell = "(`c')" + char(92) + char(92) + "`h'"
+        file write T " & \shortstack{`cell'}"
+    }
+}
+file write T " \\" _n "\midrule" _n
+local i 0
+foreach x in psu psureg psuregfld psuaddreg psuaddregfld {
+    local ++i
+    if `i' > 1 file write T "\addlinespace[0.06cm]" _n
+    file write T "`lab_`x''"
+    foreach s in full min10 {
+        foreach f in py fy ry {
+            stars `p_`s'_`f'_`x'' st
+            file write T " & \(" %6.3f (`beta_`s'_`f'_`x'') "`st'\)"
+        }
+    }
+    file write T " \\" _n
+    foreach s in full min10 {
+        foreach f in py fy ry {
+            file write T " & \((" %5.3f (`se_`s'_`f'_`x'') ")\)"
+        }
+    }
+    file write T " \\" _n "\quad Wald \(F\)"
+    foreach s in full min10 {
+        foreach f in py fy ry {
+            file write T " & " %5.2f (`wald_F_`s'_`f'_`x'')
+        }
+    }
+    file write T " \\" _n
+}
+file write T "\midrule" _n
+foreach v in N programs {
+    local vl = cond("`v'" == "N", "Observations", "Programs")
+    file write T "`vl'"
+    foreach s in full min10 {
+        foreach f in py fy ry {
+            file write T " & " %9.0fc (``v'_`s'_`f'_psu')
+        }
+    }
+    file write T " \\" _n
+}
+file write T "\bottomrule" _n "\end{tabular}" _n
+file close T
+display "Table written: $output/tables/cosine_fs.tex"

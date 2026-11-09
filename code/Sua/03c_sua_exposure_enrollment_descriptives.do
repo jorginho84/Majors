@@ -32,6 +32,9 @@ OUTPUTS
     sua_exposure_distributions_generic.png
     sua_firstyear_enrollment_distributions.png
 
+    $output/tables/sua_samples_panelA.tex (deck: analytical samples)
+    $output/tables/sua_samples_panelB.tex (deck: exposure moments)
+
 No permanent datasets or spreadsheets are created.
 *******************************************************************************/
 
@@ -1459,3 +1462,64 @@ display ""
 display "============================================================"
 display " SUA DESCRIPTIVE ANALYSIS COMPLETED"
 display "============================================================"
+
+/*******************************************************************************
+13. LATEX TABLES FOR THE DECK ("SUA exposure: samples and descriptive
+    statistics")
+        Panel A -> $output/tables/sua_samples_panelA.tex
+        Panel B -> $output/tables/sua_samples_panelB.tex (all programs,
+                   including zero exposure)
+*******************************************************************************/
+
+use `sample_results', clear
+local fields broad isced generic
+foreach f of local fields {
+    foreach v in observations programs universities markets mean_enrollment mean_psu {
+        quietly summarize `v' if field_definition == "`f'"
+        local `v'_`f' = r(mean)
+    }
+}
+
+file open T using "$output/tables/sua_samples_panelA.tex", write replace
+file write T "\begin{tabular}{lrrr}" _n "\toprule" _n "Variable & Broad & ISCED-97 & Generic \\" _n "\midrule" _n
+local lab_programs        "Programs"
+local lab_observations    "Program-year observations"
+local lab_universities    "Incumbent universities"
+local lab_markets         "Pre-treatment markets"
+local lab_mean_enrollment "Mean annual enrollment, 2009--2011"
+local lab_mean_psu        "Mean PSU score, 2009--2011"
+foreach v in programs observations universities markets mean_enrollment mean_psu {
+    file write T "`lab_`v''"
+    foreach f of local fields {
+        if inlist("`v'", "mean_enrollment", "mean_psu") file write T " & " %5.1f (``v'_`f'')
+        else file write T " & " %9.0fc (``v'_`f'')
+    }
+    file write T " \\" _n
+}
+file write T "\bottomrule" _n "\end{tabular}" _n
+file close T
+
+use `exposure_results', clear
+keep if sample == "all"
+file open T using "$output/tables/sua_samples_panelB.tex", write replace
+file write T "\begin{tabular}{llrrr}" _n "\toprule" _n "Field definition & Exposure measure & Mean & Std. dev. & Share zero \\" _n "\midrule" _n
+local i 0
+foreach f of local fields {
+    local ++i
+    local fl = cond("`f'" == "broad", "Broad", cond("`f'" == "isced", "ISCED-97", "Generic"))
+    if `i' > 1 file write T "\addlinespace[0.05cm]" _n
+    foreach m in total triangular gaussian {
+        local ml = cond("`m'" == "total", "Total", cond("`m'" == "triangular", "Triangular", "Gaussian"))
+        quietly summarize mean if field_definition == "`f'" & exposure_measure == "`m'"
+        local mu = r(mean)
+        quietly summarize sd if field_definition == "`f'" & exposure_measure == "`m'"
+        local sd = r(mean)
+        quietly summarize zero_share if field_definition == "`f'" & exposure_measure == "`m'"
+        local z = 100 * r(mean)
+        local lead = cond("`m'" == "total", "`fl'", "")
+        file write T "`lead' & `ml' & " %5.2f (`mu') " & " %5.2f (`sd') " & " %4.1f (`z') "\% \\" _n
+    }
+}
+file write T "\bottomrule" _n "\end{tabular}" _n
+file close T
+display "Tables written: sua_samples_panelA.tex, sua_samples_panelB.tex"

@@ -63,7 +63,8 @@ while retaining Q = 0 programs in exposed markets.
 
 Standard errors are clustered by the pre-treatment market.
 
-No external results file is created.
+Also estimates the levels version (12b) and writes the deck table
+$output/tables/sua_similarity_fs.tex (levels and logs).
 *******************************************************************************/
 
 clear all
@@ -755,6 +756,36 @@ postclose `results_handle'
 
 
 /*******************************************************************************
+12b. LEVELS FIRST STAGES (deck table, levels columns)
+     N_firstyear = beta [10 x Q_p^k x Post_t] + same FE, same sample and
+     clustering as the log model; one unit = a 0.10 increase in Q.
+*******************************************************************************/
+
+foreach measure in tri gau {
+    gen double lvl_q_`measure'_post = 10 * q_`measure' * post2012
+    reghdfe N_firstyear_incumbent lvl_q_`measure'_post, ///
+        absorb(program_id sim_field_year sim_region_year) ///
+        vce(cluster market_pre)
+    local L_b_`measure'  = _b[lvl_q_`measure'_post]
+    local L_se_`measure' = _se[lvl_q_`measure'_post]
+    quietly test lvl_q_`measure'_post
+    local L_F_`measure'  = r(F)
+    local L_p_`measure'  = r(p)
+    local L_N_`measure'  = e(N)
+    tempvar es tp tm
+    gen byte `es' = e(sample)
+    egen byte `tp' = tag(program_id) if `es'
+    egen byte `tm' = tag(market_pre) if `es'
+    quietly count if `tp' == 1
+    local L_P_`measure' = r(N)
+    quietly count if `tm' == 1
+    local L_M_`measure' = r(N)
+    drop `es' `tp' `tm'
+    display "LEVELS `measure': beta = " %9.3f `L_b_`measure'' " (" %6.3f `L_se_`measure'' ")  F = " %6.2f `L_F_`measure''
+}
+
+
+/*******************************************************************************
 13. DISPLAY RESULTS
 *******************************************************************************/
 
@@ -818,3 +849,70 @@ list ///
 
 display ""
 display "04h_sua_similarity_log_test.do completed successfully."
+
+/*******************************************************************************
+14. LATEX TABLE FOR THE DECK ("Similarity within exposed markets")
+    levels (12b) and logs (12), Triangular and Gaussian
+    -> $output/tables/sua_similarity_fs.tex
+*******************************************************************************/
+
+use `similarity_log_results', clear
+foreach r in 1 2 {
+    local m = cond(measure[`r'] == "Triangular", "tri", "gau")
+    local G_b_`m'  = beta[`r']
+    local G_se_`m' = se[`r']
+    local G_F_`m'  = F_stat[`r']
+    local G_p_`m'  = p_value[`r']
+    local G_N_`m'  = observations[`r']
+    local G_P_`m'  = programs[`r']
+    local G_M_`m'  = markets[`r']
+}
+
+capture program drop stars
+program define stars
+    args p name
+    local s ""
+    if `p' < 0.10 local s "^{*}"
+    if `p' < 0.05 local s "^{**}"
+    if `p' < 0.01 local s "^{***}"
+    c_local `name' "`s'"
+end
+
+file open T using "$output/tables/sua_similarity_fs.tex", write replace
+file write T "\begin{tabular}{lcccc}" _n "\toprule" _n
+file write T "& \multicolumn{2}{c}{Levels} & \multicolumn{2}{c}{Logs} \\" _n
+file write T "\cmidrule(lr){2-3}\cmidrule(lr){4-5}" _n
+file write T "& Triangular & Gaussian & Triangular & Gaussian \\" _n "\midrule" _n
+file write T "Similarity term \(\times\) Post"
+foreach k in L G {
+    foreach m in tri gau {
+        stars ``k'_p_`m'' st
+        file write T " & \(" %6.3f (``k'_b_`m'') "`st'\)"
+    }
+}
+file write T " \\" _n
+foreach k in L G {
+    foreach m in tri gau {
+        file write T " & \((" %5.3f (``k'_se_`m'') ")\)"
+    }
+}
+file write T " \\" _n "Wald \(F\)"
+foreach k in L G {
+    foreach m in tri gau {
+        file write T " & " %5.2f (``k'_F_`m'')
+    }
+}
+file write T " \\" _n
+foreach s in N P M {
+    local sl = cond("`s'" == "N", "Observations", cond("`s'" == "P", "Programs", "Markets"))
+    file write T "`sl'"
+    foreach k in L G {
+        foreach m in tri gau {
+            file write T " & " %9.0fc (``k'_`s'_`m'')
+        }
+    }
+    file write T " \\" _n
+}
+file write T "\bottomrule" _n "\end{tabular}" _n
+file close T
+display "Table written: $output/tables/sua_similarity_fs.tex"
