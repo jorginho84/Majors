@@ -1,19 +1,20 @@
 /**********************************************************************
 * 41_design5_rol_groupings.do
 *
-* Design V (issue #8): main 2SLS of 37 under the coarser ROL groupings
-* agreed on 2026-10-27 (exact ROLs are mostly unique).
+* Design V (issue #8): main 2SLS of 37 under every ROL definition of the
+* sparsity slide (36). The field-based groupings agreed on 2026-10-27
+* (02_build/16b: OECD fields, ISCED sub-areas, field x selectivity,
+* university x field) gave the same answer and are not reported.
 *
 *   n_pt = a Z_pt + x_i'a2 + psi_p + psi_t + psi_ROL(i) + nu
 *   Y_i  = b n_pt + x_i'b2 + phi_p + phi_t + phi_ROL(i) + e   (2SLS)
 *
-*   columns (ROL FE, coarse to fine):
-*     (1) none (controls only, = 37 col 2)   (2) top1 (= 37 col 3)
-*     (3) set of broad OECD fields           (4) set of ISCED-97 sub-areas
-*     (5) set of broad field x selectivity tercile
-*     (6) set of university x broad field
-*     (7) top1 + set of universities (main, = 37 col 6)
-*     (8) exact ordered list (= 37 col 9)
+*   columns (ROL FE, coarse to fine by number of groups):
+*     (1) none (controls only)        (2) top1, first preference
+*     (3) set of universities         (4) top2, first two preferences
+*     (5) top1 + set of universities (main)
+*     (6) top3, first three preferences
+*     (7) unordered set of programs   (8) exact ordered list
 *   unit, n, Z, Y, x, SE: as in 37 (one row per inframarginal student,
 *     most preferred inframarginal application in the first year;
 *     x = PSU, NEM, female, private-paid, municipal with missing dummies;
@@ -24,7 +25,6 @@
 *     specific linear trends, programs##c.ao_proceso, as in 39.
 *
 * Inputs:  $processed/design5_individual_2007_2016.dta (02_build/16)
-*          $processed/design5_rol_groupings_2007_2016.dta (02_build/16b)
 * Outputs: output/inframarginal/tables/im_d5_rolgroups.tex
 *          output/inframarginal/tables/im_d5_rolgroups.csv
 *          with "trend": im_d5_rolgroups_trends.tex / .csv
@@ -61,9 +61,6 @@ keep if _m_panel == 3 & ao_proceso <= `last_cohort'
 keep if pick_toppref & ao_proceso == first_year_i
 duplicates drop mrun, force
 isid mrun
-merge 1:1 mrun ao_proceso using "$processed/design5_rol_groupings_2007_2016.dta", ///
-    keep(master match) gen(_m_grp)
-tab _m_grp
 
 egen long pt       = group(program_id_rank_analysis ao_proceso)
 egen long programs = group(program_id_rank_analysis)
@@ -80,7 +77,7 @@ foreach v in psu_lm nem female priv mun {
     local ctrl "`ctrl' `v' m_`v'"
 }
 
-local rols "top1 oecd1 oecd2 fieldsel univfield top1u exact"
+local rols "top1 univ top2 top1u top3 set exact"
 local ncol = 1 + `: word count `rols''
 local fe1 "`progfe' ao_proceso"
 local lab1 "none"
@@ -162,10 +159,10 @@ restore
 
 local rname_none      "--"
 local rname_top1      "Top 1"
-local rname_oecd1     "Field set"
-local rname_oecd2     "Sub-area set"
-local rname_fieldsel  "Field\(\times\)sel.\ set"
-local rname_univfield "Univ.\(\times\)field set"
+local rname_univ      "Univ.\ set"
+local rname_top2      "Top 2"
+local rname_top3      "Top 3"
+local rname_set       "Program set"
 local rname_top1u     "Top 1 + univ."
 local rname_exact     "Exact"
 

@@ -269,13 +269,14 @@ foreach y in program uni he {
     file close T
 }
 
-* compact table for the deck: program+year, + controls, + top1u ROL (main), + exact ROL
-local cc "1 2 6 9"
+* compact table for the deck: program+year, + controls, + top1u ROL (main),
+* + set-of-programs ROL, + exact ROL
+local cc "1 2 6 8 9"
 file open T using "$im_out/tables/im_d5_main.tex", write replace
-file write T "\begin{tabular}{lcccc}" _n "\toprule" _n
-file write T " & (1) & (2) & (3) & (4) \\" _n
-file write T "ROL FE & -- & -- & Top 1 + univ. & Exact \\" _n
-file write T "Controls & No & Yes & Yes & Yes \\" _n "\midrule" _n
+file write T "\begin{tabular}{lccccc}" _n "\toprule" _n
+file write T " & (1) & (2) & (3) & (4) & (5) \\" _n
+file write T "ROL FE & -- & -- & Top 1 + univ. & Program set & Exact \\" _n
+file write T "Controls & No & Yes & Yes & Yes & Yes \\" _n "\midrule" _n
 file write T "First stage: \(n_{pt}\) on \(Z_{pt}\)"
 foreach c of local cc {
     stars `A`c'program_fsp' s
@@ -290,7 +291,7 @@ foreach c of local cc {
     file write T " & " %6.0f (`A`c'program_F')
 }
 file write T " \\" _n "\addlinespace" _n
-file write T "\multicolumn{5}{l}{2SLS} \\" _n
+file write T "\multicolumn{6}{l}{2SLS} \\" _n
 foreach y in program uni he {
     local yl = cond("`y'" == "program", "Graduation, enrolled program, 8y", cond("`y'" == "uni", "Graduation, any university, 8y", "Graduation, any higher education, 8y"))
     file write T "\quad `yl'"

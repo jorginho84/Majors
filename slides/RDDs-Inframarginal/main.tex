@@ -3990,15 +3990,29 @@ For inframarginal student $i$ in program $p$, admission year $t$ (the entering c
 \[
 \text{Second stage:}\quad Y_i = \beta\, n_{pt} + x_i'\beta_2 + \phi_p + \phi_t + \phi_{ROL(i)} + \varepsilon_{i}
 \]
+\vspace{-0.2cm}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.49\textwidth}
+\scriptsize
 \begin{itemize}
-    \item \textbf{Sample}: inframarginal students as in Design I ($Rank_{ipt}\le T_p$, $T_p$ = first enrolled cohort). One row per student: the most preferred inframarginal
-    application in the student's first inframarginal year (99\% of student-years have only one). \textbf{432,184 students, 1,307 programs, 8,218 program-years}, 2007--2016.
-    \item \textbf{Outcome}: graduation within 8 years from the program where the student first enrolled (main); any university; any higher-education institution. 0/1 indicators: coefficients are changes in the probability of graduating.
-    \item \textbf{Controls $x_i$}: PSU language+math, NEM, female, private-paid and municipal school (with missing indicators). \emph{No} peer composition: it is a mechanism.
-    \item \textbf{Fixed effects}: program and year always (no specification without year FE). ROL FE under several definitions (next slide).
-    \item \textbf{Inference}: SE clustered by program-year, the level at which $Z_{pt}$ and $n_{pt}$ vary.
-    $\beta$: pp change in graduation per additional entering student induced by vacancies.
-\end{itemize}
+    \setlength{\itemsep}{0pt}
+    \item $n_{pt}$: entering cohort of program $p$ in year $t$ (enrolled students); endogenous.
+    \item $Z_{pt}$: \textbf{instrument}, total seats offered by $p$ in $t$ (DEMRE Oferta Acad\'emica). $\alpha_1$: entrants per extra seat.
+    \item $Y_i$: 1 if $i$ graduates within 8 years from the program first enrolled in (main); also any university, any higher-education institution.\end{itemize}
+\end{column}
+\begin{column}{0.49\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{0pt}
+    \item $x_i$: PSU language+math, NEM, female, private-paid and municipal school (with missing indicators). \emph{No} peer composition: it is a mechanism.
+    \item $\psi_p,\phi_p$: program FE (permanent differences across programs). $\psi_t,\phi_t$: year FE (shocks common to all programs).
+    \item $\psi_{ROL(i)},\phi_{ROL(i)}$: FE for the student's application list (ROL), so only students with similar lists are compared; several definitions (next slide).\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.1cm}
+\scriptsize
+\textbf{Sample}: inframarginal students as in Design I ($Rank_{ipt}\le T_p$, $T_p$ = first enrolled cohort): they would be admitted even with fewer seats. One row per student: the most preferred inframarginal application in the student's first inframarginal year (99\% of student-years have only one). \textbf{432,184 students, 1,307 programs, 8,218 program-years}, 2007--2016.
 \end{frame}
 
 %--------------------------------------------------------
@@ -4032,13 +4046,13 @@ For inframarginal student $i$ in program $p$, admission year $t$ (the entering c
 \end{frame}
 
 %--------------------------------------------------------
-\begin{frame}{Design V: results}
+\begin{frame}[label=d5-results]{Design V: results}
 \centering
 \tiny
 \resizebox{0.66\textwidth}{!}{\input{../../output/inframarginal/tables/im_d5_main.tex}}
 
 \vspace{0.05cm}
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS of graduation within 8 years (0/1 indicator; coefficients are changes in the probability, per additional entrant) on $n_{pt}$ instrumented by $Z_{pt}$. All columns include program and year FE. SE clustered by program-year. \sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$. Full ladder of seven ROL definitions and the common-sample panel in the issue-\#8 tables.}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS of graduation within 8 years (0/1 indicator; coefficients are changes in the probability, per additional entrant) on $n_{pt}$ instrumented by $Z_{pt}$. All columns include program and year FE. SE clustered by program-year. \sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$. All seven ROL definitions: \hyperlink{d5-app-rol-levels}{\color{blue}appendix}.}
 
 \vspace{0.15cm}
 \raggedright
@@ -4055,7 +4069,7 @@ For inframarginal student $i$ in program $p$, admission year $t$ (the entering c
 \scriptsize
 \begin{itemize}
     \setlength{\itemsep}{2pt}
-    \item Portfolio FE do not move the estimate. On a common sample (the 84,087 students of column 4) the 2SLS is 0.085--0.095 under every ROL definition; the drift across definitions in the full sample comes from the change of sample.
+    \item Portfolio FE do not move the estimate. On a common sample (the 84,087 students of column 5) the 2SLS is 0.085--0.095 under every ROL definition; the drift across definitions in the full sample comes from the change of sample.
     \item Any university and any higher education: $+0.0002$ to $+0.0003$ (0.02 to 0.03 pp).
 \end{itemize}
 \end{column}
@@ -4087,8 +4101,8 @@ For inframarginal student $i$ in program $p$, admission year $t$ (the entering c
 \scriptsize
 \begin{itemize}
     \setlength{\itemsep}{2pt}
-    \item Program graduation \textbf{rises} by about 0.005--0.007 per 10\% more entrants (0.5 to 0.7 pp; main column 3: 0.0051, mean $\approx$0.35), and 0.012 with exact ROL. Same sign as in levels.
-    \item Any university and any higher education: positive without controls, close to zero and not significant with controls.
+    \item Program graduation \textbf{rises} by about 0.005--0.007 per 10\% more entrants (0.5 to 0.7 pp; main column 3: 0.0054, mean $\approx$0.35), and 0.010--0.012 with program set and exact ROL. Same sign as in levels.
+    \item Any university and any higher education: positive without controls; close to zero with controls and the main ROL; 0.003--0.004 per 10\% ($p<0.10$) with the finest ROLs.
 \end{itemize}
 \end{column}
 \end{columns}
@@ -4096,183 +4110,91 @@ For inframarginal student $i$ in program $p$, admission year $t$ (the entering c
 
 %--------------------------------------------------------
 % code/04_rdd/Inframarginals/40_design5_placebo.do (replaces 38's im_d5_balance.tex)
-\begin{frame}{Design V: is the variation in $Z$ exogenous?}
+\begin{frame}[label=d5-balance]{Design V: is the variation in $Z$ exogenous?}
 \begin{columns}[T,onlytextwidth]
-\begin{column}{0.48\textwidth}
+\begin{column}{0.56\textwidth}
 \centering
 \tiny
 \resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_placebo_balance.tex}}
 \end{column}
-\begin{column}{0.50\textwidth}
-\centering
-\tiny
-\resizebox{0.62\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_placebo_tplus1.tex}}
-
-\raggedright
+\begin{column}{0.42\textwidth}
 \scriptsize
+Each cell regresses a pre-admission characteristic on this year's seats, $x_i = g\,Z_{pt} + \psi_p + \psi_t + \psi_{ROL(i)} + u_i$. If $Z$ were as good as random, every $g$ would be zero.
 \begin{itemize}
     \setlength{\itemsep}{1pt}
-    \item \textbf{SES (A)}: only the municipal share moves, +0.13 pp per ten seats (mean 26\%).
-    \item \textbf{Achievement (B)}: slightly higher PSU, NEM, BEA. Predicted graduation +0.075 pp, $\approx$13\% of the reduced form; controls absorb it.
-    \item \textbf{Placebo (C)}: next year's seats do not move this year's cohort, but \textbf{predict this year's graduation as much as this year's seats}: programs that expand were already improving (program trends).
+    \item \textbf{SES (A)}: private-paid flat. Municipal +0.13 pp with the main ROL, ns with the finer ones; subsidized $-$0.08 to $-$0.14 pp.
+    \item \textbf{Achievement (B)}: PSU and NEM higher in every column (PSU +0.28 points with the main ROL, +0.4 with program set / exact); BEA only with the main ROL.
+    \item \textbf{Joint test}: predicted graduation +0.075 pp per ten seats with the main ROL, +0.04 with program set / exact: smaller, not zero.
 \end{itemize}
 \end{column}
 \end{columns}
 
 \vspace{0.05cm}
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} \textbf{Units}: Mean in the row's unit (\%, points or number); coefficients = change in that unit per ten seats (pp for \% rows). Panel C: entrants and pp of graduation per ten seats. SES proxies are school-based (no income variable); BEA = top 10\% of own school. (1) program + year FE; (2) adds ROL FE (top 1 + univ.). Panel C on cohorts with $Z_{p,t+1}$ observed. SE by program-year. Source: DEMRE Formulario A.}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} \textbf{Units}: Mean in the row's unit (\%, points or number); coefficients = change in that unit per ten seats (pp for \% rows). SES proxies are school-based (no income variable); BEA = top 10\% of own school. (1) program + year FE; (2) adds ROL FE (top 1 + univ., main); (3) ROL FE = set of programs; (4) exact ROL. SE by program-year. Source: DEMRE Formulario A. All seven ROL definitions: \hyperlink{d5-app-balance-rol}{\color{blue}appendix}.}
 \end{frame}
 
+
+%--------------------------------------------------------
+% code/04_rdd/Inframarginals/40_design5_placebo.do
+\begin{frame}[label=d5-leadlag-joint]{Design V: all years' seats together (distributed lag)}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.5\textwidth}
+\centering
+{\scriptsize \textbf{Entering cohort $n_{pt}$} (entrants)}\\
+\includegraphics[width=0.86\linewidth]{../../output/inframarginal/figures/im_d5_leadlag_fs.pdf}
+\end{column}
+\begin{column}{0.5\textwidth}
+\centering
+{\scriptsize \textbf{Graduation from the program, 8y} (pp)}\\
+\includegraphics[width=0.86\linewidth]{../../output/inframarginal/figures/im_d5_leadlag_grad.pdf}
+\end{column}
+\end{columns}
+
+\scriptsize
+One regression with the seats of the seven years at once:
+\[
+y_i = \gamma_{-3} Z_{p,t-3} + \gamma_{-2} Z_{p,t-2} + \gamma_{-1} Z_{p,t-1} + \gamma_{0} Z_{pt} + \gamma_{1} Z_{p,t+1} + \gamma_{2} Z_{p,t+2} + \gamma_{3} Z_{p,t+3} + \text{FE} + e_i
+\]
+Each point is one $\gamma_k$ with its 95\% CI, under three ROL FE. A clean design shows a spike at $t$ and zeros elsewhere.
+\begin{itemize}
+    \setlength{\itemsep}{0pt}
+    \item \textbf{Entrants}: spike at $t$ (7.7--8.8 per ten seats) under every ROL, as expected.
+    \item \textbf{Graduation}: future years $\approx$ 0, but \textbf{last year's seats weigh most} under every ROL (1.2 pp main; 1.8--1.9 pp, $p<0.01$, with program set / exact), more than the own year (0.7--1.1): program trends (next slide).
+\end{itemize}
+
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} x-axis: year of the seats relative to the student's entry year $t$; bars: 95\% CI; dashed line: zero. Seats observed 2007--2019, so cohorts 2010--2016 have all seven years. \textbf{Units}, per ten seats: entrants; graduation within 8 years in pp. Program and year FE plus the ROL FE in the legend; SE clustered by program-year. Students: 176,827 (top 1 + univ.), 67,446 (program set), 45,182 (exact).}
+\end{frame}
 %--------------------------------------------------------
 % code/04_rdd/Inframarginals/39_design5_trends.do
-\begin{frame}{Design V: main estimates with program-specific trends}
+\begin{frame}[label=d5-trends]{Design V: main estimates with program-specific trends}
+\scriptsize
+Every column adds a linear trend per program ($\delta_p\,t$; $\gamma_p\,t$ in the first stage), so $\beta$ comes from jumps in $Z_{pt}$ off each program's own path:
+\[
+Y_i = \beta\, n_{pt} + x_i'\beta_2 + \phi_p + \delta_p\, t + \phi_t + \phi_{ROL(i)} + \varepsilon_i
+\]
+\vspace{-0.35cm}
 \begin{columns}[T,onlytextwidth]
-\begin{column}{0.58\textwidth}
+\begin{column}{0.54\textwidth}
 \centering
 \tiny
 \resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_trends.tex}}
 \end{column}
-\begin{column}{0.40\textwidth}
+\begin{column}{0.44\textwidth}
 \scriptsize
 \begin{itemize}
     \setlength{\itemsep}{3pt}
-    \item The first stage survives the trends (0.75--0.78, F $>$ 300).
-    \item \textbf{Program graduation}: the positive effect disappears once program trends are absorbed, with Top 1 ROL ($-0.0001$) and exact ROL ($0.0003$, ns). The levels estimate was picking up program trends.
-    \item \textbf{Any university / any HE}: the effect stays positive and grows, 0.0005 per entrant (Top 1) and 0.0012 (exact).
-    \item Reading: a larger cohort does not change graduation from the program, but raises graduation somewhere in the system.
-\end{itemize}
-\end{column}
-\end{columns}
-
-\vspace{0.1cm}
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS per entrant; outcomes are 0/1. Trends are program-specific linear trends in the cohort year. Columns (3)--(4) on the exact-ROL non-singleton sample. SE clustered by program-year.}
-\end{frame}
-
-%--------------------------------------------------------
-% code/04_rdd/Inframarginals/40_design5_placebo.do
-\begin{frame}{Design V: leads and lags of the instrument, one at a time}
-\centering
-\tiny
-\resizebox{0.82\textwidth}{!}{\input{../../output/inframarginal/tables/im_d5_placebo_leadlag.tex}}
-
-\vspace{0.1cm}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.44\textwidth}
-\scriptsize
-\textbf{Definition.} Each column $k$ is one regression with this year's seats and those of year $t+k$:
-\[ y_{i} = b_0\, Z_{pt} + b_k\, Z_{p,t+k} + \text{FE} + e_i \]
-$k<0$: past seats (lags); $k>0$: future seats (leads). If seats matter only through the student's own cohort, $b_k \approx 0$.
-\end{column}
-\begin{column}{0.54\textwidth}
-\scriptsize
-\textbf{What we see:}
-\begin{itemize}
-    \setlength{\itemsep}{0pt}
-    \item $k=+1$ repeats the placebo of the ``is the variation in $Z$ exogenous?'' slide.
-    \item \textbf{First stage}: except $t+1$, other years' seats add 0.6--1.9 entrants per ten seats, on top of $\approx$9 from this year's.
-    \item \textbf{Graduation}: past seats predict it ($b_{-1}=0.72$ pp$^{**}$; $b_{-2}, b_{-3}\approx0.5$ pp$^{*}$); future seats less, not significant (0.2--0.3 pp).
+    \item First stage survives the trends (0.76--0.78, F $>$ 300).
+    \item \textbf{Program graduation}: the positive effect of the levels slide disappears: $-0.0001$ (Top 1 + univ.), $0.0002$ (program set), $0.0003$ (exact), all ns. The levels estimate picked up program trends.
+    \item \textbf{Any university / HE}: stays positive and grows, 0.0007 per entrant = 0.07 pp (Top 1 + univ.), 0.0010--0.0012 (program set, exact).
+    \item A larger cohort does not change graduation from the program, but raises it somewhere in the system.
 \end{itemize}
 \end{column}
 \end{columns}
 
 \vspace{0.05cm}
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} $Z$ exists only for 2007--2016, so each column uses the cohorts where $Z_{p,t+k}$ is observed; the sample changes across columns, which is why $b_0$ moves. \textbf{Units}, per ten seats: first stage in entrants; graduation within 8 years from the program in pp (outcome 0--100). Program, year and ROL (first preference + set of universities) FE. SE clustered by program-year.}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS per entrant; outcomes are 0/1 (0.001 = 0.1 pp). Trends are program-specific linear trends in the cohort year. Each column keeps its own non-singleton sample. Controls as in the results slide. SE clustered by program-year. All seven ROL definitions with trends: \hyperlink{d5-app-rol-trends}{\color{blue}appendix}.}
 \end{frame}
 
-%--------------------------------------------------------
-% code/04_rdd/Inframarginals/40_design5_placebo.do
-\begin{frame}{Design V: leads and lags together (distributed lag)}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.5\textwidth}
-\centering
-{\scriptsize Graduation from the program, 8y (pp)}\\
-\includegraphics[width=0.78\linewidth]{../../output/inframarginal/figures/im_d5_leadlag_grad.pdf}
-\end{column}
-\begin{column}{0.5\textwidth}
-\centering
-{\scriptsize First stage: entering cohort $n_{pt}$ (entrants)}\\
-\includegraphics[width=0.78\linewidth]{../../output/inframarginal/figures/im_d5_leadlag_fs.pdf}
-\end{column}
-\end{columns}
-
-\scriptsize
-\textbf{Definition.} One regression with seats from $t-3$ to $t+3$ together, $y_i=\sum_{k=-3}^{3}\gamma_k V_{p,t+k}+\text{FE}+e_i$. $V$ = regular vacancies (DEMRE Oferta Acad\'emica), available to 2025, so cohorts 2010--2016 keep all seven terms.
-\begin{itemize}
-    \setlength{\itemsep}{0pt}
-    \item \textbf{Leads are zero for graduation} (joint $p=0.99$): with the other years in, next year's seats no longer predict graduation.
-    \item \textbf{Last year's seats matter} ($\gamma_{-1}=1.45$ pp, $p\approx0.06$; lags jointly $p=0.05$), more than this year's ($\gamma_0=0.95$ pp, ns): persistent program trends, as in the trends slide.
-    \item First stage: $\gamma_0=7.6$ entrants per ten seats, plus smaller lag and lead terms (joint $p<0.01$).
-\end{itemize}
-
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} \textbf{Units}, per ten vacancies: graduation in pp (outcome 0--100), first stage in entrants. $V$ is not $Z$: regular seats only, $\approx$19 fewer on average, correlation 0.96. Program, year and ROL (first preference + set of universities) FE; 95\% CI, SE clustered by program-year; 176,827 students.}
-\end{frame}
-
-%--------------------------------------------------------
-% code/02_build/16b_build_design5_rol_groupings.do, code/04_rdd/Inframarginals/41_design5_rol_groupings.do
-\begin{frame}{Design V: alternative ROL groupings}
-\centering
-\tiny
-\resizebox{0.92\textwidth}{!}{\input{../../output/inframarginal/tables/im_d5_rolgroups.tex}}
-
-\vspace{0.1cm}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.44\textwidth}
-\scriptsize
-\textbf{Definitions.} Each program in the student's list is replaced by a category; the ROL is the \emph{set} of categories applied to:
-\begin{itemize}
-    \setlength{\itemsep}{0pt}
-    \item \emph{Field}: 10 broad areas (OECD/UNESCO).
-    \item \emph{Sub-area}: 22 ISCED-97 sub-areas.
-    \item \emph{Field$\times$sel.}: field $\times$ tercile of the program's mean entrant PSU (2007--09).
-    \item \emph{Univ.$\times$field}: university $\times$ field.
-\end{itemize}
-\end{column}
-\begin{column}{0.54\textwidth}
-\scriptsize
-\textbf{What we see:}
-\begin{itemize}
-    \setlength{\itemsep}{0pt}
-    \item First stage stable (0.81--0.93, F $>$ 350).
-    \item \textbf{Program graduation: 0.00061--0.00068 ($\approx$0.06 pp per entrant) under the four new groupings}, as in the main column (7) and with no ROL FE. Only the exact list differs (0.00092, 84k students).
-    \item Coarser groupings keep more identifying students (79--93\% vs 62\%).
-    \item Any university / HE: 0.0002 (0.02 pp) with field-based groupings, 0.0003 (0.03 pp) once the university enters the ROL.
-\end{itemize}
-\end{column}
-\end{columns}
-
-\vspace{0.05cm}
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} \textbf{Units}: first stage in entrants per seat; 2SLS = change in the probability of graduating (outcome 0/1) per extra entrant, so 0.0006 = 0.06 pp. Program and year FE and controls in every column; SE clustered by program-year. Field of a program = its most frequent SIES classification. Levels, without program trends: the trend caveat applies.}
-\end{frame}
-
-%--------------------------------------------------------
-% code/04_rdd/Inframarginals/41b_design5_rol_groupings_trends.do (runs 41 with program trends)
-\begin{frame}{Design V: alternative ROL groupings, with program-specific trends}
-\centering
-\tiny
-\resizebox{0.92\textwidth}{!}{\input{../../output/inframarginal/tables/im_d5_rolgroups_trends.tex}}
-
-\vspace{0.1cm}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.44\textwidth}
-\scriptsize
-\textbf{Definition.} Same columns, sample and controls as the previous slide, adding a linear trend per program in every column: only deviations of $Z_{pt}$ from each program's own path identify. Columns (2) and (8) reproduce the trends slide.
-\end{column}
-\begin{column}{0.54\textwidth}
-\scriptsize
-\textbf{What we see:}
-\begin{itemize}
-    \setlength{\itemsep}{0pt}
-    \item First stage stays strong (0.75--0.78, F $>$ 300).
-    \item \textbf{Program graduation: zero under every grouping} ($-0.0001$ to $0.0003$, i.e.\ $-0.01$ to $0.03$ pp, ns), down from 0.0006--0.0009 in levels.
-    \item \textbf{Any university / HE: positive under every grouping}, 0.0005 (0.05 pp per entrant) with field-based ROLs, 0.0007 once the university enters, 0.0012 exact; larger than in levels.
-    \item The trends result does not depend on how the ROL is defined.
-\end{itemize}
-\end{column}
-\end{columns}
-
-\vspace{0.05cm}
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} \textbf{Units}: first stage in entrants per seat; 2SLS = change in the probability of graduating (outcome 0/1) per extra entrant, so 0.0005 = 0.05 pp. Program and year FE, program-specific linear trends in the cohort year and controls in every column; SE clustered by program-year.}
-\end{frame}
 
 \section{Appendix}
 
@@ -5518,4 +5440,102 @@ conditioning on positive exposure.
 
 
 
+
+%--------------------------------------------------------
+% code/04_rdd/Inframarginals/42_design5_balance_rolgroups.do
+\begin{frame}[label=d5-app-balance-rol]{Appendix: Design V, balance under every ROL definition}
+\vspace{-0.3cm}
+\hyperlink{d5-balance}{\tiny\color{blue}$\leftarrow$ Main (is the variation in $Z$ exogenous?)}
+
+\centering
+\tiny
+\resizebox{0.80\textwidth}{!}{\input{../../output/inframarginal/tables/im_d5_balance_rolgroups.tex}}
+
+\vspace{0.05cm}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.44\textwidth}
+\scriptsize
+Same balance regressions as the main balance slide, $x_i = g\,Z_{pt} + \psi_p + \psi_t + \psi_{ROL(i)} + u_i$, under the seven ROL definitions of the sparsity slide (coarse to fine). Columns (5) and (7) = columns (2) and (3) of the main slide. If finer ROLs absorbed the selection, coefficients would shrink to the right.
+\end{column}
+\begin{column}{0.54\textwidth}
+\scriptsize
+\textbf{What we see:}
+\begin{itemize}
+    \setlength{\itemsep}{0pt}
+    \item \textbf{Joint test}: predicted graduation rises with $Z$ under every ROL, 0.040--0.075 pp per ten seats; smaller with the finest ROLs (0.04) but never zero.
+    \item \textbf{Achievement}: PSU and NEM rise with $Z$ in every column (PSU grows to 0.4 points); BEA vanishes from Top 3 on.
+    \item \textbf{SES}: the municipal shift fades with fine ROLs; subsidized turns more negative.
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.05cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} \textbf{Units}: mean in the row's unit; coefficients = change in that unit per ten seats (pp for \% rows). Program and year FE in every column plus the ROL FE in the header; no controls, no program trends. Each column keeps its own non-singleton sample. SE clustered by program-year.}
+\end{frame}
+
+%--------------------------------------------------------
+% code/04_rdd/Inframarginals/41_design5_rol_groupings.do
+\begin{frame}[label=d5-app-rol-levels]{Appendix: Design V, results under every ROL definition}
+\vspace{-0.3cm}
+\hyperlink{d5-results}{\tiny\color{blue}$\leftarrow$ Main (results)}
+
+\centering
+\tiny
+\resizebox{0.90\textwidth}{!}{\input{../../output/inframarginal/tables/im_d5_rolgroups.tex}}
+
+\vspace{0.1cm}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.44\textwidth}
+\scriptsize
+\textbf{Definitions.} Columns (2)--(8) are the seven ROL definitions of the sparsity slide, ordered from coarse to fine (number of groups); column (1) has no ROL FE. Column (5), first preference + set of universities, is the main specification.
+\end{column}
+\begin{column}{0.54\textwidth}
+\scriptsize
+\textbf{What we see:}
+\begin{itemize}
+    \setlength{\itemsep}{0pt}
+    \item First stage rises with finer ROLs (0.81--0.93, F $>$ 350).
+    \item \textbf{Program graduation: 0.00062--0.00067 ($\approx$0.06 pp per entrant) from no ROL FE to Top 3}; 0.0009 with the two finest (program set, exact), on 84--129k students.
+    \item Finer ROLs keep fewer identifying students (93\% with Top 1, 16\% exact).
+    \item Any university / HE: 0.0002--0.0003 (0.02--0.03 pp) in every column.
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.05cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} \textbf{Units}: first stage in entrants per seat; 2SLS = change in the probability of graduating (outcome 0/1) per extra entrant, so 0.0006 = 0.06 pp. Program and year FE and controls in every column; SE clustered by program-year. Levels, without program trends: the trend caveat applies.}
+\end{frame}
+
+%--------------------------------------------------------
+% code/04_rdd/Inframarginals/41b_design5_rol_groupings_trends.do (runs 41 with program trends)
+\begin{frame}[label=d5-app-rol-trends]{Appendix: Design V, every ROL definition with trends}
+\vspace{-0.3cm}
+\hyperlink{d5-trends}{\tiny\color{blue}$\leftarrow$ Main (program-specific trends)}
+
+\centering
+\tiny
+\resizebox{0.90\textwidth}{!}{\input{../../output/inframarginal/tables/im_d5_rolgroups_trends.tex}}
+
+\vspace{0.1cm}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.44\textwidth}
+\scriptsize
+\textbf{Definition.} Same columns, sample and controls as the previous slide (levels), adding a linear trend per program in every column: only deviations of $Z_{pt}$ from each program's own path identify. Columns (5), (7) and (8) reproduce the main trends slide.
+\end{column}
+\begin{column}{0.54\textwidth}
+\scriptsize
+\textbf{What we see:}
+\begin{itemize}
+    \setlength{\itemsep}{0pt}
+    \item First stage stays strong (0.75--0.78, F $>$ 300).
+    \item \textbf{Program graduation: zero under every definition} ($-0.0001$ to $0.0003$, i.e.\ $-0.01$ to $0.03$ pp, ns), down from 0.0006--0.0009 in levels.
+    \item \textbf{Any university / HE: positive under every definition}, 0.0005--0.0007 (0.05--0.07 pp per entrant) up to Top 3, 0.0010--0.0012 with the two finest; larger than in levels.
+    \item The trends result does not depend on how the ROL is defined.
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.05cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} \textbf{Units}: first stage in entrants per seat; 2SLS = change in the probability of graduating (outcome 0/1) per extra entrant, so 0.0005 = 0.05 pp. Program and year FE, program-specific linear trends in the cohort year and controls in every column; SE clustered by program-year.}
+\end{frame}
 \end{document}

@@ -1,13 +1,13 @@
 /**********************************************************************
 * 39_design5_trends.do
 *
-* Design V (issues #8, #10): main 2SLS with and without program-specific
-* linear trends. The lead placebo in 38 shows that Z_p,t+1 predicts this
+* Design V (issues #8, #10): main 2SLS with program-specific linear
+* trends. The lead placebo in 38 shows that Z_p,t+1 predicts this
 * year's graduation as much as Z_pt does, consistent with programs that
 * expand also having improving graduation. Program trends absorb that.
 *
-*   columns: (1) ROL top1            (2) ROL top1  + program trends
-*            (3) ROL exact           (4) ROL exact + program trends
+*   columns (all with program trends; the levels versions are in 37):
+*            (1) ROL top1u (main)  (2) ROL set of programs  (3) ROL exact
 *   FE     : program and year always; controls as in 37
 *   trends : programs##c.ao_proceso (program FE and program slopes)
 *   SE     : clustered by program-year
@@ -54,12 +54,11 @@ foreach v in psu_lm nem female priv mun {
     local ctrl "`ctrl' `v' m_`v'"
 }
 
-local fe1 "programs ao_proceso rol_top1"
-local fe2 "programs##c.ao_proceso ao_proceso rol_top1"
-local fe3 "programs ao_proceso rol_exact"
-local fe4 "programs##c.ao_proceso ao_proceso rol_exact"
+local fe1 "programs##c.ao_proceso ao_proceso rol_top1u"
+local fe2 "programs##c.ao_proceso ao_proceso rol_set"
+local fe3 "programs##c.ao_proceso ao_proceso rol_exact"
 
-forvalues c = 1/4 {
+forvalues c = 1/3 {
     quietly reghdfe N_total_enter Z_total_cupos `ctrl', absorb(`fe`c'') vce(cluster pt)
     local fs`c'   = _b[Z_total_cupos]
     local fsse`c' = _se[Z_total_cupos]
@@ -92,57 +91,57 @@ forvalues c = 1/4 {
 
 * table
 file open T using "$im_out/tables/im_d5_trends.tex", write replace
-file write T "\begin{tabular}{lcccc}" _n "\toprule" _n
-file write T " & (1) & (2) & (3) & (4) \\" _n "\midrule" _n
+file write T "\begin{tabular}{lccc}" _n "\toprule" _n
+file write T " & (1) & (2) & (3) \\" _n "\midrule" _n
 file write T "First stage: \(n_{pt}\) on \(Z_{pt}\)"
-forvalues c = 1/4 {
+forvalues c = 1/3 {
     stars `fsp`c'' s
     file write T " & " %6.3f (`fs`c'') "`s'"
 }
 file write T " \\" _n
-forvalues c = 1/4 {
+forvalues c = 1/3 {
     file write T " & (" %5.3f (`fsse`c'') ")"
 }
 file write T " \\" _n "Kleibergen--Paap F"
-forvalues c = 1/4 {
+forvalues c = 1/3 {
     file write T " & " %6.0f (`F`c'')
 }
 file write T " \\" _n "\addlinespace" _n
 foreach y in program uni he {
     local yl = cond("`y'" == "program", "Graduation, enrolled program, 8y", cond("`y'" == "uni", "Graduation, any university, 8y", "Graduation, any higher education, 8y"))
-    file write T "\multicolumn{5}{l}{`yl'} \\" _n
+    file write T "\multicolumn{4}{l}{`yl'} \\" _n
     foreach e in rf iv {
         local elab = cond("`e'" == "rf", "\quad Reduced form", "\quad \textbf{2SLS}")
         file write T "`elab'"
-        forvalues c = 1/4 {
+        forvalues c = 1/3 {
             stars ``e'p`c'`y'' s
             file write T " & " %8.5f (``e'`c'`y'') "`s'"
         }
         file write T " \\" _n
-        forvalues c = 1/4 {
+        forvalues c = 1/3 {
             file write T " & (" %8.5f (``e'se`c'`y'') ")"
         }
         file write T " \\" _n
     }
 }
 file write T "\midrule" _n "Mean of program graduation"
-forvalues c = 1/4 {
+forvalues c = 1/3 {
     file write T " & " %5.3f (`ym`c'')
 }
 file write T " \\" _n "Students"
-forvalues c = 1/4 {
+forvalues c = 1/3 {
     file write T " & " %9.0fc (`N`c'')
 }
 file write T " \\" _n "Program-years (clusters)"
-forvalues c = 1/4 {
+forvalues c = 1/3 {
     file write T " & " %6.0fc (`npt`c'')
 }
 file write T " \\" _n "\midrule" _n
-file write T "Program FE & Yes & Yes & Yes & Yes \\" _n
-file write T "Year FE & Yes & Yes & Yes & Yes \\" _n
-file write T "ROL FE & Top 1 & Top 1 & Exact & Exact \\" _n
-file write T "Program-specific linear trends & No & Yes & No & Yes \\" _n
-file write T "Controls & Yes & Yes & Yes & Yes \\" _n
+file write T "Program FE & Yes & Yes & Yes \\" _n
+file write T "Year FE & Yes & Yes & Yes \\" _n
+file write T "ROL FE & Top 1 + univ. & Program set & Exact \\" _n
+file write T "Program-specific linear trends & Yes & Yes & Yes \\" _n
+file write T "Controls & Yes & Yes & Yes \\" _n
 file write T "\bottomrule" _n "\end{tabular}" _n
 file close T
 

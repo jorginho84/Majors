@@ -10,7 +10,8 @@
 *
 *   b/10 = change in the probability of graduating per 10% more entrants
 *   Columns as in im_d5_main.tex: program+year, + controls,
-*   + top1u ROL (main), + exact ROL. SE clustered by program-year.
+*   + top1u ROL (main), + set-of-programs ROL, + exact ROL. SE clustered
+*   by program-year.
 *
 * Output: output/inframarginal/tables/im_d5_logs.tex
 * Input : $processed/design5_individual_2007_2016.dta (02_build/16)
@@ -67,14 +68,16 @@ local fe2 "programs ao_proceso"
 local ct2 "`ctrl'"
 local fe3 "programs ao_proceso rol_top1u"
 local ct3 "`ctrl'"
-local fe4 "programs ao_proceso rol_exact"
+local fe4 "programs ao_proceso rol_set"
 local ct4 "`ctrl'"
+local fe5 "programs ao_proceso rol_exact"
+local ct5 "`ctrl'"
 
 /**********************************************************************
 * 1. Estimation
 **********************************************************************/
 
-forvalues c = 1/4 {
+forvalues c = 1/5 {
     quietly reghdfe ln_n ln_z `ct`c'', absorb(`fe`c'') vce(cluster pt)
     local fs`c'   = _b[ln_z]
     local fsse`c' = _se[ln_z]
@@ -107,44 +110,44 @@ forvalues c = 1/4 {
 **********************************************************************/
 
 file open T using "$im_out/tables/im_d5_logs.tex", write replace
-file write T "\begin{tabular}{lcccc}" _n "\toprule" _n
-file write T " & (1) & (2) & (3) & (4) \\" _n
-file write T "ROL FE & -- & -- & Top 1 + univ. & Exact \\" _n
-file write T "Controls & No & Yes & Yes & Yes \\" _n "\midrule" _n
+file write T "\begin{tabular}{lccccc}" _n "\toprule" _n
+file write T " & (1) & (2) & (3) & (4) & (5) \\" _n
+file write T "ROL FE & -- & -- & Top 1 + univ. & Program set & Exact \\" _n
+file write T "Controls & No & Yes & Yes & Yes & Yes \\" _n "\midrule" _n
 file write T "First stage: \(\ln n_{pt}\) on \(\ln Z_{pt}\)"
-forvalues c = 1/4 {
+forvalues c = 1/5 {
     stars `fsp`c'' s
     file write T " & " %6.3f (`fs`c'') "`s'"
 }
 file write T " \\" _n
-forvalues c = 1/4 {
+forvalues c = 1/5 {
     file write T " & (" %5.3f (`fsse`c'') ")"
 }
 file write T " \\" _n "Kleibergen--Paap F"
-forvalues c = 1/4 {
+forvalues c = 1/5 {
     file write T " & " %6.0f (`F`c'')
 }
 file write T " \\" _n "\addlinespace" _n
-file write T "\multicolumn{5}{l}{2SLS (change in probability per log point of \(n_{pt}\))} \\" _n
+file write T "\multicolumn{6}{l}{2SLS (change in probability per log point of \(n_{pt}\))} \\" _n
 foreach y in program uni he {
     local yl = cond("`y'" == "program", "Graduation, enrolled program, 8y", cond("`y'" == "uni", "Graduation, any university, 8y", "Graduation, any higher education, 8y"))
     file write T "\quad `yl'"
-    forvalues c = 1/4 {
+    forvalues c = 1/5 {
         stars `ivp`c'`y'' s
         file write T " & " %7.4f (`iv`c'`y'') "`s'"
     }
     file write T " \\" _n
-    forvalues c = 1/4 {
+    forvalues c = 1/5 {
         file write T " & (" %7.4f (`ivse`c'`y'') ")"
     }
     file write T " \\" _n
 }
 file write T "\midrule" _n "Students"
-forvalues c = 1/4 {
+forvalues c = 1/5 {
     file write T " & " %9.0fc (`N`c'')
 }
 file write T " \\" _n "Program-years (clusters)"
-forvalues c = 1/4 {
+forvalues c = 1/5 {
     file write T " & " %6.0fc (`npt`c'')
 }
 file write T " \\" _n "\bottomrule" _n "\end{tabular}" _n

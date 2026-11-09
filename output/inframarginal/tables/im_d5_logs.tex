@@ -1,22 +1,22 @@
-\begin{tabular}{lcccc}
+\begin{tabular}{lccccc}
 \toprule
- & (1) & (2) & (3) & (4) \\
-ROL FE & -- & -- & Top 1 + univ. & Exact \\
-Controls & No & Yes & Yes & Yes \\
+ & (1) & (2) & (3) & (4) & (5) \\
+ROL FE & -- & -- & Top 1 + univ. & Program set & Exact \\
+Controls & No & Yes & Yes & Yes & Yes \\
 \midrule
-First stage: \(\ln n_{pt}\) on \(\ln Z_{pt}\) &  0.778\sym{***} &  0.776\sym{***} &  0.790\sym{***} &  0.779\sym{***} \\
- & (0.016) & (0.016) & (0.018) & (0.020) \\
-Kleibergen--Paap F &   2460 &   2437 &   1859 &   1574 \\
+First stage: \(\ln n_{pt}\) on \(\ln Z_{pt}\) &  0.778\sym{***} &  0.776\sym{***} &  0.790\sym{***} &  0.774\sym{***} &  0.779\sym{***} \\
+ & (0.016) & (0.016) & (0.018) & (0.019) & (0.020) \\
+Kleibergen--Paap F &   2460 &   2437 &   1859 &   1706 &   1574 \\
 \addlinespace
-\multicolumn{5}{l}{2SLS (change in probability per log point of \(n_{pt}\))} \\
-\quad Graduation, enrolled program, 8y &  0.0657\sym{***} &  0.0479\sym{***} &  0.0513\sym{**} &  0.1155\sym{**} \\
- & ( 0.0188) & ( 0.0183) & ( 0.0227) & ( 0.0456) \\
-\quad Graduation, any university, 8y &  0.0190\sym{**} &  0.0003 &  0.0130 &  0.0406\sym{*} \\
- & ( 0.0087) & ( 0.0083) & ( 0.0098) & ( 0.0238) \\
-\quad Graduation, any higher education, 8y &  0.0168\sym{*} & -0.0020 &  0.0068 &  0.0342 \\
- & ( 0.0086) & ( 0.0084) & ( 0.0099) & ( 0.0240) \\
+\multicolumn{6}{l}{2SLS (change in probability per log point of \(n_{pt}\))} \\
+\quad Graduation, enrolled program, 8y &  0.0684\sym{***} &  0.0506\sym{***} &  0.0540\sym{**} &  0.0987\sym{***} &  0.1186\sym{***} \\
+ & ( 0.0189) & ( 0.0184) & ( 0.0228) & ( 0.0370) & ( 0.0455) \\
+\quad Graduation, any university, 8y &  0.0197\sym{**} &  0.0010 &  0.0134 &  0.0330\sym{*} &  0.0410\sym{*} \\
+ & ( 0.0087) & ( 0.0083) & ( 0.0098) & ( 0.0184) & ( 0.0237) \\
+\quad Graduation, any higher education, 8y &  0.0176\sym{**} & -0.0011 &  0.0074 &  0.0264 &  0.0344 \\
+ & ( 0.0086) & ( 0.0083) & ( 0.0099) & ( 0.0184) & ( 0.0239) \\
 \midrule
-Students &   432,184 &   432,184 &   341,430 &    84,087 \\
-Program-years (clusters) &  8,218 &  8,218 &  8,218 &  7,735 \\
+Students &   432,184 &   432,184 &   341,430 &   129,025 &    84,087 \\
+Program-years (clusters) &  8,218 &  8,218 &  8,218 &  8,051 &  7,735 \\
 \bottomrule
 \end{tabular}
