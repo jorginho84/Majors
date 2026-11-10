@@ -1,0 +1,36 @@
+\begin{tabular}{lccc}
+\toprule
+ & (1) & (2) & (3) \\
+\midrule
+First stage: \(n_{pt}\) on \(Z_{pt}\) &  0.864\sym{***} &  0.862\sym{***} &  0.865\sym{***} \\
+ & (0.041) & (0.033) & (0.039) \\
+Kleibergen--Paap F &    435 &    665 &    490 \\
+\addlinespace
+\multicolumn{4}{l}{Graduation, enrolled program, 8y} \\
+\quad Reduced form &  0.00055\sym{**} &  0.00002 &  0.00065\sym{**} \\
+ & ( 0.00026) & ( 0.00026) & ( 0.00026) \\
+\quad \textbf{2SLS} &  0.00064\sym{**} &  0.00002 &  0.00076\sym{***} \\
+ & ( 0.00030) & ( 0.00030) & ( 0.00029) \\
+\multicolumn{4}{l}{Graduation, any university, 8y} \\
+\quad Reduced form &  0.00026\sym{**} &  0.00033\sym{***} &  0.00022\sym{**} \\
+ & ( 0.00011) & ( 0.00009) & ( 0.00010) \\
+\quad \textbf{2SLS} &  0.00031\sym{**} &  0.00039\sym{***} &  0.00026\sym{**} \\
+ & ( 0.00012) & ( 0.00011) & ( 0.00011) \\
+\multicolumn{4}{l}{Graduation, any higher education, 8y} \\
+\quad Reduced form &  0.00025\sym{**} &  0.00032\sym{***} &  0.00021\sym{**} \\
+ & ( 0.00011) & ( 0.00009) & ( 0.00010) \\
+\quad \textbf{2SLS} &  0.00029\sym{**} &  0.00037\sym{***} &  0.00024\sym{**} \\
+ & ( 0.00012) & ( 0.00011) & ( 0.00011) \\
+\midrule
+Mean of program graduation & 0.354 & 0.354 & 0.354 \\
+Students &   341,430 &   341,430 &   341,430 \\
+Program-years (clusters) &  8,218 &  8,218 &  8,218 \\
+\midrule
+Program FE & Yes & Yes & Yes \\
+Year FE & Yes & -- & -- \\
+University \(\times\) year FE & No & Yes & No \\
+Field \(\times\) year FE & No & No & Yes \\
+ROL FE & Top 1 + univ. & Top 1 + univ. & Top 1 + univ. \\
+Controls & Yes & Yes & Yes \\
+\bottomrule
+\end{tabular}
