@@ -3287,7 +3287,7 @@ For inframarginal student $i$ in program $p$, admission year $t$ (the entering c
 \scriptsize
 \begin{itemize}
     \setlength{\itemsep}{2pt}
-    \item Portfolio FE do not move the estimate. On a common sample (the 84,087 students of column 5) the 2SLS is 0.085--0.095 under every ROL definition; the drift across definitions in the full sample comes from the change of sample.
+    \item Portfolio FE do not move the estimate. On a common sample (the 84,087 students of column 5) the 2SLS is 0.00085--0.00095 (0.085--0.095 pp) under every ROL definition; the drift across definitions in the full sample comes from the change of sample.
     \item Any university and any higher education: $+0.0002$ to $+0.0003$ (0.02 to 0.03 pp).
 \end{itemize}
 \end{column}
@@ -3311,9 +3311,7 @@ For inframarginal student $i$ in program $p$, admission year $t$ (the entering c
 \begin{itemize}
     \setlength{\itemsep}{2pt}
     \item Same specification, with $\ln n_{pt}$ instrumented by $\ln Z_{pt}$. $Y_i$ is binary and stays in levels.
-    \item First stage: a 10\% increase in vacancies raises the entering cohort by about 7.8\% ($F>1{,}500$).
-    \item The placebo caveat of the next slide applies here too.
-\end{itemize}
+    \item First stage: a 10\% increase in vacancies raises the entering cohort by about 7.8\% ($F>1{,}500$).\end{itemize}
 \end{column}
 \begin{column}{0.49\textwidth}
 \scriptsize
@@ -3329,26 +3327,53 @@ For inframarginal student $i$ in program $p$, admission year $t$ (the entering c
 %--------------------------------------------------------
 % code/04_rdd/Inframarginals/40_design5_placebo.do (replaces 38's im_d5_balance.tex)
 \begin{frame}[label=d5-balance]{Design V: is the variation in $Z$ exogenous?}
+\vspace{-0.15cm}
+{\scriptsize Each cell regresses a pre-admission characteristic on this year's seats, $x_i = g\,Z_{pt} + \psi_p + \psi_t + \psi_{ROL(i)} + u_i$, and reports $g$ per ten seats (first column: mean level). If $Z$ were as good as random, every $g$ would be zero.\par}
+\vspace{0.1cm}
 \begin{columns}[T,onlytextwidth]
-\begin{column}{0.56\textwidth}
+\begin{column}{0.62\textwidth}
 \centering
-\tiny
 \resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_placebo_balance.tex}}
 \end{column}
-\begin{column}{0.42\textwidth}
+\begin{column}{0.36\textwidth}
 \scriptsize
-Each cell regresses a pre-admission characteristic on this year's seats, $x_i = g\,Z_{pt} + \psi_p + \psi_t + \psi_{ROL(i)} + u_i$. If $Z$ were as good as random, every $g$ would be zero.
 \begin{itemize}
-    \setlength{\itemsep}{1pt}
-    \item \textbf{SES (A)}: private-paid flat. Municipal +0.13 pp with the main ROL, ns with the finer ones; subsidized $-$0.08 to $-$0.14 pp.
-    \item \textbf{Achievement (B)}: PSU and NEM higher in every column (PSU +0.28 points with the main ROL, +0.4 with program set / exact); BEA only with the main ROL.
-    \item \textbf{Joint test}: predicted graduation +0.075 pp per ten seats with the main ROL, +0.04 with program set / exact: smaller, not zero.
+    \setlength{\itemsep}{3pt}
+    \item \textbf{SES (A)}: private-paid flat; municipal +0.13 pp (main ROL), ns with finer ROLs; subsidized $-$0.08 to $-$0.14 pp.
+    \item \textbf{Achievement (B)}: PSU and NEM higher in every column (PSU +0.28 points main, +0.4 finer ROLs); BEA only without ROL and with the main ROL.
+    \item \textbf{Joint test}: predicted graduation +0.075 pp (main), +0.04 (finer ROLs): smaller, not zero.
 \end{itemize}
 \end{column}
 \end{columns}
 
-\vspace{0.05cm}
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} \textbf{Units}: Mean in the row's unit (\%, points or number); coefficients = change in that unit per ten seats (pp for \% rows). SES proxies are school-based (no income variable); BEA = top 10\% of own school. (1) program + year FE; (2) adds ROL FE (top 1 + univ., main); (3) ROL FE = set of programs; (4) exact ROL. SE by program-year. Source: DEMRE Formulario A. All seven ROL definitions: \hyperlink{d5-app-balance-rol}{\color{blue}appendix}.}
+\vspace{0.1cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} The table shows changes per ten additional seats. Mean: average level of each characteristic (\%, points or number). Columns (1)--(4): change in that characteristic, in its own unit, when the program offers ten more seats; for \% rows the change is in percentage points. Each column adds the ROL FE in its header to program and year FE; (2) is the main specification. BEA = top 10\% of own school. SE clustered by program-year. All ROL definitions: \hyperlink{d5-app-balance-rol}{\color{blue}appendix}.}
+\end{frame}
+
+%--------------------------------------------------------
+% code/04_rdd/Inframarginals/40b_design5_balance_psu.do
+\begin{frame}[label=d5-balance-psu]{Design V: balance controlling for PSU}
+\vspace{-0.15cm}
+{\scriptsize Is the imbalance only about PSU? Same balance regressions, adding the student's PSU score: $x_i = g\,Z_{pt} + h(\text{PSU}_i) + \psi_p + \psi_t + \psi_{ROL(i)} + u_i$, with $h$ linear or PSU deciles within year.\par}
+\vspace{0.1cm}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.64\textwidth}
+\centering
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_balance_psu.tex}}
+\end{column}
+\begin{column}{0.34\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{3pt}
+    \item \textbf{No}: with PSU held fixed, NEM, BEA and municipal school still rise with $Z$ (main ROL), slightly more than without the control.
+    \item \textbf{Joint test}: predicted graduation from all but PSU rises 0.08 pp per ten seats (main ROL), 0.045 (exact), up from 0.073 and 0.034.
+    \item Linear PSU and PSU deciles give the same answer.
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.1cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} The table shows changes per ten additional seats, in each row's unit (pp for \% rows). Columns (1) and (4) are columns (2) and (4) of the previous slide; (2)--(3) and (5)--(6) add PSU linearly (with a missing indicator) or as within-year decile FE. Program, year and ROL FE in every column. Rows with missing values use slightly fewer students. SE clustered by program-year.}
 \end{frame}
 
 
@@ -3358,29 +3383,29 @@ Each cell regresses a pre-admission characteristic on this year's seats, $x_i = 
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.5\textwidth}
 \centering
-{\scriptsize \textbf{Entering cohort $n_{pt}$} (entrants)}\\
-\includegraphics[width=0.86\linewidth]{../../output/inframarginal/figures/im_d5_leadlag_fs.pdf}
+{\scriptsize \textbf{Size of the entering cohort}}\\
+\includegraphics[width=0.8\linewidth]{../../output/inframarginal/figures/im_d5_leadlag_fs.pdf}
 \end{column}
 \begin{column}{0.5\textwidth}
 \centering
-{\scriptsize \textbf{Graduation from the program, 8y} (pp)}\\
-\includegraphics[width=0.86\linewidth]{../../output/inframarginal/figures/im_d5_leadlag_grad.pdf}
+{\scriptsize \textbf{Graduation from the program within 8 years}}\\
+\includegraphics[width=0.8\linewidth]{../../output/inframarginal/figures/im_d5_leadlag_grad.pdf}
 \end{column}
 \end{columns}
 
 \scriptsize
 One regression with the seats of the seven years at once:
 \[
-y_i = \gamma_{-3} Z_{p,t-3} + \gamma_{-2} Z_{p,t-2} + \gamma_{-1} Z_{p,t-1} + \gamma_{0} Z_{pt} + \gamma_{1} Z_{p,t+1} + \gamma_{2} Z_{p,t+2} + \gamma_{3} Z_{p,t+3} + \text{FE} + e_i
+y_i = \gamma_{-3} Z_{p,t-3} + \gamma_{-2} Z_{p,t-2} + \gamma_{-1} Z_{p,t-1} + \gamma_{0} Z_{pt} + \gamma_{1} Z_{p,t+1} + \gamma_{2} Z_{p,t+2} + \gamma_{3} Z_{p,t+3} + x_i'\delta + \text{FE} + e_i
 \]
-Each point is one $\gamma_k$ with its 95\% CI, under three ROL FE. A clean design shows a spike at $t$ and zeros elsewhere.
+Each point ($\gamma_k$): change in the outcome of a student entering in $t$ when the program offered ten more seats in year $t+k$, other years' seats fixed. Only year $t$ should matter.
 \begin{itemize}
     \setlength{\itemsep}{0pt}
-    \item \textbf{Entrants}: spike at $t$ (7.7--8.8 per ten seats) under every ROL, as expected.
-    \item \textbf{Graduation}: future years $\approx$ 0, but \textbf{last year's seats weigh most} under every ROL (1.2 pp main; 1.8--1.9 pp, $p<0.01$, with program set / exact), more than the own year (0.7--1.1): a confounder that varies over time (next slide).
+    \item \textbf{Entrants}: ten more seats in $t$ bring 7.7--8.8 more entrants; small elsewhere ($t-3$: $\approx$1.7).
+    \item \textbf{Graduation}: ten more seats in $t-1$ raise graduation by 1.1 pp (main; 1.7--1.9 pp with program set / exact), more than seats in $t$ (0.7--1.0 pp); future years $\approx$ 0. Last year's seats should not matter: a confounder that varies over time (next slide).
 \end{itemize}
 
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} x-axis: year of the seats relative to the student's entry year $t$; bars: 95\% CI; dashed line: zero. Seats observed 2007--2019, so cohorts 2010--2016 have all seven years. \textbf{Units}, per ten seats: entrants; graduation within 8 years in pp. Program and year FE plus the ROL FE in the legend; SE clustered by program-year. Students: 176,827 (top 1 + univ.), 67,446 (program set), 45,182 (exact).}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} Bars: 95\% CI. Cohorts 2010--2016. Controls $x_i$ as in the main specification (PSU, NEM, female, school type); without them the estimates are nearly identical ($t-1$: 1.16 / 1.79 / 1.93). Program and year FE plus the ROL FE in the legend; SE by program-year. Students: 176,827 / 67,446 / 45,182.}
 \end{frame}
 
 %--------------------------------------------------------

@@ -27,9 +27,12 @@
 *        be ~0 for every k. Panel C (k = +1) uses the same series.
 *
 *   (B2) Distributed lag, t-3..t+3 jointly with Z (cohorts 2010-2016
-*        keep all seven terms). Robustness (csv only, panel B2V): the
-*        same with Oferta Academica regular vacancies V
-*        (pva_vacancies_2007_2025, ProgramVA/01c).
+*        keep all seven terms), with controls X as in the main
+*        specification of 37 (PSU, NEM, female, private-paid,
+*        municipal, with missing indicators; 2026-11-11). Robustness
+*        (csv only): panel B2V, the same with Oferta Academica regular
+*        vacancies V (pva_vacancies_2007_2025, ProgramVA/01c); panel
+*        B2nX, B2 without controls (the figures before 2026-11-11).
 *
 *   y   : first stage n_pt (N_total_enter) and graduation from the
 *         enrolled program within 8 years (x100)
@@ -241,7 +244,7 @@ local lab_yhat   "Predicted graduation, program, 8y (\%)"
 file open T using "$im_out/tables/im_d5_placebo_balance.tex", write replace
 file write T "\begin{tabular}{lccccc}" _n "\toprule" _n
 file write T " & Mean & (1) & (2) & (3) & (4) \\" _n
-file write T " & level & \multicolumn{4}{c}{per 10 seats} \\" _n "\midrule" _n
+file write T "ROL FE & & -- & Top 1 + univ. & Program set & Exact \\" _n "\midrule" _n
 foreach x in priv mun subv psu_lm nem bea female n_apps yhat {
     if "`x'" == "priv"   file write T "\multicolumn{6}{l}{\textit{Panel A. Socioeconomic proxies}} \\" _n
     if "`x'" == "psu_lm" file write T "\addlinespace" _n "\multicolumn{6}{l}{\textit{Panel B. Achievement and other predetermined}} \\" _n
@@ -261,7 +264,6 @@ file write T "\midrule" _n
 file write T "Students & & " %9.0fc (`N_psu_lm_1') " & " %9.0fc (`N_psu_lm_2') " & " %9.0fc (`N_psu_lm_3') " & " %9.0fc (`N_psu_lm_4') " \\" _n
 file write T "Program FE & & Yes & Yes & Yes & Yes \\" _n
 file write T "Year FE & & Yes & Yes & Yes & Yes \\" _n
-file write T "ROL FE & & -- & Top 1 + univ. & Program set & Exact \\" _n
 file write T "\bottomrule" _n "\end{tabular}" _n
 file close T
 
@@ -366,16 +368,27 @@ file close T
 *    Oferta Academica regular vacancies V (robustness, csv only)
 **********************************************************************/
 
-local terms_B2  "Zm3 Zm2 Zm1 Z10 Zp1 Zp2 Zp3"
-local terms_B2V "Vm3 Vm2 Vm1 V0 Vp1 Vp2 Vp3"
-foreach pn in B2 B2V {
+* controls X as in the main specification (37): PSU, NEM, female,
+* private-paid, municipal, each with a missing indicator (2026-11-11).
+* B2 and B2V include them; B2nX is B2 without controls (csv only).
+local ctrl ""
+foreach v in psu_lm nem female priv mun {
+    gen double c_`v' = cond(missing(`v'), 0, `v')
+    gen byte   m_`v' = missing(`v')
+    local ctrl "`ctrl' c_`v' m_`v'"
+}
+local terms_B2   "Zm3 Zm2 Zm1 Z10 Zp1 Zp2 Zp3"
+local terms_B2V  "Vm3 Vm2 Vm1 V0 Vp1 Vp2 Vp3"
+local terms_B2nX "`terms_B2'"
+foreach pn in B2 B2V B2nX {
     local terms `terms_`pn''
+    local cc = cond("`pn'" == "B2nX", "", "`ctrl'")
     local lags  : word 1 of `terms'
     local lags  "`lags' `: word 2 of `terms'' `: word 3 of `terms''"
     local leads "`: word 5 of `terms'' `: word 6 of `terms'' `: word 7 of `terms''"
     foreach dv in N_total_enter y_program {
         foreach f in 1 2 3 4 {
-            quietly reghdfe `dv' `terms', absorb(`fe`f'') vce(cluster pt)
+            quietly reghdfe `dv' `terms' `cc', absorb(`fe`f'') vce(cluster pt)
             local df = e(df_r)
             local N  = e(N)
             di as result _n "`pn' `dv' fe`f', distributed lag, N=" `N'
@@ -408,7 +421,7 @@ gen double hi = b + 1.96 * se
 gen double kx = k + cond(fe == 2, -0.22, cond(fe == 3, 0, 0.22))
 foreach dv in y_program N_total_enter {
     local nm = cond("`dv'" == "y_program", "grad", "fs")
-    local yt = cond("`dv'" == "y_program", "pp per 10 seats", "entrants per 10 seats")
+    local yt = cond("`dv'" == "y_program", "Change in graduation rate (pp)", "Extra entrants")
     twoway (rcap lo hi kx if dv == "`dv'" & fe == 2, lcolor(navy%70) lwidth(medthick)) ///
            (rcap lo hi kx if dv == "`dv'" & fe == 3, lcolor(dkorange%70) lwidth(medthick)) ///
            (rcap lo hi kx if dv == "`dv'" & fe == 4, lcolor(forest_green%70) lwidth(medthick)) ///
@@ -417,7 +430,7 @@ foreach dv in y_program N_total_enter {
            (scatter b kx if dv == "`dv'" & fe == 4, mcolor(forest_green) msymbol(triangle) msize(large)), ///
         yline(0, lcolor(gs8) lpattern(dash)) xline(0, lcolor(gs14) lwidth(vthick)) ///
         xlabel(-3 "t-3" -2 "t-2" -1 "t-1" 0 "t (own)" 1 "t+1" 2 "t+2" 3 "t+3", labsize(large)) ///
-        xscale(range(-3.5 3.5)) xtitle("Year of the seats", size(large)) ///
+        xscale(range(-3.5 3.5)) xtitle("Year of the 10 extra seats (relative to entry year t)", size(large)) ///
         ylabel(, labsize(large) angle(0) nogrid) ytitle("`yt'", size(large)) ///
         legend(order(4 "Top 1 + univ. (main)" 5 "Program set" 6 "Exact") rows(1) size(medlarge) position(6)) ///
         graphregion(color(white)) plotregion(color(white))
