@@ -1492,6 +1492,82 @@ with or without university $\times$ year FE: programs that expand reach further 
 \end{frame}
 
 %--------------------------------------------------------
+% DESIGN I WITH ROL FE: stacked first differences
+% code/04_rdd/Inframarginals/44b_design1_rol_stacked.do
+%--------------------------------------------------------
+\begin{frame}{Design I with ROL fixed effects: stacked first differences}
+\scriptsize
+\textbf{Problem.} Design I compares program averages in consecutive years ($\Delta \bar Y_{pt}=\beta\,\Delta N_{pt}+\phi_t+\Delta e_{pt}$). The portfolio (ROL) of each applicant is lost in the averages, and applicants cannot be differenced one by one (different people in $t-1$ and $t$).
+
+\vspace{0.04cm}
+\textbf{Idea.} Keep each applicant as a row, grouped so that the comparison is still ``program $p$ in $t$ against $p$ in $t-1$''. Each group is a \textbf{block}:
+\vspace{-0.2cm}
+\[
+Y_{i}=\beta N_{ps}+\phi_g+\gamma_{t(g)}\,post+\lambda_{ROL(i)}+e_{i},\qquad N_{ps}\text{ instrumented by } Z_{ps}
+\]
+\vspace{-0.5cm}
+\begin{columns}[T]
+\begin{column}{0.45\textwidth}
+\textbf{Block} $g=(p,t)$: inframarginal applicants of $p$ in $t-1$ ($post=0$) and in $t$ ($post=1$) = one Design I first difference.
+
+\vspace{0.05cm}
+\centering
+\tiny
+\begin{tabular}{lcc}
+\toprule
+ & $post=0$ & $post=1$ \\
+\midrule
+Block $(p,2011)$ & applicants 2010 & applicants 2011 \\
+Block $(p,2012)$ & applicants 2011 & applicants 2012 \\
+\bottomrule
+\end{tabular}
+
+\raggedright
+\scriptsize
+\vspace{0.05cm}
+Applicants of 2011 enter both blocks, as $N_{p,2011}$ enters both $\Delta N_{p,2011}$ and $\Delta N_{p,2012}$.
+\end{column}
+\begin{column}{0.53\textwidth}
+\begin{itemize}
+    \setlength{\itemsep}{0pt}
+    \item $Y_i$: graduates within 8 years. $N_{ps}$, $Z_{ps}$: entering cohort and vacancies of $p$ in $s\in\{t-1,t\}$.
+    \item $\phi_g$: removes the level of the block; what is left is $t$ vs.\ $t-1$ (the $\Delta$'s of Design I).
+    \item $\gamma_{t(g)}\,post$: change common to all programs from $t-1$ to $t$ (= year FE of Design I).
+    \item Weighted as Design I: without $\lambda_{ROL}$, $\beta$ = Design I exactly.
+    \item $\lambda_{ROL(i)}$, \textbf{the only addition}: applicants of $t$ are compared with applicants of $t-1$ with the same portfolio.
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.04cm}
+\textbf{ROL}, coarse to fine: 1st preference + set of universities (main); set of programs; exact ordered list; main ROL $\times$ block. Unique ROLs drop out.
+
+\vspace{0.02cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} Design I applicants (Rank $\leq T_p$, First Cohort threshold, every inframarginal application): 507,169 applications, 821,704 applicant-block rows, 6,529 blocks = the Design I first differences. $Y$: graduation from the program within 8 years. First stage with the same terms. SE clustered by program.}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design I with ROL fixed effects: results}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d1_rol_stacked.tex}}
+
+\vspace{0.15cm}
+\raggedright
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{2pt}
+    \item Column (1) reproduces Design I exactly (0.005 and $-0.033$).
+    \item Adding ROL FE barely moves the estimate. With year FE it stays at zero; within university and year it stays at $-0.024$ to $-0.036$ pp per entrant.
+    \item Same answer in the most demanding comparison: same portfolio, same program, consecutive years (column 5).
+    \item Year-to-year changes in seats do not bring applicants with different portfolios. The gap between Design I ($\approx 0$) and Design V ($+0.065$ pp per entrant) does not come from the ROL control.
+\end{itemize}
+
+\vspace{0.05cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS of 8-year graduation from the program ($\times 100$, pp per entering student) on the entering cohort, instrumented by vacancies, within blocks. ROL FE drop applicants whose ROL appears once, so the samples differ across columns; without ROL FE on the samples of columns (2)--(4), the estimates are $-0.002$, $-0.008$, $-0.013$ (panel A) and $-0.033$, $-0.033$, $-0.034$ (panel B). SE clustered by program. \sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$.}
+\end{frame}
+
+%--------------------------------------------------------
 % DESIGN I: CONTINUOUS DiD (Callaway, Goodman-Bacon & Sant'Anna 2024)
 % code/04_rdd/Inframarginals/33_design1_contdid.do (issue #5)
 %--------------------------------------------------------
@@ -3511,6 +3587,71 @@ $p$ (equal): Wald test in the pooled model fully interacted with the group.
 
 \vspace{0.05cm}
 \parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS per entrant; outcomes are 0/1 (0.001 = 0.1 pp). Terciles of EB program VA across the 1,318 classified programs (Step 0); cutoffs $-5.1$ and $1.4$ income rank points. Each group keeps its own non-singleton sample. ROL FE: top 1 + univ. Controls as in the results slide. SE clustered by program-year. $p$ (equal): joint Wald test, pooled model fully interacted with the tercile.}
+\end{frame}
+
+%--------------------------------------------------------
+% code/04_rdd/Inframarginals/40c_design5_leadlag_uniyear.do
+\begin{frame}[label=d5-tm1-uniyear]{Why do last year's seats raise graduation? University-wide shocks}
+\scriptsize
+\textbf{Question.} In the \hyperlink{d5-leadlag-joint}{\color{blue}distributed lag}, ten more seats in $t-1$ raise graduation of the cohort entering in $t$ by 1.1 pp. A \textbf{revenue effect}? (more students $\to$ more money $\to$ more resources for the next cohort).
+\textbf{Test.} \textbf{University $\times$ year FE} absorb anything common to the university in a year (revenue, spending, staff): a university-wide revenue effect would send $\gamma_{-1}$ to zero.
+\vspace{-0.15cm}
+\[
+y_i = \textstyle\sum_{k=-3}^{3} \gamma_k Z_{p,t+k} + x_i'\delta + \phi_p + \phi_{u(p)t} \;[\text{or } \phi_t,\ \phi_{f(p)t}] + \phi_{ROL(i)} + e_i
+\]
+\vspace{-0.3cm}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.58\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_leadlag_uniyear.tex}}
+\end{column}
+\begin{column}{0.40\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{2pt}
+    \item \textbf{$\gamma_{-1}$ survives} university $\times$ year FE (1.14 $\to$ 1.11): not a university-wide shock (revenue included), nor a field-wide one.
+    \item \textbf{Not cohort size}: entrants in $t$ do not move.
+    \item \textbf{Not observable composition}: PSU and predicted graduation do not move ($\approx$2\% of the 1.1 pp).
+    \item What remains is program-specific and time-varying: trends, reallocation within the university, unobserved selection.
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.05cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} Per ten seats, seats of $t-3$ to $t+3$ jointly. Sample, controls and seats as in the distributed-lag slide (column (1) reproduces it); ROL FE top 1 + univ.; SE by program-year. Predicted graduation: fitted graduation on PSU, NEM, female, school type; PSU and predicted graduation without controls. Mean: sample mean over students (entrants and seats: of the student's program).}
+\end{frame}
+
+%--------------------------------------------------------
+% code/04_rdd/Inframarginals/45_finance_seats_rf.do (needs 01_clean/08, 02_build/17, 18)
+\begin{frame}[label=d5-tm1-finance]{Why do last year's seats raise graduation? University finances}
+\scriptsize
+\textbf{Question.} If a university raised its seats \textbf{last year} ($t-1$), does it spend or invest more per student \textbf{this year} ($t$), when the next cohort enters?
+\textbf{Data:} university financial statements (Superintendencia de Educaci\'on Superior), 2013--2022, by university and year.
+\vspace{-0.2cm}
+\[
+\Delta \ln Y_{ut} = b_0\, \Delta \ln \text{Seats}_{ut} + b_1\, \Delta \ln \text{Seats}_{u,t-1} + b_2\, \Delta \ln \text{Seats}_{u,t-2} + \Delta \text{Field shares}_{ut}'\theta + \phi_t + e_{ut}
+\]
+\vspace{-0.35cm}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.53\textwidth}
+\centering
+\tiny
+\resizebox{0.88\linewidth}{!}{\input{../../output/inframarginal/tables/im_fin_seats_rf.tex}}
+\end{column}
+\begin{column}{0.45\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{3pt}
+    \item \textbf{More students, more tuition}, but expenses grow less than students and \textbf{capital does not move} (no investment).
+    \item \textbf{Seats up 10\% last year}: this year's expenses per student barely change ($+0.15\%$). No extra resources for the next cohort.
+    \item \textbf{Per student, resources fall} in the year of the expansion: expenses $-1.6\%$, capital $-3\%$; the fall is spread over teaching and fixed costs.
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.1cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} One regression per row; $u$ university, $t$ year. Entries: $10\times b_k$, the \% change in the outcome in year $t$ when seats rose 10\% in $t$, $t-1$ or $t-2$. Mean: sample mean of the outcome level per university-year (nominal pesos). Field shares: share of each knowledge area in enrollment (so that growing in cheaper fields is not read as less spending). $\phi_t$: year FE; 41 universities, SE by university. Seats: regular vacancies of the university's programs. Per student: over undergraduate enrollment (MINEDUC). Teaching: academic salaries ($\approx$31\% of expenses). Overhead: administrative and executive salaries + administration and sales ($\approx$48\%). Capital: non-current assets of the audited balance sheet (no investment line exists); 4 university-years with asset jumps $>$2.5$\times$ dropped in those rows.}
 \end{frame}
 
 

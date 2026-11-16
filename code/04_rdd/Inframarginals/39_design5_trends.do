@@ -92,7 +92,8 @@ forvalues c = 1/3 {
 * table
 file open T using "$im_out/tables/im_d5_trends.tex", write replace
 file write T "\begin{tabular}{lccc}" _n "\toprule" _n
-file write T " & (1) & (2) & (3) \\" _n "\midrule" _n
+file write T " & (1) & (2) & (3) \\" _n
+file write T "ROL FE & Top 1 + univ. & Program set & Exact \\" _n "\midrule" _n
 file write T "First stage: \(n_{pt}\) on \(Z_{pt}\)"
 forvalues c = 1/3 {
     stars `fsp`c'' s
@@ -139,7 +140,6 @@ forvalues c = 1/3 {
 file write T " \\" _n "\midrule" _n
 file write T "Program FE & Yes & Yes & Yes \\" _n
 file write T "Year FE & Yes & Yes & Yes \\" _n
-file write T "ROL FE & Top 1 + univ. & Program set & Exact \\" _n
 file write T "Program-specific linear trends & Yes & Yes & Yes \\" _n
 file write T "Controls & Yes & Yes & Yes \\" _n
 file write T "\bottomrule" _n "\end{tabular}" _n

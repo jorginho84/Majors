@@ -1,0 +1,25 @@
+\begin{tabular}{l*{5}{c}}
+\toprule
+ & Design I & Main ROL & Program-set ROL & Exact ROL & Main ROL \\
+ & (replication) & (1st pref. + set of univ.) & (set of programs) & (ordered list) & \(\times\) block \\
+\cmidrule(lr){2-2}\cmidrule(lr){3-6}
+ & (1) & (2) & (3) & (4) & (5) \\
+ROL fixed effects & No & Yes & Yes & Yes & Yes \\
+\midrule
+\multicolumn{6}{l}{\textit{Panel A. FE: block + year}} \\
+2SLS, graduation from the program (pp per entrant) &   0.005 &   0.003 &   0.009 &   0.019 &  -0.003 \\
+ & (0.023) & (0.023) & (0.026) & (0.027) & (0.022) \\
+First stage &  0.735 &  0.761 &  0.768 &  0.789 &  0.795 \\
+Kleibergen--Paap F &  197.4 &  196.9 &  126.1 &  112.8 &  253.4 \\
+Applicant-block rows &    821,704 &    784,782 &    706,514 &    690,002 &    473,350 \\
+Blocks (first differences) &  6,529 &  6,529 &  6,522 &  6,510 &  6,522 \\
+\addlinespace
+\multicolumn{6}{l}{\textit{Panel B. FE: block + university \(\times\) year}} \\
+2SLS, graduation from the program (pp per entrant) &  -0.033\sym{**} &  -0.034\sym{**} &  -0.036\sym{**} &  -0.024 &  -0.030\sym{*} \\
+ & (0.015) & (0.015) & (0.018) & (0.024) & (0.017) \\
+First stage &  0.764 &  0.787 &  0.797 &  0.812 &  0.813 \\
+Kleibergen--Paap F &  284.4 &  302.7 &  217.7 &  192.6 &  389.3 \\
+Applicant-block rows &    821,704 &    784,782 &    706,514 &    690,002 &    473,350 \\
+Blocks (first differences) &  6,529 &  6,529 &  6,522 &  6,510 &  6,522 \\
+\bottomrule
+\end{tabular}
