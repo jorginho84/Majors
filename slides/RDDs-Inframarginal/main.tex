@@ -3453,6 +3453,33 @@ For inframarginal student $i$ in program $p$, admission year $t$ (the entering c
 \end{frame}
 
 %--------------------------------------------------------
+% code/04_rdd/Inframarginals/47_design5_balance_noctrl.do
+\begin{frame}[label=d5-balance-noctrl]{Design V: how much selection do the controls absorb?}
+\vspace{-0.15cm}
+{\scriptsize Same balance regressions, $x_i = g\,Z_{pt} + \text{controls} + u_i$, adding the controls one block at a time, from none to program, year and ROL FE (ROL = unordered set of programs). Columns (2)--(4) use the same students, so any change comes from the controls, not the sample.\par}
+\vspace{0.1cm}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.62\textwidth}
+\centering
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_balance_noctrl.tex}}
+\end{column}
+\begin{column}{0.36\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{2pt}
+    \item \textbf{No controls}: strong selection; +1.1 pp private-paid, +2.3 PSU points, predicted graduation +0.12 pp.
+    \item \textbf{Program + year FE} do most of the work: $>$85\% of the school-type and PSU gaps, $\sim$60\% of the joint index.
+    \item \textbf{ROL FE} adds little: joint index flat (0.044); trims NEM (0.83 $\to$ 0.62).
+    \item \textbf{Residual}: about a third of the raw bias, mostly PSU and NEM.
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.1cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} Change per ten seats in each row's unit (pp for \% rows). (2)--(4): non-singleton sample of the program-set ROL FE; (4) = col.\ (7) of the \hyperlink{d5-app-balance-rol}{\color{blue}ROL appendix}. ROL length is collinear with the FE in (4). SE clustered by program-year.}
+\end{frame}
+
+%--------------------------------------------------------
 % code/04_rdd/Inframarginals/40b_design5_balance_psu.do
 \begin{frame}[label=d5-balance-psu]{Design V: balance controlling for PSU}
 \vspace{-0.15cm}
