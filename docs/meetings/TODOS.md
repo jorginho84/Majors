@@ -9,10 +9,14 @@
 - [ ] Add a motivating figure: program returns vs. average change in program size over 10–15 years — created 2026-10-27 · issue #9 · status: Not started
 - [ ] Validate program VA within the RD bandwidth against RD jumps (tax-authority earnings as a possible source) — created 2026-10-27 · issue #9 · status: Not started
 - [ ] Look up and compare the Mata–Viera value-added paper — created 2026-10-27 · status: Not started
-- [ ] Ask Agustín for program-level average earnings from Central Bank data (zeros included, up to ~10 years after enrollment, conditional on enrollment) — created 2026-11-10 · issues #9, #11 · status: Not started
-- [ ] Update the team on the Ministry of Labor response — created 2026-11-10 · status: Not started
+- [ ] Re-run balance table columns 1–3 on the 84k non-singleton sample (same-sample ROL diagnostic) — created 2026-11-17 · issue #10 · status: Not started
+- [ ] Re-estimate the university expenditure regressions in levels with university and year FE (seats in T, then add T−1 and T−2) — created 2026-11-17 · issue #10 · status: Not started
+- [ ] (Tentative) Add expenditure per student as a control in the Design V balance specification — created 2026-11-17 · issue #10 · status: Not started
+- [ ] Prepare quartile-level program VA estimates from Central Bank earnings — created 2026-11-17 · issues #9, #11 · status: Not started
+- [ ] Follow up with the Ministry of Labor contact on data access — created 2026-11-17 · status: Not started
 
 ## Done
+- [x] Ask Agustín for program-level average earnings from Central Bank data — created 2026-11-10 · closed 2026-11-17 · issues #9, #11 · evidence: discussed with Agustín (`docs/meetings/2026-11-17.md`); program-level estimates are not disclosable, replaced by the quartile-level to-do
 - [x] Re-run the Design V balance table controlling for PSU score (and PSU deciles) — created 2026-11-10 · closed 2026-11-12 · issue #10 · evidence: `40b_design5_balance_psu.do`, `im_d5_balance_psu.tex` (`4528844`); the imbalance persists once PSU is controlled for. Follow-up: no-controls vs. ROL FE balance in `47_design5_balance_noctrl.do` (`2ba21c1`)
 - [x] Verify the balance table: program-year clustering, school-type shares that don't sum to 100%, units of the private-subsidized coefficient — created 2026-11-10 · closed 2026-11-12 · issue #10 · evidence: issue #10 comment of 2026-11-12. SEs were already clustered by program-year; the missing ~2.2% are delegated-administration schools (omitted category); coefficients are pp per ten seats, now stated in the table notes (`4528844`)
 - [x] Look up university financial statements from the Superintendencia de Educación Superior (revenue channel behind the T−1 graduation coefficient) — created 2026-11-10 · closed 2026-11-16 · issues #8, #10 · evidence: `01_clean/08_clean_ses_finance.do`, `02_build/17`, `45_finance_seats_rf.do`, `im_fin_seats_rf.tex` (`6d5e45c`); no revenue channel found. `40c_design5_leadlag_uniyear.do` shows the T−1 coefficient survives university × year and field × year FE
@@ -37,3 +41,4 @@
   > We will want to estimate these on only the inframarginal students.
 
 ## Dropped
+- Update the team on the Ministry of Labor response — dropped 2026-11-17 · reason: no reply yet; replaced by the follow-up to-do
