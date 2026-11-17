@@ -1492,82 +1492,6 @@ with or without university $\times$ year FE: programs that expand reach further 
 \end{frame}
 
 %--------------------------------------------------------
-% DESIGN I WITH ROL FE: stacked first differences
-% code/04_rdd/Inframarginals/44b_design1_rol_stacked.do
-%--------------------------------------------------------
-\begin{frame}{Design I with ROL fixed effects: stacked first differences}
-\scriptsize
-\textbf{Problem.} Design I compares program averages in consecutive years ($\Delta \bar Y_{pt}=\beta\,\Delta N_{pt}+\phi_t+\Delta e_{pt}$). The portfolio (ROL) of each applicant is lost in the averages, and applicants cannot be differenced one by one (different people in $t-1$ and $t$).
-
-\vspace{0.04cm}
-\textbf{Idea.} Keep each applicant as a row, grouped so that the comparison is still ``program $p$ in $t$ against $p$ in $t-1$''. Each group is a \textbf{block}:
-\vspace{-0.2cm}
-\[
-Y_{i}=\beta N_{ps}+\phi_g+\gamma_{t(g)}\,post+\lambda_{ROL(i)}+e_{i},\qquad N_{ps}\text{ instrumented by } Z_{ps}
-\]
-\vspace{-0.5cm}
-\begin{columns}[T]
-\begin{column}{0.45\textwidth}
-\textbf{Block} $g=(p,t)$: inframarginal applicants of $p$ in $t-1$ ($post=0$) and in $t$ ($post=1$) = one Design I first difference.
-
-\vspace{0.05cm}
-\centering
-\tiny
-\begin{tabular}{lcc}
-\toprule
- & $post=0$ & $post=1$ \\
-\midrule
-Block $(p,2011)$ & applicants 2010 & applicants 2011 \\
-Block $(p,2012)$ & applicants 2011 & applicants 2012 \\
-\bottomrule
-\end{tabular}
-
-\raggedright
-\scriptsize
-\vspace{0.05cm}
-Applicants of 2011 enter both blocks, as $N_{p,2011}$ enters both $\Delta N_{p,2011}$ and $\Delta N_{p,2012}$.
-\end{column}
-\begin{column}{0.53\textwidth}
-\begin{itemize}
-    \setlength{\itemsep}{0pt}
-    \item $Y_i$: graduates within 8 years. $N_{ps}$, $Z_{ps}$: entering cohort and vacancies of $p$ in $s\in\{t-1,t\}$.
-    \item $\phi_g$: removes the level of the block; what is left is $t$ vs.\ $t-1$ (the $\Delta$'s of Design I).
-    \item $\gamma_{t(g)}\,post$: change common to all programs from $t-1$ to $t$ (= year FE of Design I).
-    \item Weighted as Design I: without $\lambda_{ROL}$, $\beta$ = Design I exactly.
-    \item $\lambda_{ROL(i)}$, \textbf{the only addition}: applicants of $t$ are compared with applicants of $t-1$ with the same portfolio.
-\end{itemize}
-\end{column}
-\end{columns}
-
-\vspace{0.04cm}
-\textbf{ROL}, coarse to fine: 1st preference + set of universities (main); set of programs; exact ordered list; main ROL $\times$ block. Unique ROLs drop out.
-
-\vspace{0.02cm}
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} Design I applicants (Rank $\leq T_p$, First Cohort threshold, every inframarginal application): 507,169 applications, 821,704 applicant-block rows, 6,529 blocks = the Design I first differences. $Y$: graduation from the program within 8 years. First stage with the same terms. SE clustered by program.}
-\end{frame}
-
-%--------------------------------------------------------
-\begin{frame}{Design I with ROL fixed effects: results}
-\centering
-\tiny
-\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d1_rol_stacked.tex}}
-
-\vspace{0.15cm}
-\raggedright
-\scriptsize
-\begin{itemize}
-    \setlength{\itemsep}{2pt}
-    \item Column (1) reproduces Design I exactly (0.005 and $-0.033$).
-    \item Adding ROL FE barely moves the estimate. With year FE it stays at zero; within university and year it stays at $-0.024$ to $-0.036$ pp per entrant.
-    \item Same answer in the most demanding comparison: same portfolio, same program, consecutive years (column 5).
-    \item Year-to-year changes in seats do not bring applicants with different portfolios. The gap between Design I ($\approx 0$) and Design V ($+0.065$ pp per entrant) does not come from the ROL control.
-\end{itemize}
-
-\vspace{0.05cm}
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS of 8-year graduation from the program ($\times 100$, pp per entering student) on the entering cohort, instrumented by vacancies, within blocks. ROL FE drop applicants whose ROL appears once, so the samples differ across columns; without ROL FE on the samples of columns (2)--(4), the estimates are $-0.002$, $-0.008$, $-0.013$ (panel A) and $-0.033$, $-0.033$, $-0.034$ (panel B). SE clustered by program. \sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$.}
-\end{frame}
-
-%--------------------------------------------------------
 % DESIGN I: CONTINUOUS DiD (Callaway, Goodman-Bacon & Sant'Anna 2024)
 % code/04_rdd/Inframarginals/33_design1_contdid.do (issue #5)
 %--------------------------------------------------------
@@ -1951,6 +1875,32 @@ y_{pt}=\sum_{\ell\neq-1}b_\ell\,\mathbf 1\{t-g_p=\ell\}+\mu_p+\lambda+e_{pt},\qq
 \end{frame}
 
 %--------------------------------------------------------
+\begin{frame}{Design II (D): reduced-form event study, selective vs all programs}
+\scriptsize
+Program graduation 8y of inframarginal applicants (First Cohort); program and year FE (FE (1)) in the TWFE; CS with program and year.
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.49\textwidth}
+\centering
+\textbf{Selective programs}
+
+\includegraphics[width=\linewidth, height=0.52\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_2sls_rf_es_g8p_f_fe1.pdf}
+\end{column}
+\begin{column}{0.49\textwidth}
+\centering
+\textbf{All programs}
+
+\includegraphics[width=\linewidth, height=0.52\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_2sls_rf_es_g8p_f_fe1_all.pdf}
+\end{column}
+\end{columns}
+\begin{itemize}\tiny
+    \setlength{\itemsep}{0pt}
+    \item Selective: the leads reject (TWFE $p=0.001$; CS $p=0.008$ / $0.012$); graduation is falling before the shock, which drives the static $-6.5^{***}$.
+    \item All programs: flat leads (TWFE $p=0.35$; CS $p=0.10$ / $0.13$) and post coefficients near zero or slightly positive (CS not yet treated ATT $+2.6$ (1.6)), consistent with the static $+0.5$ (1.1).
+    \item The vertical scales differ across panels.
+\end{itemize}
+\end{frame}
+
+%--------------------------------------------------------
 \begin{frame}{Design II (D): results, inframarginal graduation}
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.56\textwidth}
@@ -1977,6 +1927,57 @@ y_{pt}=\sum_{\ell\neq-1}b_\ell\,\mathbf 1\{t-g_p=\ell\}+\mu_p+\lambda+e_{pt},\qq
 2SLS: pp of graduation per additional entrant (Design I, with university $\times$ year FE: $-0.033$). \textbf{Caveat}: the reduced form fails the CS pre-period test
 ($p=0.008$) and CS not-yet-treated gives $-1.3$ (1.9), so the 2SLS inherits a fragile reduced form.
 \sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$.}
+\end{frame}
+
+%--------------------------------------------------------
+% code/Own_expansion/08_design2_income_rank.do (issue #13; needs 02_build/19, ProgramVA/01b)
+\begin{frame}[label=d2-incrank]{Design II (D): income rank of the program of graduation}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.56\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/own_expansion/tables/oe_2sls_design2_incrank_first.tex}}
+\end{column}
+\begin{column}{0.42\textwidth}
+\scriptsize
+\textbf{Outcome}: income rank (1--100) of the program of the student's first title within 8 years, \emph{any} program or institution (Step 0 outcome); 0 if no title.
+\begin{itemize}
+    \setlength{\itemsep}{3pt}
+    \item \textbf{Zero everywhere}: $0.02$--$0.04$ rank points per entrant in selective programs (SE $\approx 0.05$), $\approx 0$ in all programs.
+    \item Any title and the rank among graduates do not move either.
+    \item The $-0.28^{***}$ in program graduation (FE (1), reference row) does not become fewer titles or lower-paying ones: inframarginals graduate \emph{elsewhere}.
+    \item Same with the Minimum Cohort definition (in the csv).
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.06cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} (1) program and year FE; (2) program and university $\times$ year FE. Unweighted, SE by program. 2SLS per entrant: income rank in rank points; titles and graduation in pp. Income rank: program-level Mi Futuro average, not the student's wage. Rank among graduates: selected sample. \sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$.}
+\end{frame}
+
+%--------------------------------------------------------
+\begin{frame}{Design II (D): reduced-form event study, income rank}
+\scriptsize
+Outcome: mean income rank of the program of graduation of the inframarginal applicants (First Cohort); event time around the first own sudden expansion; selective programs.
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.49\textwidth}
+\centering
+\textbf{(1) Program and year FE}
+
+\includegraphics[width=\linewidth, height=0.55\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_ir_rf_es_ir_f_fe1.pdf}
+\end{column}
+\begin{column}{0.49\textwidth}
+\centering
+\textbf{(2) Program and university $\times$ year FE}
+
+\includegraphics[width=\linewidth, height=0.55\textheight, keepaspectratio]{../../output/own_expansion/figures/oe_ir_rf_es_ir_f_fe2.pdf}
+\end{column}
+\end{columns}
+\begin{itemize}\tiny
+    \setlength{\itemsep}{0pt}
+    \item Unlike program graduation, the leads are flat: TWFE joint-leads $p=0.49$ (1) and $0.95$ (2); CS pre-period $p=0.98$ (never treated) and $0.99$ (not yet).
+    \item Post coefficients are small and not significant; CS not-yet-treated ATT $=2.1$ (1.95) rank points (pre-shock mean 47.7).
+\end{itemize}
 \end{frame}
 
 \subsection{Inframarginal Design No. 3}
@@ -3398,6 +3399,31 @@ For inframarginal student $i$ in program $p$, admission year $t$ (the entering c
 \end{itemize}
 \end{column}
 \end{columns}
+\end{frame}
+
+%--------------------------------------------------------
+% code/04_rdd/Inframarginals/46_design5_income_rank.do (issue #13; needs 16, ProgramVA/01b)
+\begin{frame}[label=d5-incrank]{Design V: income rank of the program of graduation}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.56\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_incrank.tex}}
+\end{column}
+\begin{column}{0.42\textwidth}
+\scriptsize
+\textbf{Outcome}: income rank (1--100) of the program of the student's first title within 8 years, \emph{any} program or institution (Step 0 outcome); 0 if no title.
+\begin{itemize}
+    \setlength{\itemsep}{3pt}
+    \item \textbf{Zero in every column}. Main spec (3): $-0.003$ rank points per 10 entrants (SE 0.065); the 95\% CI rules out effects beyond $\pm0.13$ points (outcome SD $\approx 33$).
+    \item Any title and the rank among graduates: also zero.
+    \item The rise in graduation from the enrolled program (reference row, $+0.64$ pp per 10 entrants) is not more titles or better-paid ones: it is \emph{where} students graduate.
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.06cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS on $n_{pt}$ instrumented by $Z_{pt}$, coefficients $\times 10$ (per 10 additional entrants). Income rank in rank points; any title and program graduation in pp. Program FE in all columns; ROL FE top 1 + univ.; controls as in the results slide. SE clustered by program-year. Income rank: Mi Futuro income (institution $\times$ carrera gen\'erica) ranked among sample graduates, a program-level average, not the student's wage. Rank among graduates: selected sample, descriptive. \sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$.}
 \end{frame}
 
 %--------------------------------------------------------

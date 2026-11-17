@@ -25,6 +25,8 @@
 * Output: output/own_expansion/tables/oe_2sls_design2.tex
 *         output/own_expansion/figures/oe_2sls_rf_es_<y>_<fe>.pdf (reduced-form
 *         event studies, selective programs)
+*         output/own_expansion/figures/oe_2sls_rf_es_g8p_f_fe1_all.pdf (same,
+*         all incumbent programs, program and year FE)
 **********************************************************************/
 
 do "code/config.do"
@@ -162,10 +164,21 @@ macro drop S_*
 
 
 /**********************************************************************
-* 3. Reduced-form event studies, selective programs
+* 3. Reduced-form event studies, all programs (g8p_f, FE 1) and selective
 *    Outcome: the second-stage y; event time around g_main (the shock).
 *    TWFE with FE (1) or (2), plus CS (never / not yet, program + year).
 **********************************************************************/
+
+* All incumbent programs first (program graduation 8y, First Cohort, FE (1)),
+* to compare with the selective-program event study of the same spec.
+oe_es g8p_f, g(g_main) rel(rel_main) absorb(pid ao_proceso) cluster(pid) ///
+    ylab("Program graduation 8y, First Cohort (pct.)") ///
+    xlab("Years since first own vacancy shock") ///
+    file("$oe_out/figures/oe_2sls_rf_es_g8p_f_fe1_all.pdf")
+di as text "ALL g8p_f fe1: TWFE leads p = " as result %5.3f r(pTWFE) ///
+    as text "  CS never Pre_avg p = " as result %5.3f r(pCSnv) ///
+    as text "  CS not yet Pre_avg p = " as result %5.3f r(pCSny) ///
+    as text "  CS ny ATT = " as result %6.2f r(attCSny) " (" %5.2f r(seCSny) ")"
 
 keep if selective
 foreach y in g8p_f g8p_m g8u_f {
