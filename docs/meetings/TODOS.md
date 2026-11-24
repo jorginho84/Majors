@@ -9,13 +9,19 @@
 - [ ] Add a motivating figure: program returns vs. average change in program size over 10–15 years — created 2026-10-27 · issue #9 · status: Not started
 - [ ] Validate program VA within the RD bandwidth against RD jumps (tax-authority earnings as a possible source) — created 2026-10-27 · issue #9 · status: Not started
 - [ ] Look up and compare the Mata–Viera value-added paper — created 2026-10-27 · status: Not started
-- [ ] Re-run balance table columns 1–3 on the 84k non-singleton sample (same-sample ROL diagnostic) — created 2026-11-17 · issue #10 · status: Not started
-- [ ] Re-estimate the university expenditure regressions in levels with university and year FE (seats in T, then add T−1 and T−2) — created 2026-11-17 · issue #10 · status: Not started
-- [ ] (Tentative) Add expenditure per student as a control in the Design V balance specification — created 2026-11-17 · issue #10 · status: Not started
 - [ ] Prepare quartile-level program VA estimates from Central Bank earnings — created 2026-11-17 · issues #9, #11 · status: Not started
-- [ ] Follow up with the Ministry of Labor contact on data access — created 2026-11-17 · status: Not started
+- [ ] Follow up with the Ministry of Labor contact on data access — created 2026-11-17 · status: In progress · still no reply as of 2026-11-24 (co-author busy with congressional legislation)
+- [ ] Investigate transfer and PSU retake as 2SLS outcomes (research institutional transfer rules in the study period; transfer dummy within first 2 years; PSU retake probability) — created 2026-11-24 · issue #10 · status: Not started
+- [ ] Add PSU score (language and math) as the dependent variable in the event-study figure — created 2026-11-24 · issue #10 · status: Not started
+- [ ] Re-run balance and main specs controlling for PSU quantiles (5 or 10) instead of the raw score — created 2026-11-24 · issue #10 · status: Not started
+- [ ] 2SLS heterogeneity by program size (above/below median enrollment) — created 2026-11-24 · issue #10 · status: Not started
+- [ ] Determine which program-year (CPT) control drives the balance improvement (one at a time vs. all at once) — created 2026-11-24 · issue #10 · status: Not started
+- [ ] Send Emilio the value-added specification by email — created 2026-11-24 · issue #9 · status: Not started
 
 ## Done
+- [x] Re-run balance table columns 1–3 on the non-singleton sample (same-sample ROL diagnostic) — created 2026-11-17 · closed 2026-11-24 · issue #10 · evidence: `51_design5_balance_rolctrl.do` (`c97064c`); columns (2)–(6) share the same non-singleton students for each ROL FE
+- [x] Re-estimate the university expenditure regressions in levels with university and year FE — created 2026-11-17 · closed 2026-11-24 · issue #10 · evidence: `49_finance_seats_levels.do`, `im_fin_seats_levels.tex` (`c97064c`)
+- [x] (Tentative) Add expenditure per student as a control in the Design V balance specification — created 2026-11-17 · closed 2026-11-24 · issue #10 · evidence: `02_build/20_build_program_year_controls.do` and `51_design5_balance_rolctrl.do` (`c97064c`)
 - [x] Ask Agustín for program-level average earnings from Central Bank data — created 2026-11-10 · closed 2026-11-17 · issues #9, #11 · evidence: discussed with Agustín (`docs/meetings/2026-11-17.md`); program-level estimates are not disclosable, replaced by the quartile-level to-do
 - [x] Re-run the Design V balance table controlling for PSU score (and PSU deciles) — created 2026-11-10 · closed 2026-11-12 · issue #10 · evidence: `40b_design5_balance_psu.do`, `im_d5_balance_psu.tex` (`4528844`); the imbalance persists once PSU is controlled for. Follow-up: no-controls vs. ROL FE balance in `47_design5_balance_noctrl.do` (`2ba21c1`)
 - [x] Verify the balance table: program-year clustering, school-type shares that don't sum to 100%, units of the private-subsidized coefficient — created 2026-11-10 · closed 2026-11-12 · issue #10 · evidence: issue #10 comment of 2026-11-12. SEs were already clustered by program-year; the missing ~2.2% are delegated-administration schools (omitted category); coefficients are pp per ten seats, now stated in the table notes (`4528844`)
