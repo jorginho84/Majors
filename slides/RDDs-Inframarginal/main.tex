@@ -18,6 +18,7 @@
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{tabularx}
+\usepackage{adjustbox}
 \usepackage{appendix}
 
 % section and subsection divider pages (not counted in frame numbers)
@@ -3279,13 +3280,15 @@ cohort is larger graduate at lower rates?
 \begin{frame}{Design V: equations and sample}
 \scriptsize
 For inframarginal student $i$ in program $p$, admission year $t$ (the entering cohort of $p$ in $t$ is $n_{pt}$):
+\vspace{-0.15cm}
 \[
-\text{First stage:}\quad n_{pt} = \alpha_1 Z_{pt} + x_i'\alpha_2 + \psi_p + \psi_t + \psi_{ROL(i)} + \nu_{i}
+\text{First stage:}\quad n_{pt} = \alpha_1 Z_{pt} + x_i'\alpha_2 + c_{pt}'\alpha_3 + \psi_p + \psi_t + \psi_{ROL(i)} + \nu_{i}
 \]
+\vspace{-0.25cm}
 \[
-\text{Second stage:}\quad Y_i = \beta\, n_{pt} + x_i'\beta_2 + \phi_p + \phi_t + \phi_{ROL(i)} + \varepsilon_{i}
+\text{Second stage:}\quad Y_i = \beta\, n_{pt} + x_i'\beta_2 + c_{pt}'\beta_3 + \phi_p + \phi_t + \phi_{ROL(i)} + \varepsilon_{i}
 \]
-\vspace{-0.2cm}
+\vspace{-0.3cm}
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.49\textwidth}
 \scriptsize
@@ -3293,21 +3296,25 @@ For inframarginal student $i$ in program $p$, admission year $t$ (the entering c
     \setlength{\itemsep}{0pt}
     \item $n_{pt}$: entering cohort of program $p$ in year $t$ (enrolled students); endogenous.
     \item $Z_{pt}$: \textbf{instrument}, total seats offered by $p$ in $t$ (DEMRE Oferta Acad\'emica). $\alpha_1$: entrants per extra seat.
-    \item $Y_i$: 1 if $i$ graduates within 8 years from the program first enrolled in (main); also any university, any higher-education institution.\end{itemize}
+    \item $Y_i$: 1 if $i$ graduates within 8 years from the program first enrolled in (main); also any university, any HE institution.
+    \item $x_i$: PSU, NEM, female, school type (with missing indicators). \emph{No} peer composition: it is a mechanism.\end{itemize}
 \end{column}
 \begin{column}{0.49\textwidth}
 \scriptsize
 \begin{itemize}
     \setlength{\itemsep}{0pt}
-    \item $x_i$: PSU language+math, NEM, female, private-paid and municipal school (with missing indicators). \emph{No} peer composition: it is a mechanism.
-    \item $\psi_p,\phi_p$: program FE (permanent differences across programs). $\psi_t,\phi_t$: year FE (shocks common to all programs).
-    \item $\psi_{ROL(i)},\phi_{ROL(i)}$: FE for the student's application list (ROL), so only students with similar lists are compared; several definitions (next slide).\end{itemize}
+    \item \textbf{New} $c_{pt}$: program demand in $t-1$, the year before $t$ (log applicants, first-preference applicants and waiting list; mean score of first-preference applicants); accreditation and tuition in $t$. Missing $\to 0$ plus indicator.
+    \item $\psi_p,\phi_p$: program FE. $\psi_t,\phi_t$: year FE, or (\textbf{new}) university $\times$ year and field $\times$ year FE (U, F $\times$ yr).
+    \item $\psi_{ROL(i)},\phi_{ROL(i)}$: FE for the student's application list (ROL); several definitions (next slide).\end{itemize}
 \end{column}
 \end{columns}
 
-\vspace{0.1cm}
+\vspace{0.05cm}
 \scriptsize
-\textbf{Sample}: inframarginal students as in Design I ($Rank_{ipt}\le T_p$, $T_p$ = first enrolled cohort): they would be admitted even with fewer seats. One row per student: the most preferred inframarginal application in the student's first inframarginal year (99\% of student-years have only one). \textbf{432,184 students, 1,307 programs, 8,218 program-years}, 2007--2016.
+\textbf{Specifications}: (a) program, year and ROL FE; (b) (a) + $c_{pt}$: a program gaining applicants or accreditation may both open seats and graduate more; (c) (b) with U, F $\times$ yr: shocks to a whole university (finances, SUA entry in 2012) or field.
+
+\vspace{0.05cm}
+\textbf{Sample}: inframarginal students as in Design I ($Rank_{ipt}\le T_p$): admitted even with fewer seats; one row per student. \textbf{432,184 students, 1,307 programs, 8,218 program-years}, 2007--2016.
 \end{frame}
 
 %--------------------------------------------------------
@@ -3334,346 +3341,288 @@ For inframarginal student $i$ in program $p$, admission year $t$ (the entering c
 \scriptsize
 \begin{itemize}
     \setlength{\itemsep}{3pt}
-    \item So we report a ladder of coarser definitions. Main: \textbf{first preference + set of universities} (62\% contribute).
+    \item So we use coarser definitions. In the main slides, three: \textbf{first preference + set of universities} (main, 62\% contribute), \textbf{first three preferences} (44\%) and the \textbf{set of programs} (22\%). All seven definitions: \hyperlink{d5-app-rol-ctrl}{\color{blue}appendix}.
 \end{itemize}
 \end{column}
 \end{columns}
 \end{frame}
 
 %--------------------------------------------------------
+% code/04_rdd/Inframarginals/50_design5_results_rolctrl.do (issue #10; table only, from 48t, which needs 48s and 37)
 \begin{frame}[label=d5-results]{Design V: results}
 \centering
 \tiny
-\resizebox{0.66\textwidth}{!}{\input{../../output/inframarginal/tables/im_d5_main.tex}}
+\resizebox{0.80\textwidth}{!}{\input{../../output/inframarginal/tables/im_d5_main_rolctrl.tex}}
+
+\vspace{0.02cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS in pp per ten additional entrants; first stage in entrants per seat. Program and ROL FE and individual controls (PSU, NEM, female, school type) in every column. Program-year controls: demand in $t-1$, the year before $t$ (log applicants, log first-preference applicants, log waiting list, mean score of first-preference applicants); accreditation and tuition in $t$ (shares in accredited program and institution, years of institutional accreditation, log median tuition, share in day programs, formal duration). U, F $\times$ yr: university $\times$ year and field $\times$ year FE. Each ROL keeps its own non-singleton sample. SE by program-year. All eight ROL: \hyperlink{d5-app-rol-ctrl}{\color{blue}appendix}.}
 
 \vspace{0.05cm}
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS of graduation within 8 years (0/1 indicator; coefficients are changes in the probability, per additional entrant) on $n_{pt}$ instrumented by $Z_{pt}$. All columns include program and year FE. SE clustered by program-year. \sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$. All seven ROL definitions: \hyperlink{d5-app-rol-levels}{\color{blue}appendix}.}
-
-\vspace{0.15cm}
 \raggedright
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.49\textwidth}
 \scriptsize
 \begin{itemize}
-    \setlength{\itemsep}{2pt}
-    \item Strong first stage: ten more vacancies bring about 8--9 more entrants ($F>350$).
-    \item Graduation from the program \textbf{rises} by about 0.0006--0.0009 per additional entrant (0.06--0.09 pp), not falls. This is the sign Design I gives \emph{in levels}; column (1) reproduces it.
+    \setlength{\itemsep}{1pt}
+    \item \textbf{Program graduation}: $+0.62$ to $+0.88$ pp per ten entrants without program-year controls; 0.42--0.43 (ns) with them (main, first three), about zero with U, F $\times$ yr. Program set: 0.84* and 0.51 (ns).
 \end{itemize}
 \end{column}
 \begin{column}{0.49\textwidth}
 \scriptsize
 \begin{itemize}
-    \setlength{\itemsep}{2pt}
-    \item Portfolio FE do not move the estimate. On a common sample (the 84,087 students of column 5) the 2SLS is 0.00085--0.00095 (0.085--0.095 pp) under every ROL definition; the drift across definitions in the full sample comes from the change of sample.
-    \item Any university and any higher education: $+0.0002$ to $+0.0003$ (0.02 to 0.03 pp).
+    \setlength{\itemsep}{1pt}
+    \item \textbf{Any university / HE}: $+0.24$ to $+0.36$ pp, significant in every column; the controls do not lower it.
+    \item First stage: 8--9 entrants per ten seats ($F>390$).
 \end{itemize}
 \end{column}
 \end{columns}
 \end{frame}
 
 %--------------------------------------------------------
+% code/04_rdd/Inframarginals/50b_design5_logs_rolctrl.do (issue #10)
 \begin{frame}{Design V: results in logs}
 \centering
 \tiny
-\resizebox{0.66\textwidth}{!}{\input{../../output/inframarginal/tables/im_d5_logs.tex}}
+\resizebox{0.86\textwidth}{!}{\input{../../output/inframarginal/tables/im_d5_logs_rolctrl.tex}}
 
 \vspace{0.05cm}
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS of graduation within 8 years (0/1 indicator) on $\ln n_{pt}$ instrumented by $\ln Z_{pt}$. Coefficients are changes in the probability per log point; divide by 10 for 10\% more entrants. No program-year has $n_{pt}$ or $Z_{pt}\le 0$. All columns include program and year FE. SE clustered by program-year. \sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$. Code: \texttt{37b\_design5\_logs.do}.}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS of graduation within 8 years (0/1) on $\ln n_{pt}$ instrumented by $\ln Z_{pt}$, reported in pp per 10\% more entrants. No program-year has $n_{pt}$ or $Z_{pt}\le 0$. Columns, controls and FE as in the results slide. SE clustered by program-year. \sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$.}
 
-\vspace{0.15cm}
+\vspace{0.1cm}
 \raggedright
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.49\textwidth}
 \scriptsize
 \begin{itemize}
     \setlength{\itemsep}{2pt}
-    \item Same specification, with $\ln n_{pt}$ instrumented by $\ln Z_{pt}$. $Y_i$ is binary and stays in levels.
-    \item First stage: a 10\% increase in vacancies raises the entering cohort by about 7.8\% ($F>1{,}500$).\end{itemize}
+    \item Same specifications as the results slide, with $\ln n_{pt}$ instrumented by $\ln Z_{pt}$; $Y_i$ stays in levels.
+    \item First stage: 10\% more seats raise the entering cohort by 7.6--8.3\% ($F>1{,}200$).
+\end{itemize}
 \end{column}
 \begin{column}{0.49\textwidth}
 \scriptsize
 \begin{itemize}
     \setlength{\itemsep}{2pt}
-    \item Program graduation \textbf{rises} by about 0.005--0.007 per 10\% more entrants (0.5 to 0.7 pp; main column 3: 0.0054, mean $\approx$0.35), and 0.010--0.012 with program set and exact ROL. Same sign as in levels.
-    \item Any university and any higher education: positive without controls; close to zero with controls and the main ROL; 0.003--0.004 per 10\% ($p<0.10$) with the finest ROLs.
+    \item \textbf{Program graduation}: $+0.54$ to $+0.99$ pp per 10\% more entrants without program-year controls; with them 0.10--0.64 (ns), and $-0.10$ to $0.26$ (ns) with U, F $\times$ yr. Same pattern as in levels.
+    \item \textbf{Any university}: 0.13--0.22 under the main and first-three ROL, significant only in (c) under the main ROL; 0.33--0.39 with the program set, significant in all three.
 \end{itemize}
 \end{column}
 \end{columns}
 \end{frame}
 
 %--------------------------------------------------------
-% code/04_rdd/Inframarginals/46_design5_income_rank.do (issue #13; needs 16, ProgramVA/01b)
+% code/04_rdd/Inframarginals/54_design5_income_rank_rolctrl.do (issue #13; needs 16, 20, ProgramVA/01b; replaces 46's im_d5_incrank.tex)
 \begin{frame}[label=d5-incrank]{Design V: income rank of the program of graduation}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.56\textwidth}
 \centering
 \tiny
-\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_incrank.tex}}
-\end{column}
-\begin{column}{0.42\textwidth}
+\begin{adjustbox}{max width=0.92\textwidth, max totalheight=0.50\textheight}
+\input{../../output/inframarginal/tables/im_d5_incrank_rolctrl.tex}
+\end{adjustbox}
+
+\vspace{0.02cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS per ten additional entrants; first stage in entrants per seat. Income rank (1--100): Mi Futuro income (institution $\times$ carrera gen\'erica) of the program of the student's first title within 8 years, \emph{any} program or institution (Step 0 outcome), ranked among sample graduates; 0 if no title. A program-level average, not the student's wage. Rank among graduates: selected sample, descriptive. Program and ROL FE and individual controls in every column; program-year controls and U, F $\times$ yr as in the results slide. SE by program-year.}
+
+\vspace{0.04cm}
+\raggedright
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.49\textwidth}
 \scriptsize
-\textbf{Outcome}: income rank (1--100) of the program of the student's first title within 8 years, \emph{any} program or institution (Step 0 outcome); 0 if no title.
 \begin{itemize}
-    \setlength{\itemsep}{3pt}
-    \item \textbf{Zero in every column}. Main spec (3): $-0.003$ rank points per 10 entrants (SE 0.065); the 95\% CI rules out effects beyond $\pm0.13$ points (outcome SD $\approx 33$).
-    \item Any title and the rank among graduates: also zero.
-    \item The rise in graduation from the enrolled program (reference row, $+0.64$ pp per 10 entrants) is not more titles or better-paid ones: it is \emph{where} students graduate.
+    \setlength{\itemsep}{1pt}
+    \item \textbf{Income rank: zero} with the main ROL and first three ($-$0.03 to 0.06 rank points per ten entrants; outcome SD $\approx$ 33). Program set: 0.10--0.17, only (c) at 10\%.
+    \item Any title and the rank among graduates: also about zero.
+\end{itemize}
+\end{column}
+\begin{column}{0.49\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{1pt}
+    \item \textbf{Program graduation} (reference row) as in the results slide: 0.62--0.88 in (a), smaller with controls, about zero with U, F $\times$ yr. Where it appears, it is not more titles or better-paid ones: it is \emph{where} students graduate.
 \end{itemize}
 \end{column}
 \end{columns}
-
-\vspace{0.06cm}
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS on $n_{pt}$ instrumented by $Z_{pt}$, coefficients $\times 10$ (per 10 additional entrants). Income rank in rank points; any title and program graduation in pp. Program FE in all columns; ROL FE top 1 + univ.; controls as in the results slide. SE clustered by program-year. Income rank: Mi Futuro income (institution $\times$ carrera gen\'erica) ranked among sample graduates, a program-level average, not the student's wage. Rank among graduates: selected sample, descriptive. \sym{***}~$p<0.01$, \sym{**}~$p<0.05$, \sym{*}~$p<0.10$.}
 \end{frame}
 
 %--------------------------------------------------------
-% code/04_rdd/Inframarginals/40_design5_placebo.do (replaces 38's im_d5_balance.tex)
+% code/04_rdd/Inframarginals/51_design5_balance_rolctrl.do (issue #10; replaces 40's im_d5_placebo_balance.tex)
 \begin{frame}[label=d5-balance]{Design V: is the variation in $Z$ exogenous?}
-\vspace{-0.15cm}
-{\scriptsize Each cell regresses a pre-admission characteristic on this year's seats, $x_i = g\,Z_{pt} + \psi_p + \psi_t + \psi_{ROL(i)} + u_i$, and reports $g$ per ten seats (first column: mean level). If $Z$ were as good as random, every $g$ would be zero.\par}
-\vspace{0.1cm}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.62\textwidth}
+{\scriptsize Each cell: $x_i = g\,Z_{pt} + c_{pt}'\alpha + \text{FE} + \psi_{ROL(i)} + u_i$, $g$ per ten seats. If $Z$ were as good as random, every $g$ would be zero.\par}
+\vspace{0.02cm}
 \centering
-\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_placebo_balance.tex}}
-\end{column}
-\begin{column}{0.36\textwidth}
+\begin{adjustbox}{max width=\textwidth, max totalheight=0.58\textheight}
+\input{../../output/inframarginal/tables/im_d5_balance_rolctrl.tex}
+\end{adjustbox}
+
+\vspace{0.02cm}
+\raggedright
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.49\textwidth}
 \scriptsize
 \begin{itemize}
-    \setlength{\itemsep}{3pt}
-    \item \textbf{SES (A)}: private-paid flat; municipal +0.13 pp (main ROL), ns with finer ROLs; subsidized $-$0.08 to $-$0.14 pp.
-    \item \textbf{Achievement (B)}: PSU and NEM higher in every column (PSU +0.28 points main, +0.4 finer ROLs); BEA only without ROL and with the main ROL.
-    \item \textbf{Joint test}: predicted graduation +0.075 pp (main), +0.04 (finer ROLs): smaller, not zero.
+    \setlength{\itemsep}{0pt}
+    \item \textbf{Index}: 0.075*** (main), 0.042--0.044*** (finer ROL) without program-year controls; with all, 0.018* (main), 0.009 and $-0.001$.
+\end{itemize}
+\end{column}
+\begin{column}{0.49\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{0pt}
+    \item \textbf{But PSU stays imbalanced} under the finer ROL even with all (0.12**, 0.13**); NEM under the main ROL (0.19*).
 \end{itemize}
 \end{column}
 \end{columns}
 
-\vspace{0.1cm}
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} The table shows changes per ten additional seats. Mean: average level of each characteristic (\%, points or number). Columns (1)--(4): change in that characteristic, in its own unit, when the program offers ten more seats; for \% rows the change is in percentage points. Each column adds the ROL FE in its header to program and year FE; (2) is the main specification. BEA = top 10\% of own school. SE clustered by program-year. All ROL definitions: \hyperlink{d5-app-balance-rol}{\color{blue}appendix}.}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} Change per ten seats in each row's unit (pp for \% rows). Program FE in all columns; program-year controls and U, F $\times$ yr as in the \hyperlink{d5-results}{\color{blue}results slide}. Each ROL keeps its own non-singleton sample. BEA = top 10\% of own school. --: absorbed by the ROL FE. SE by program-year. With PSU held fixed: \hyperlink{d5-balance-psu}{\color{blue}PSU control}; every ROL, no controls: \hyperlink{d5-app-balance-rol}{\color{blue}appendix}.}
 \end{frame}
 
 %--------------------------------------------------------
-% code/04_rdd/Inframarginals/47_design5_balance_noctrl.do
-\begin{frame}[label=d5-balance-noctrl]{Design V: how much selection do the controls absorb?}
-\vspace{-0.15cm}
-{\scriptsize Same balance regressions, $x_i = g\,Z_{pt} + \text{controls} + u_i$, adding the controls one block at a time, from none to program, year and ROL FE (ROL = unordered set of programs). Columns (2)--(4) use the same students, so any change comes from the controls, not the sample.\par}
-\vspace{0.1cm}
+% code/04_rdd/Inframarginals/51_design5_balance_rolctrl.do (issue #10; replaces 47)
+\begin{frame}[label=d5-balance-noctrl]{Design V: how much selection do the controls absorb? Main ROL}
+\vspace{-0.2cm}
+{\scriptsize Same balance regressions, adding the controls one block at a time. Columns (2)--(6) use the same students (non-singletons of the main ROL FE), so any change comes from the controls, not the sample.\par}
+\vspace{0.05cm}
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.62\textwidth}
 \centering
-\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_balance_noctrl.tex}}
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_balance_seq_top1u.tex}}
 \end{column}
 \begin{column}{0.36\textwidth}
 \scriptsize
 \begin{itemize}
     \setlength{\itemsep}{2pt}
-    \item \textbf{No controls}: strong selection; +1.1 pp private-paid, +2.3 PSU points, predicted graduation +0.12 pp.
-    \item \textbf{Program + year FE} do most of the work: $>$85\% of the school-type and PSU gaps, $\sim$60\% of the joint index.
-    \item \textbf{ROL FE} adds little: joint index flat (0.044); trims NEM (0.83 $\to$ 0.62).
-    \item \textbf{Residual}: about a third of the raw bias, mostly PSU and NEM.
+    \item \textbf{No controls}: strong selection; +1.1 pp private-paid, +2.4 PSU points, predicted graduation +0.13 pp.
+    \item \textbf{Program + year FE} do most of the work: index 0.135 $\to$ 0.066, PSU 2.4 $\to$ 0.24.
+    \item \textbf{ROL FE} adds nothing to the index (0.075).
+    \item \textbf{Program-year controls} halve it (0.034); with U, F $\times$ yr, 0.018*. NEM is the last covariate to go (0.97 $\to$ 0.45 $\to$ 0.19*).
 \end{itemize}
 \end{column}
 \end{columns}
 
-\vspace{0.1cm}
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} Change per ten seats in each row's unit (pp for \% rows). (2)--(4): non-singleton sample of the program-set ROL FE; (4) = col.\ (7) of the \hyperlink{d5-app-balance-rol}{\color{blue}ROL appendix}. ROL length is collinear with the FE in (4). SE clustered by program-year.}
+\vspace{0.05cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} Change per ten seats in each row's unit (pp for \% rows). (1): all students, no controls. (2)--(6): non-singleton sample of the main ROL FE (1st preference + set of universities). Program-year controls and U, F $\times$ yr as in the results slide. The index without PSU holds PSU fixed (linear control), so it starts in (4). SE clustered by program-year. First three: \hyperlink{d5-balance-noctrl-top3}{\color{blue}next slide}; program set: \hyperlink{d5-balance-noctrl-set}{\color{blue}after}.}
 \end{frame}
 
 %--------------------------------------------------------
-% code/04_rdd/Inframarginals/40b_design5_balance_psu.do
-\begin{frame}[label=d5-balance-psu]{Design V: balance controlling for PSU}
-\vspace{-0.15cm}
-{\scriptsize Is the imbalance only about PSU? Same balance regressions, adding the student's PSU score: $x_i = g\,Z_{pt} + h(\text{PSU}_i) + \psi_p + \psi_t + \psi_{ROL(i)} + u_i$, with $h$ linear or PSU deciles within year.\par}
-\vspace{0.1cm}
+% code/04_rdd/Inframarginals/51_design5_balance_rolctrl.do (issue #10)
+\begin{frame}[label=d5-balance-noctrl-top3]{Design V: how much selection do the controls absorb? First three}
+\vspace{-0.2cm}
+{\scriptsize As the previous slide, on the non-singleton sample of the first-three-preferences ROL FE.\par}
+\vspace{0.05cm}
 \begin{columns}[T,onlytextwidth]
-\begin{column}{0.64\textwidth}
+\begin{column}{0.62\textwidth}
 \centering
-\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_balance_psu.tex}}
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_balance_seq_top3.tex}}
 \end{column}
-\begin{column}{0.34\textwidth}
+\begin{column}{0.36\textwidth}
 \scriptsize
 \begin{itemize}
-    \setlength{\itemsep}{3pt}
-    \item \textbf{No}: with PSU held fixed, NEM, BEA and municipal school still rise with $Z$ (main ROL), slightly more than without the control.
-    \item \textbf{Joint test}: predicted graduation from all but PSU rises 0.08 pp per ten seats (main ROL), 0.045 (exact), up from 0.073 and 0.034.
-    \item Linear PSU and PSU deciles give the same answer.
+    \setlength{\itemsep}{2pt}
+    \item \textbf{Program + year FE}: index 0.119 $\to$ 0.052.
+    \item \textbf{ROL FE} help a little here: 0.052 $\to$ 0.042, and NEM 0.81 $\to$ 0.59.
+    \item \textbf{Program-year controls}: 0.016*; with U, F $\times$ yr, 0.009 (ns). NEM goes to zero (0.02).
+    \item \textbf{PSU does not}: 0.27 $\to$ 0.22 $\to$ 0.12**.
 \end{itemize}
 \end{column}
 \end{columns}
 
-\vspace{0.1cm}
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} The table shows changes per ten additional seats, in each row's unit (pp for \% rows). Columns (1) and (4) are columns (2) and (4) of the previous slide; (2)--(3) and (5)--(6) add PSU linearly (with a missing indicator) or as within-year decile FE. Program, year and ROL FE in every column. Rows with missing values use slightly fewer students. SE clustered by program-year.}
+\vspace{0.05cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} As the previous slide. (2)--(6): non-singleton sample of the first-three-preferences ROL FE (258,694 students). SE clustered by program-year.}
+\end{frame}
+
+%--------------------------------------------------------
+% code/04_rdd/Inframarginals/51_design5_balance_rolctrl.do (issue #10)
+\begin{frame}[label=d5-balance-noctrl-set]{Design V: how much selection do the controls absorb? Program set}
+\vspace{-0.2cm}
+{\scriptsize As the previous slides, on the non-singleton sample of the set-of-programs ROL FE.\par}
+\vspace{0.05cm}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.62\textwidth}
+\centering
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_balance_seq_set.tex}}
+\end{column}
+\begin{column}{0.36\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{2pt}
+    \item \textbf{Program + year FE}: index 0.118 $\to$ 0.045; the ROL FE keep it there (0.044).
+    \item \textbf{Program-year controls}: 0.015 (ns); with U, F $\times$ yr, $-0.001$. NEM goes to zero (0.05).
+    \item \textbf{PSU does not}: 0.38 $\to$ 0.28 $\to$ 0.13**.
+    \item ROL length is absorbed by the program-set FE (--).
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.05cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} As the previous slides. (2)--(6): non-singleton sample of the set-of-programs ROL FE (128,385 students). SE clustered by program-year.}
+\end{frame}
+
+%--------------------------------------------------------
+% code/04_rdd/Inframarginals/51_design5_balance_rolctrl.do (issue #10; replaces 40b)
+\begin{frame}[label=d5-balance-psu]{Design V: balance controlling for PSU}
+{\scriptsize Is the imbalance only about PSU? The \hyperlink{d5-balance}{\color{blue}balance table} adding the student's PSU score (linear, with a missing indicator): $x_i = g\,Z_{pt} + h\,\text{PSU}_i + c_{pt}'\alpha + \text{FE} + \psi_{ROL(i)} + u_i$.\par}
+\vspace{0.02cm}
+\centering
+\begin{adjustbox}{max width=\textwidth, max totalheight=0.52\textheight}
+\input{../../output/inframarginal/tables/im_d5_balance_psu_rolctrl.tex}
+\end{adjustbox}
+
+\vspace{0.02cm}
+\raggedright
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.49\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{1pt}
+    \item \textbf{No}: with PSU held fixed, NEM still rises with $Z$ (0.71--1.07*** without program-year controls, 0.32--0.51*** with them), slightly more than without the PSU control.
+\end{itemize}
+\end{column}
+\begin{column}{0.49\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{1pt}
+    \item Only with U, F $\times$ yr does NEM become small under the finer ROL (0.07--0.08); under the main ROL it stays at 0.21**.
+    \item School type and BEA: imbalanced only without program-year controls, main ROL.
+\end{itemize}
+\end{column}
+\end{columns}
+
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} Change per ten seats in each row's unit (pp for \% rows). Columns, samples and controls as in the balance table, plus PSU. SE clustered by program-year.}
 \end{frame}
 
 
 %--------------------------------------------------------
-% code/04_rdd/Inframarginals/40_design5_placebo.do
+% code/04_rdd/Inframarginals/52_design5_leadlag_rolctrl.do (issue #10)
 \begin{frame}[label=d5-leadlag-joint]{Design V: all years' seats together (distributed lag)}
 \begin{columns}[T,onlytextwidth]
 \begin{column}{0.5\textwidth}
 \centering
-{\scriptsize \textbf{Size of the entering cohort}}\\
-\includegraphics[width=0.8\linewidth]{../../output/inframarginal/figures/im_d5_leadlag_fs.pdf}
+{\scriptsize \textbf{Graduation, with program-year controls}}\\
+\includegraphics[width=0.72\linewidth]{../../output/inframarginal/figures/im_d5_leadlag_grad_s2.pdf}
 \end{column}
 \begin{column}{0.5\textwidth}
 \centering
-{\scriptsize \textbf{Graduation from the program within 8 years}}\\
-\includegraphics[width=0.8\linewidth]{../../output/inframarginal/figures/im_d5_leadlag_grad.pdf}
+{\scriptsize \textbf{Graduation, + university, field $\times$ year FE}}\\
+\includegraphics[width=0.72\linewidth]{../../output/inframarginal/figures/im_d5_leadlag_grad_s3.pdf}
 \end{column}
 \end{columns}
 
 \scriptsize
-One regression with the seats of the seven years at once:
-\[
-y_i = \gamma_{-3} Z_{p,t-3} + \gamma_{-2} Z_{p,t-2} + \gamma_{-1} Z_{p,t-1} + \gamma_{0} Z_{pt} + \gamma_{1} Z_{p,t+1} + \gamma_{2} Z_{p,t+2} + \gamma_{3} Z_{p,t+3} + x_i'\delta + \text{FE} + e_i
-\]
-Each point ($\gamma_k$): change in the outcome of a student entering in $t$ when the program offered ten more seats in year $t+k$, other years' seats fixed. Only year $t$ should matter.
-\begin{itemize}
-    \setlength{\itemsep}{0pt}
-    \item \textbf{Entrants}: ten more seats in $t$ bring 7.7--8.8 more entrants; small elsewhere ($t-3$: $\approx$1.7).
-    \item \textbf{Graduation}: ten more seats in $t-1$ raise graduation by 1.1 pp (main; 1.7--1.9 pp with program set / exact), more than seats in $t$ (0.7--1.0 pp); future years $\approx$ 0. Last year's seats should not matter: a confounder that varies over time (next slide).
-\end{itemize}
-
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} Bars: 95\% CI. Cohorts 2010--2016. Controls $x_i$ as in the main specification (PSU, NEM, female, school type); without them the estimates are nearly identical ($t-1$: 1.16 / 1.79 / 1.93). Program and year FE plus the ROL FE in the legend; SE by program-year. Students: 176,827 / 67,446 / 45,182.}
-\end{frame}
-
-%--------------------------------------------------------
-% code/04_rdd/Inframarginals/39b_design5_unifield_year.do
-\begin{frame}[label=d5-unifield-year]{Design V: university-year and field-year shocks}
-\scriptsize
-To absorb shocks that vary over time, replace $\phi_t$ with a year effect per university, $\phi_{u(p)t}$, or per field, $\phi_{f(p)t}$ (as in Design I):
-\[
-Y_i = \beta\, n_{pt} + x_i'\beta_2 + \phi_p + \phi_{u(p)t} \;[\text{or } \phi_{f(p)t}] + \phi_{ROL(i)} + \varepsilon_i
-\]
-\vspace{-0.35cm}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.54\textwidth}
-\centering
-\tiny
-\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_unifield_year.tex}}
-\end{column}
-\begin{column}{0.44\textwidth}
-\scriptsize
-\begin{itemize}
-    \setlength{\itemsep}{3pt}
-    \item First stage unchanged (0.86, F $\geq$ 435); same students in every column.
-    \item \textbf{Program graduation}: \textbf{university $\times$ year FE} remove the positive effect ($0.00064 \to 0.00002$, ns). \textbf{Field $\times$ year FE} keep it ($0.00076$).
-    \item \textbf{Any university / HE}: positive throughout, 0.02--0.04 pp per entrant.
-    \item The levels estimate reflects universities that expand and improve graduation in the same years.
-\end{itemize}
-\end{column}
-\end{columns}
-
-\vspace{0.05cm}
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS per entrant; outcomes are 0/1 (0.001 = 0.1 pp). (1) = main column of the results slide. ROL FE: top 1 + univ. Controls as in the results slide. SE by program-year.}
-\end{frame}
-
-%--------------------------------------------------------
-% Design V x Step 0 (issue #11): code/04_rdd/Inframarginals/43_design5_by_va.do
-\begin{frame}[label=d5-va-intro]{Design V by program value-added: why and how}
-\footnotesize
-\textbf{Back to the question of the paper} (\hyperlink{va-why}{\color{blue}Step 0}): what happens to inframarginal students when \emph{high-return} programs expand?
-Design V gives the average effect of a larger entering cohort. Here we ask whether it differs between high- and low-VA programs.
-
-\vspace{0.15cm}
-\textbf{VA groups, from Step 0.}
-\begin{itemize}
-    \setlength{\itemsep}{2pt}
-    \item $v_j$: program value-added on the income rank, within admission portfolios (\hyperlink{va-model}{\color{blue}model}), Empirical-Bayes shrunk (\hyperlink{va-dist}{\color{blue}distribution}).
-    \item Same classification as the VA-decile slides (\hyperlink{va-vacancies}{\color{blue}vacancies by decile}): the 1,318 programs with $\geq$20 students in the identifying sample, cut by number of programs into \textbf{(i) below / above the median} and \textbf{(ii) terciles}.
-    \item 97\% of Design V students (421,001 of 432,184) are in a classified program (1,193 of 1,307 programs).
-\end{itemize}
-
-\vspace{0.15cm}
-\textbf{Estimation.} The main Design V specification (program and year FE, ROL top 1 + univ., controls), estimated separately in each group. Panel B uses university $\times$ year FE, as in the previous slide.
-$p$ (equal): Wald test in the pooled model fully interacted with the group.
-
-\vspace{0.15cm}
-\footnotesize
-\textbf{Caveats.} The VA outcome is 0 without a title, so VA partly reflects graduation; its level is absorbed by the program FE, and $\beta$ still comes from year-to-year changes in $Z_{pt}$. VA and Design V use overlapping cohorts (2007--2016).
-\end{frame}
-
-%--------------------------------------------------------
-% code/04_rdd/Inframarginals/43_design5_by_va.do
-\begin{frame}[label=d5-va-median]{Design V by program VA: below vs.\ above the median}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.58\textwidth}
-\centering
-\tiny
-\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_va_median.tex}}
-\end{column}
-\begin{column}{0.40\textwidth}
-\scriptsize
-\begin{itemize}
-    \setlength{\itemsep}{3pt}
-    \item \textbf{First stage}: high-VA programs fill their extra seats more (0.91 vs.\ 0.75 entrants per seat; $p=0.01$).
-    \item \textbf{Program graduation}: no difference between groups ($p\geq0.48$). With university $\times$ year FE both are zero, as in the full sample.
-    \item \textbf{Any university / HE}: positive in both groups, of similar size (0.02--0.04 pp per entrant), and it survives university $\times$ year FE.
-    \item Splitting at the median, the effect of a larger cohort does not depend on the program's VA.
-\end{itemize}
-\end{column}
-\end{columns}
-
-\vspace{0.05cm}
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS per entrant; outcomes are 0/1 (0.001 = 0.1 pp). Groups: median of EB program VA across the 1,318 classified programs (Step 0). Each group keeps its own non-singleton sample. ROL FE: top 1 + univ. Controls as in the results slide. SE clustered by program-year. $p$ (equal): Wald test of equal coefficients across groups, pooled model fully interacted with the group.}
-\end{frame}
-
-%--------------------------------------------------------
-% code/04_rdd/Inframarginals/43_design5_by_va.do
-\begin{frame}[label=d5-va-terciles]{Design V by program VA: terciles}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.58\textwidth}
-\centering
-\tiny
-\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_va_terciles.tex}}
-\end{column}
-\begin{column}{0.40\textwidth}
-\scriptsize
-\begin{itemize}
-    \setlength{\itemsep}{3pt}
-    \item \textbf{First stage}: highest in the top tercile (0.97), lowest in the middle (0.58, F = 74).
-    \item \textbf{Program graduation} differs across terciles ($p<0.01$), not monotonically. \textbf{Low VA}: $-0.06$ pp per entrant with univ.\ $\times$ year FE ($p<0.01$), the only sign of congestion. \textbf{Middle}: $+$0.12--0.21 pp, where the first stage is weakest. \textbf{High VA}: zero with univ.\ $\times$ year FE.
-    \item \textbf{Any university / HE}: zero in the low tercile; positive in the middle and top (top: 0.03 pp with univ.\ $\times$ year FE).
-\end{itemize}
-\end{column}
-\end{columns}
-
-\vspace{0.05cm}
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS per entrant; outcomes are 0/1 (0.001 = 0.1 pp). Terciles of EB program VA across the 1,318 classified programs (Step 0); cutoffs $-5.1$ and $1.4$ income rank points. Each group keeps its own non-singleton sample. ROL FE: top 1 + univ. Controls as in the results slide. SE clustered by program-year. $p$ (equal): joint Wald test, pooled model fully interacted with the tercile.}
-\end{frame}
-
-%--------------------------------------------------------
-% code/04_rdd/Inframarginals/40c_design5_leadlag_uniyear.do
-\begin{frame}[label=d5-tm1-uniyear]{Why do last year's seats raise graduation? University-wide shocks}
-\scriptsize
-\textbf{Question.} In the \hyperlink{d5-leadlag-joint}{\color{blue}distributed lag}, ten more seats in $t-1$ raise graduation of the cohort entering in $t$ by 1.1 pp. A \textbf{revenue effect}? (more students $\to$ more money $\to$ more resources for the next cohort).
-\textbf{Test.} \textbf{University $\times$ year FE} absorb anything common to the university in a year (revenue, spending, staff): a university-wide revenue effect would send $\gamma_{-1}$ to zero.
 \vspace{-0.15cm}
 \[
-y_i = \textstyle\sum_{k=-3}^{3} \gamma_k Z_{p,t+k} + x_i'\delta + \phi_p + \phi_{u(p)t} \;[\text{or } \phi_t,\ \phi_{f(p)t}] + \phi_{ROL(i)} + e_i
+y_i = \textstyle\sum_{k=-3}^{3} \gamma_k Z_{p,t+k} + x_i'\delta + c_{pt}'\alpha + \text{FE} + e_i
 \]
-\vspace{-0.3cm}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.58\textwidth}
-\centering
-\tiny
-\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_leadlag_uniyear.tex}}
-\end{column}
-\begin{column}{0.40\textwidth}
-\scriptsize
-\begin{itemize}
-    \setlength{\itemsep}{2pt}
-    \item \textbf{$\gamma_{-1}$ survives} university $\times$ year FE (1.14 $\to$ 1.11): not a university-wide shock (revenue included), nor a field-wide one.
-    \item \textbf{Not cohort size}: entrants in $t$ do not move.
-    \item \textbf{Not observable composition}: PSU and predicted graduation do not move ($\approx$2\% of the 1.1 pp).
-    \item What remains is program-specific and time-varying: trends, reallocation within the university, unobserved selection.
-\end{itemize}
-\end{column}
-\end{columns}
+\vspace{-0.4cm}
 
-\vspace{0.05cm}
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} Per ten seats, seats of $t-3$ to $t+3$ jointly. Sample, controls and seats as in the distributed-lag slide (column (1) reproduces it); ROL FE top 1 + univ.; SE by program-year. Predicted graduation: fitted graduation on PSU, NEM, female, school type; PSU and predicted graduation without controls. Mean: sample mean over students (entrants and seats: of the student's program).}
+$\gamma_k$: change in graduation from the program within 8 years of a student entering in $t$ when the program offered ten more seats in $t+k$, other years' seats fixed. Only $t$ should matter.
+\begin{itemize}
+    \setlength{\itemsep}{0pt}
+    \item \textbf{Entrants} (not shown): ten more seats in $t$ bring 7.9--8.8 entrants; seats in $t-1$ add none (0.1--0.4, ns).
+    \item \textbf{Graduation}: ten more seats in $t-1$, the year before entry, raise graduation by 1.2--1.9 pp under every ROL and specification, more than seats in $t$ (0.7--0.9); future years $\approx$ 0. Controls and FE do not remove it (main: 1.14 without them; 1.30 and 1.16 with them): not a university- or field-wide shock (e.g.\ revenue), nor observable composition (\hyperlink{d5-tm1-uniyear}{\color{blue}appendix}).
+\end{itemize}
+
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} Bars: 95\% CI. Cohorts 2010--2016. $x_i$: individual controls; $c_{pt}$: program-year controls as in the results slide. Left: program, year, ROL FE; right: program, university $\times$ year, field $\times$ year, ROL FE. SE by program-year. Students: 176,827 / 129,953 / 67,446.}
 \end{frame}
+
 
 %--------------------------------------------------------
 % code/04_rdd/Inframarginals/45_finance_seats_rf.do (needs 01_clean/08, 02_build/17, 18)
@@ -3707,7 +3656,132 @@ y_i = \textstyle\sum_{k=-3}^{3} \gamma_k Z_{p,t+k} + x_i'\delta + \phi_p + \phi_
 \parbox{0.97\textwidth}{\tiny \textit{Notes:} One regression per row; $u$ university, $t$ year. Entries: $10\times b_k$, the \% change in the outcome in year $t$ when seats rose 10\% in $t$, $t-1$ or $t-2$. Mean: sample mean of the outcome level per university-year (nominal pesos). Field shares: share of each knowledge area in enrollment (so that growing in cheaper fields is not read as less spending). $\phi_t$: year FE; 41 universities, SE by university. Seats: regular vacancies of the university's programs. Per student: over undergraduate enrollment (MINEDUC). Teaching: academic salaries ($\approx$31\% of expenses). Overhead: administrative and executive salaries + administration and sales ($\approx$48\%). Capital: non-current assets of the audited balance sheet (no investment line exists); 4 university-years with asset jumps $>$2.5$\times$ dropped in those rows.}
 \end{frame}
 
+%--------------------------------------------------------
+% code/04_rdd/Inframarginals/49_finance_seats_levels.do (2026-11-17 meeting)
+\begin{frame}[label=d5-tm1-finance-levels]{Expenses, capital and students after a 10\% rise in seats}
+\scriptsize
+Log levels with university and year FE (the first-difference version, previous slide, forces the coefficient on $\ln Y_{u,t-1}$ to one), adding seats in $t$, then $t-1$, then $t-2$:
+\vspace{-0.25cm}
+\[
+\ln Y_{ut} = b_0 \ln \text{Seats}_{ut} + b_1 \ln \text{Seats}_{u,t-1} + b_2 \ln \text{Seats}_{u,t-2} + \text{Field shares}_{ut}'\theta + \phi_u + \phi_t + e_{ut}
+\]
+\vspace{-0.45cm}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.58\textwidth}
+\centering
+\tiny
+\begin{adjustbox}{max width=\linewidth, max totalheight=0.60\textheight}
+\input{../../output/inframarginal/tables/im_fin_seats_levels.tex}
+\end{adjustbox}
+\end{column}
+\begin{column}{0.40\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{2pt}
+    \item \textbf{Spending follows students.} Sum of the three coefficients of column (3), per 10\% more seats: expenses +2.8\%, undergraduates +2.9\%, all students +3.4\%.
+    \item \textbf{Per student, no change}: expenses per undergraduate $-$0.1\%, per student at all levels $-$0.6\%.
+    \item \textbf{Capital per student falls two years later} ($-$5.0\%** and $-$5.6\%***): students accumulate, buildings do not.
+    \item The fall in expenses per student in $t$ of the first-difference version ($-$1.6\%) disappears.
+\end{itemize}
+\end{column}
+\end{columns}
 
+\vspace{0.03cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} University $\times$ fiscal year, 2014--2022; 41 universities, 316 university-years (312 in capital rows). Each column block is one regression (same sample); cells: \% change in $Y_t$ when seats rise 10\% ($10\times b_k$). Controls: knowledge-area shares of undergraduate enrollment. SE clustered by university. Per student: over undergraduates, or over all students (including graduate and post\'itulo). Correlations, not causal: universities choose their seats.}
+\end{frame}
+
+%--------------------------------------------------------
+% Design V x Step 0 (issues #10, #11): code/04_rdd/Inframarginals/53_design5_by_va_rolctrl.do (43 without program-year controls)
+\begin{frame}[label=d5-va-intro]{Design V by program value-added: why and how}
+\footnotesize
+\textbf{Back to the question of the paper} (\hyperlink{va-why}{\color{blue}Step 0}): what happens to inframarginal students when \emph{high-return} programs expand?
+Design V gives the average effect of a larger entering cohort. Here we ask whether it differs between high- and low-VA programs.
+
+\vspace{0.15cm}
+\textbf{VA groups, from Step 0.}
+\begin{itemize}
+    \setlength{\itemsep}{2pt}
+    \item $v_j$: program value-added on the income rank, within admission portfolios (\hyperlink{va-model}{\color{blue}model}), Empirical-Bayes shrunk (\hyperlink{va-dist}{\color{blue}distribution}).
+    \item Same classification as the VA-decile slides (\hyperlink{va-vacancies}{\color{blue}vacancies by decile}): the 1,318 programs with $\geq$20 students in the identifying sample, cut by number of programs into \textbf{(i) below / above the median} and \textbf{(ii) terciles}.
+    \item 97\% of Design V students (421,001 of 432,184) are in a classified program (1,193 of 1,307 programs).
+\end{itemize}
+
+\vspace{0.15cm}
+\textbf{Estimation.} Design V with the main ROL (top 1 + univ.), individual controls and the program-year controls of the \hyperlink{d5-results}{\color{blue}results slide} (demand in $t-1$, accreditation, tuition), estimated separately in each group. Panel A: program and year FE (results slide, spec.\ (b)). Panel B: program, university $\times$ year and field $\times$ year FE (spec.\ (c)).
+$p$ (equal): Wald test in the pooled model fully interacted with the group.
+
+\vspace{0.15cm}
+\footnotesize
+\textbf{Caveats.} The VA outcome is 0 without a title, so VA partly reflects graduation; its level is absorbed by the program FE, and $\beta$ still comes from year-to-year changes in $Z_{pt}$. VA and Design V use overlapping cohorts (2007--2016).
+\end{frame}
+
+%--------------------------------------------------------
+% code/04_rdd/Inframarginals/53_design5_by_va_rolctrl.do (issue #10; 43 with program-year controls)
+\begin{frame}[label=d5-va-median]{Design V by program VA: below vs.\ above the median}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.58\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_va_median_ctrl_top1u.tex}}
+\end{column}
+\begin{column}{0.40\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{3pt}
+    \item \textbf{First stage}: high-VA programs fill their extra seats more (0.84--0.87 vs.\ 0.73--0.74 entrants per seat; $p\leq0.04$).
+    \item \textbf{Program graduation}: not significant in either group, and no difference between them ($p\geq0.25$): 0.04 and 0.68 pp per ten entrants with year FE; $-0.23$ and 0.21 with university, field $\times$ year FE.
+    \item \textbf{Any university / HE}: positive in both groups (0.23--0.48 pp), also with university, field $\times$ year FE; no difference ($p\geq0.36$).
+    \item Splitting at the median, the effect of a larger cohort does not depend on the program's VA.
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.05cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS in pp per ten entrants; first stage in entrants per seat. Groups: median of EB program VA across the 1,318 classified programs (Step 0). Each group keeps its own non-singleton sample. ROL FE: top 1 + univ. Individual and program-year controls as in the results slide. SE clustered by program-year. $p$ (equal): Wald test of equal coefficients across groups, pooled model fully interacted with the group (FE, controls, instrument). Other ROL: \hyperlink{d5-app-va-median-top3}{\color{blue}first three}, \hyperlink{d5-app-va-median-set}{\color{blue}program set}.}
+\end{frame}
+
+%--------------------------------------------------------
+% code/04_rdd/Inframarginals/53_design5_by_va_rolctrl.do (issue #10; 43 with program-year controls)
+\begin{frame}[label=d5-va-terciles]{Design V by program VA: terciles}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.58\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_va_terciles_ctrl_top1u.tex}}
+\end{column}
+\begin{column}{0.40\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{3pt}
+    \item \textbf{First stage}: highest in the top tercile (0.89--0.92), lowest in the middle (0.56--0.57, F = 67--192).
+    \item \textbf{Program graduation} differs across terciles ($p=0.003$ and 0.035), not monotonically. \textbf{Low VA}: $-0.54$** and $-0.48$*** pp per ten entrants, the only sign of congestion, and it survives the controls. \textbf{Middle}: $+1.10$** with year FE, 0.48 (ns) with university, field $\times$ year FE. \textbf{High VA}: 0.67 and 0.10, ns.
+    \item \textbf{Any university / HE}: zero in the low tercile; positive in the middle (0.76--0.82**) and top (0.21--0.24).
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.05cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS in pp per ten entrants; first stage in entrants per seat. Terciles of EB program VA across the 1,318 classified programs (Step 0); cutoffs $-5.1$ and $1.4$ income rank points. Each group keeps its own non-singleton sample. ROL FE: top 1 + univ. Individual and program-year controls as in the results slide. SE clustered by program-year. $p$ (equal): joint Wald test, pooled model fully interacted with the tercile. Other ROL: \hyperlink{d5-app-va-terciles-top3}{\color{blue}first three}, \hyperlink{d5-app-va-terciles-set}{\color{blue}program set}.}
+\end{frame}
+
+
+
+
+
+%--------------------------------------------------------
+% Design V wrap-up (draft, 2026-11-24): numbers from 50, 51, 52, 53, 54, 49
+\begin{frame}[label=d5-summary]{Design V: what we learn}
+\footnotesize
+Ten more entrants in a program, for its inframarginal students (the three ROL agree unless noted):
+\begin{itemize}
+    \setlength{\itemsep}{4pt}
+    \item \textbf{Graduation from the enrolled program}: +0.6 to +0.9 pp with program and year FE; smaller and not significant with program-year controls, about zero with university, field $\times$ year FE (\hyperlink{d5-results}{\color{blue}results}).
+    \item \textbf{Graduation from a program entered in $t$, any university or HE}: +0.24 to +0.36 pp in every specification. Any title (also programs entered later) and the income rank of the title: about zero (\hyperlink{d5-incrank}{\color{blue}income rank}).
+    \item \textbf{Balance}: the program-year controls bring the index close to zero; small imbalance remains in NEM (main ROL) and PSU (finer ROL) (\hyperlink{d5-balance}{\color{blue}balance}).
+    \item \textbf{Seats of the year before} raise graduation (+1.1 to +1.9 pp per ten seats) more than seats of $t$; not a university- or field-wide shock, nor observable composition, and university spending per student does not change (\hyperlink{d5-leadlag-joint}{\color{blue}distributed lag}, \hyperlink{d5-tm1-finance-levels}{\color{blue}finances}). Still unexplained.
+    \item \textbf{By program VA}: congestion only in the low-VA tercile ($-$0.5 pp, main and first three; not significant with the program set) (\hyperlink{d5-va-terciles}{\color{blue}terciles}).
+\end{itemize}
+\end{frame}
 
 \section{Appendix}
 
@@ -4818,6 +4892,40 @@ conditioning on positive exposure.
 
 
 
+
+%--------------------------------------------------------
+% code/04_rdd/Inframarginals/55_design5_leadlag_uniyear_rolctrl.do (issue #10; replaces 40c)
+\begin{frame}[label=d5-tm1-uniyear]{Appendix: Design V, seats of $t-1$ and university shocks}
+\hyperlink{d5-leadlag-joint}{\tiny\color{blue}$\leftarrow$ Main (distributed lag)}
+\scriptsize
+\textbf{Question.} Ten more seats in $t-1$ raise graduation of the cohort entering in $t$ by 1.2--1.3 pp (\hyperlink{d5-leadlag-joint}{\color{blue}distributed lag}). A university- or field-wide shock (revenue, spending, staff), or a change in who enters?
+\vspace{-0.2cm}
+\[
+y_i = \textstyle\sum_{k=-3}^{3} \gamma_k Z_{p,t+k} + x_i'\delta + c_{pt}'\alpha + \phi_p + \text{time FE} + \phi_{ROL(i)} + e_i
+\]
+\vspace{-0.35cm}
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.58\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_leadlag_uniyear_rolctrl.tex}}
+\end{column}
+\begin{column}{0.40\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{2pt}
+    \item \textbf{$\gamma_{-1}$ survives} every set of time FE (1.16--1.30***): not a university- or field-wide shock.
+    \item \textbf{Not cohort size}: entrants in $t$ do not move.
+    \item \textbf{Not observable composition}: PSU does not move; predicted graduation 0.02--0.04 pp, significant but $\approx$2--3\% of the effect.
+    \item What remains is program-specific: trends, reallocation within the university, unobserved selection.
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.05cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} Per ten seats, seats of $t-3$ to $t+3$ jointly; sample as in the distributed lag ((1) and (4) are its main-ROL estimates). ROL FE top 1 + univ.; $c_{pt}$ as in the results slide, in every column. Predicted graduation: fitted on PSU, NEM, female, school type; PSU and predicted graduation without individual controls. SE by program-year.}
+\end{frame}
+
 %--------------------------------------------------------
 % code/04_rdd/Inframarginals/42_design5_balance_rolgroups.do
 \begin{frame}[label=d5-app-balance-rol]{Appendix: Design V, balance under every ROL definition}
@@ -4851,68 +4959,139 @@ Same balance regressions as the main balance slide, $x_i = g\,Z_{pt} + \psi_p + 
 \end{frame}
 
 %--------------------------------------------------------
-% code/04_rdd/Inframarginals/41_design5_rol_groupings.do
-\begin{frame}[label=d5-app-rol-levels]{Appendix: Design V, results under every ROL definition}
+% code/04_rdd/Inframarginals/48t_design5_2sls_all_rol_controls.do (issue #10)
+\begin{frame}[label=d5-app-rol-ctrl]{Appendix: Design V, every ROL definition with program-year controls}
 \vspace{-0.3cm}
 \hyperlink{d5-results}{\tiny\color{blue}$\leftarrow$ Main (results)}
 
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.60\textwidth}
 \centering
 \tiny
-\resizebox{0.90\textwidth}{!}{\input{../../output/inframarginal/tables/im_d5_rolgroups.tex}}
-
-\vspace{0.1cm}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.44\textwidth}
-\scriptsize
-\textbf{Definitions.} Columns (2)--(8) are the seven ROL definitions of the sparsity slide, ordered from coarse to fine (number of groups); column (1) has no ROL FE. Column (5), first preference + set of universities, is the main specification.
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_2sls_all_rol_controls.tex}}
 \end{column}
-\begin{column}{0.54\textwidth}
+\begin{column}{0.38\textwidth}
 \scriptsize
-\textbf{What we see:}
+\textbf{Columns}: (1) program + year FE; (2) + program-year controls (demand in $t-1$, accreditation, tuition); (3) (2) with university $\times$ year and field $\times$ year FE. Rows: the ROL definitions of the sparsity slide, coarse to fine.
 \begin{itemize}
-    \setlength{\itemsep}{0pt}
-    \item First stage rises with finer ROLs (0.81--0.93, F $>$ 350).
-    \item \textbf{Program graduation: 0.00062--0.00067 ($\approx$0.06 pp per entrant) from no ROL FE to Top 3}; 0.0009 with the two finest (program set, exact), on 84--129k students.
-    \item Finer ROLs keep fewer identifying students (93\% with Top 1, 16\% exact).
-    \item Any university / HE: 0.0002--0.0003 (0.02--0.03 pp) in every column.
+    \setlength{\itemsep}{2pt}
+    \item \textbf{Program graduation}, no ROL to main: 0.64--0.67** in (1), 0.32--0.42 (ns) in (2), about zero in (3).
+    \item It grows with the fineness of the ROL in (3): 0.10 (first three), 0.51 (program set), 0.69** (exact). Only the exact list stays significant, on 84k students.
+    \item \textbf{Any university / HE}: 0.20--0.41, significant everywhere.
 \end{itemize}
 \end{column}
 \end{columns}
 
 \vspace{0.05cm}
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} \textbf{Units}: first stage in entrants per seat; 2SLS = change in the probability of graduating (outcome 0/1) per extra entrant, so 0.0006 = 0.06 pp. Program and year FE and controls in every column; SE clustered by program-year. Levels, without program trends: the trend caveat applies.}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} 2SLS in pp per ten entrants; first stage in entrants per seat, Kleibergen--Paap F in brackets. Program FE, ROL FE (none in the first row) and individual controls in every column. Each ROL keeps its own non-singleton sample; students in column (1). SE clustered by program-year.}
 \end{frame}
 
 %--------------------------------------------------------
-% code/04_rdd/Inframarginals/41b_design5_rol_groupings_trends.do (runs 41 with program trends)
-\begin{frame}[label=d5-app-rol-trends]{Appendix: Design V, every ROL definition with trends}
+% code/04_rdd/Inframarginals/53_design5_by_va_rolctrl.do top3 (issue #10)
+\begin{frame}[label=d5-app-va-median-top3]{Appendix: Design V by program VA, median, first three preferences}
 \vspace{-0.3cm}
-\hyperlink{d5-results}{\tiny\color{blue}$\leftarrow$ Main results}
+\hyperlink{d5-va-median}{\tiny\color{blue}$\leftarrow$ Main (VA, median)}
 
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.58\textwidth}
 \centering
 \tiny
-\resizebox{0.90\textwidth}{!}{\input{../../output/inframarginal/tables/im_d5_rolgroups_trends.tex}}
-
-\vspace{0.1cm}
-\begin{columns}[T,onlytextwidth]
-\begin{column}{0.44\textwidth}
-\scriptsize
-\textbf{Definition.} Same columns, sample and controls as the previous slide (levels), adding a linear trend per program in every column: only deviations of $Z_{pt}$ from each program's own path identify.
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_va_median_ctrl_top3.tex}}
 \end{column}
-\begin{column}{0.54\textwidth}
+\begin{column}{0.40\textwidth}
 \scriptsize
-\textbf{What we see:}
 \begin{itemize}
-    \setlength{\itemsep}{0pt}
-    \item First stage stays strong (0.75--0.78, F $>$ 300).
-    \item \textbf{Program graduation: zero under every definition} ($-0.0001$ to $0.0003$, i.e.\ $-0.01$ to $0.03$ pp, ns), down from 0.0006--0.0009 in levels.
-    \item \textbf{Any university / HE: positive under every definition}, 0.0005--0.0007 (0.05--0.07 pp per entrant) up to Top 3, 0.0010--0.0012 with the two finest; larger than in levels.
-    \item The trends result does not depend on how the ROL is defined.
+    \setlength{\itemsep}{3pt}
+    \item \textbf{First stage}: higher above the median (0.83--0.87 vs.\ 0.72--0.75).
+    \item \textbf{Program graduation}: no difference with year FE ($-$0.09 vs.\ 0.72, $p=0.17$). With university, field $\times$ year FE, below-median programs fall ($-$0.39**) and the groups differ ($p=0.04$); with the main ROL they did not.
+    \item \textbf{Any university / HE}: 0.17--0.40 pp in both groups, no difference ($p\geq0.41$).
 \end{itemize}
 \end{column}
 \end{columns}
 
 \vspace{0.05cm}
-\parbox{0.97\textwidth}{\tiny \textit{Notes:} \textbf{Units}: first stage in entrants per seat; 2SLS = change in the probability of graduating (outcome 0/1) per extra entrant, so 0.0005 = 0.05 pp. Program and year FE, program-specific linear trends in the cohort year and controls in every column; SE clustered by program-year.}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} As the main median slide, with ROL FE first three preferences (own non-singleton sample, 24\% fewer students than the main ROL). 2SLS in pp per ten entrants; first stage in entrants per seat. SE clustered by program-year. $p$ (equal): Wald test, pooled model fully interacted with the group.}
+\end{frame}
+
+%--------------------------------------------------------
+% code/04_rdd/Inframarginals/53_design5_by_va_rolctrl.do top3 (issue #10)
+\begin{frame}[label=d5-app-va-terciles-top3]{Appendix: Design V by program VA, terciles, first three preferences}
+\vspace{-0.3cm}
+\hyperlink{d5-va-terciles}{\tiny\color{blue}$\leftarrow$ Main (VA, terciles)}
+
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.58\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_va_terciles_ctrl_top3.tex}}
+\end{column}
+\begin{column}{0.40\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{3pt}
+    \item \textbf{First stage}: weakest in the middle tercile (0.58, F = 43--144).
+    \item \textbf{Program graduation}: same pattern as the main ROL. \textbf{Low VA}: $-$0.55** and $-$0.40** pp per ten entrants. Middle: 0.91* with year FE, 0.32 (ns) with university, field $\times$ year FE. High: 0.69 and 0.35, ns. Groups differ ($p=0.006$ and 0.073).
+    \item \textbf{Any university / HE}: no difference across terciles ($p\geq0.41$).
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.05cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} As the main terciles slide, with ROL FE first three preferences (own non-singleton sample). 2SLS in pp per ten entrants; first stage in entrants per seat. SE clustered by program-year. $p$ (equal): joint Wald test, pooled model fully interacted with the tercile.}
+\end{frame}
+
+%--------------------------------------------------------
+% code/04_rdd/Inframarginals/53_design5_by_va_rolctrl.do set (issue #10)
+\begin{frame}[label=d5-app-va-median-set]{Appendix: Design V by program VA, median, program set}
+\vspace{-0.3cm}
+\hyperlink{d5-va-median}{\tiny\color{blue}$\leftarrow$ Main (VA, median)}
+
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.58\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_va_median_ctrl_set.tex}}
+\end{column}
+\begin{column}{0.40\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{3pt}
+    \item \textbf{First stage}: higher above the median (0.85--0.89 vs.\ 0.66--0.71; $p\leq0.015$).
+    \item \textbf{Program graduation}: positive above the median (1.20** and 0.91***), zero below (0.28 and $-$0.06); the difference is significant with university, field $\times$ year FE ($p=0.021$).
+    \item \textbf{Any university / HE}: the opposite, positive below the median (0.73--0.87***), zero above (0.13--0.17); $p=0.04$--0.06.
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.05cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} As the main median slide, with ROL FE set of programs (own non-singleton sample, 62\% fewer students than the main ROL). 2SLS in pp per ten entrants; first stage in entrants per seat. SE clustered by program-year. $p$ (equal): Wald test, pooled model fully interacted with the group.}
+\end{frame}
+
+%--------------------------------------------------------
+% code/04_rdd/Inframarginals/53_design5_by_va_rolctrl.do set (issue #10)
+\begin{frame}[label=d5-app-va-terciles-set]{Appendix: Design V by program VA, terciles, program set}
+\vspace{-0.3cm}
+\hyperlink{d5-va-terciles}{\tiny\color{blue}$\leftarrow$ Main (VA, terciles)}
+
+\begin{columns}[T,onlytextwidth]
+\begin{column}{0.58\textwidth}
+\centering
+\tiny
+\resizebox{\linewidth}{!}{\input{../../output/inframarginal/tables/im_d5_va_terciles_ctrl_set.tex}}
+\end{column}
+\begin{column}{0.40\textwidth}
+\scriptsize
+\begin{itemize}
+    \setlength{\itemsep}{3pt}
+    \item \textbf{First stage}: weakest in the middle tercile (0.55--0.60, F = 36--144).
+    \item \textbf{Program graduation} rises with VA: low $-$0.51 and $-$0.06 (ns), middle 0.97 and 0.18 (ns), \textbf{high 1.22** and 0.89**}. Groups differ with year FE ($p=0.010$), not with university, field $\times$ year FE ($p=0.11$).
+    \item The congestion in the low tercile of the main ROL is not significant here.
+    \item \textbf{Any university / HE}: no difference across terciles ($p\geq0.28$).
+\end{itemize}
+\end{column}
+\end{columns}
+
+\vspace{0.05cm}
+\parbox{0.97\textwidth}{\tiny \textit{Notes:} As the main terciles slide, with ROL FE set of programs (own non-singleton sample). 2SLS in pp per ten entrants; first stage in entrants per seat. SE clustered by program-year. $p$ (equal): joint Wald test, pooled model fully interacted with the tercile.}
 \end{frame}
 \end{document}

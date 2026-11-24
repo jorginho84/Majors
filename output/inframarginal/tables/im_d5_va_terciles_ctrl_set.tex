@@ -1,0 +1,32 @@
+\begin{tabular}{lcccc}
+\toprule
+ & Tercile 1 (low) & Tercile 2 & Tercile 3 (high) & \(p\) (equal) \\
+\midrule
+\multicolumn{5}{l}{\textit{Panel A: program-year controls, year FE}} \\
+First stage: \(n_{pt}\) on \(Z_{pt}\) &  0.720\sym{***} &  0.603\sym{***} &  0.941\sym{***} & 0.000 \\
+ & (0.044) & (0.101) & (0.038) & \\
+Kleibergen--Paap F &    274 &     36 &    608 & \\
+2SLS: graduation, enrolled program, 8y & -0.514 &  0.971 &  1.216\sym{**} & 0.010 \\
+ & (0.329) & (0.669) & (0.558) & \\
+2SLS: graduation, any university, 8y &  0.418 &  0.939 &  0.110 & 0.283 \\
+ & (0.267) & (0.619) & (0.140) & \\
+2SLS: graduation, any higher education, 8y &  0.389 &  0.970 &  0.116 & 0.298 \\
+ & (0.273) & (0.618) & (0.141) & \\
+\addlinespace
+\multicolumn{5}{l}{\textit{Panel B: program-year controls, university \(\times\) year and field \(\times\) year FE}} \\
+First stage: \(n_{pt}\) on \(Z_{pt}\) &  0.791\sym{***} &  0.549\sym{***} &  0.882\sym{***} & 0.000 \\
+ & (0.023) & (0.046) & (0.027) & \\
+Kleibergen--Paap F &   1151 &    144 &   1034 & \\
+2SLS: graduation, enrolled program, 8y & -0.062 &  0.177 &  0.892\sym{**} & 0.114 \\
+ & (0.278) & (0.514) & (0.363) & \\
+2SLS: graduation, any university, 8y &  0.480\sym{*} &  0.163 &  0.062 & 0.417 \\
+ & (0.278) & (0.515) & (0.154) & \\
+2SLS: graduation, any higher education, 8y &  0.444 &  0.246 &  0.095 & 0.548 \\
+ & (0.283) & (0.505) & (0.153) & \\
+\midrule
+Mean program VA (EB, income rank points) &  -9.7 &  -2.0 &   8.1 & \\
+Mean of program graduation (\%) &  32.9 &  35.8 &  44.9 & \\
+Students (Panel A) &    33,084 &    29,868 &    51,787 & \\
+Programs (Panel A) &    399 &    383 &    399 & \\
+\bottomrule
+\end{tabular}

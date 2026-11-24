@@ -1,0 +1,27 @@
+\begin{tabular}{l*{9}{c}}
+\toprule
+ROL FE & \multicolumn{3}{c}{Top 1 + univ. (main)} & \multicolumn{3}{c}{First three pref.} & \multicolumn{3}{c}{Program set} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}
+ & (1) & (2) & (3) & (4) & (5) & (6) & (7) & (8) & (9) \\
+Program-year controls & -- & Yes & Yes & -- & Yes & Yes & -- & Yes & Yes \\
+Time FE & Year & Year & U, F \(\times\) yr & Year & Year & U, F \(\times\) yr & Year & Year & U, F \(\times\) yr \\
+\midrule
+First stage: \(n_{pt}\) on \(Z_{pt}\) & 0.864\sym{***} & 0.834\sym{***} & 0.836\sym{***} & 0.866\sym{***} & 0.843\sym{***} & 0.835\sym{***} & 0.886\sym{***} & 0.860\sym{***} & 0.836\sym{***} \\
+ & (0.041) & (0.037) & (0.028) & (0.042) & (0.038) & (0.028) & (0.045) & (0.041) & (0.031) \\
+Kleibergen--Paap F &   435 &   520 &   888 &   422 &   488 &   860 &   396 &   433 &   717 \\
+\addlinespace
+\multicolumn{10}{l}{2SLS (pp per ten entrants)} \\
+\quad Graduation, enrolled program, 8y &  0.650\sym{**} &  0.421 &  0.021 &  0.624\sym{*} &  0.434 &  0.097 &  0.882\sym{**} &  0.838\sym{*} &  0.509 \\
+ & (0.299) & (0.348) & (0.283) & (0.321) & (0.367) & (0.299) & (0.392) & (0.431) & (0.339) \\
+\quad \quad Mean (\%) & 35.4 & 35.4 & 35.4 & 36.9 & 36.9 & 36.9 & 38.8 & 38.8 & 38.8 \\
+\quad Graduation, any university, 8y &  0.306\sym{**} &  0.335\sym{***} &  0.328\sym{***} &  0.235\sym{*} &  0.250\sym{**} &  0.247\sym{**} &  0.313\sym{**} &  0.357\sym{**} &  0.326\sym{**} \\
+ & (0.121) & (0.111) & (0.095) & (0.121) & (0.112) & (0.101) & (0.142) & (0.145) & (0.127) \\
+\quad \quad Mean (\%) & 49.6 & 49.6 & 49.6 & 51.8 & 51.8 & 51.8 & 54.3 & 54.3 & 54.3 \\
+\quad Graduation, any higher education, 8y &  0.290\sym{**} &  0.324\sym{***} &  0.316\sym{***} &  0.235\sym{*} &  0.251\sym{**} &  0.252\sym{**} &  0.306\sym{**} &  0.354\sym{**} &  0.325\sym{***} \\
+ & (0.121) & (0.111) & (0.094) & (0.121) & (0.113) & (0.101) & (0.141) & (0.145) & (0.126) \\
+\quad \quad Mean (\%) & 50.6 & 50.6 & 50.6 & 52.5 & 52.5 & 52.5 & 55.0 & 55.0 & 55.0 \\
+\midrule
+Students &   341,430 &   341,430 &   341,430 &   259,874 &   259,874 &   259,874 &   129,025 &   129,025 &   129,025 \\
+Program-years (clusters) &  8,218 &  8,218 &  8,218 &  8,191 &  8,191 &  8,191 &  8,051 &  8,051 &  8,051 \\
+\bottomrule
+\end{tabular}

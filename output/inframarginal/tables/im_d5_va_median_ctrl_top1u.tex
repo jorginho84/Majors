@@ -1,0 +1,32 @@
+\begin{tabular}{lccc}
+\toprule
+ & Below median & Above median & \(p\) (equal) \\
+\midrule
+\multicolumn{4}{l}{\textit{Panel A: program-year controls, year FE}} \\
+First stage: \(n_{pt}\) on \(Z_{pt}\) &  0.736\sym{***} &  0.865\sym{***} & 0.036 \\
+ & (0.042) & (0.044) & \\
+Kleibergen--Paap F &    304 &    382 & \\
+2SLS: graduation, enrolled program, 8y &  0.044 &  0.677 & 0.269 \\
+ & (0.356) & (0.450) & \\
+2SLS: graduation, any university, 8y &  0.477\sym{**} &  0.241\sym{*} & 0.378 \\
+ & (0.238) & (0.123) & \\
+2SLS: graduation, any higher education, 8y &  0.476\sym{**} &  0.228\sym{*} & 0.355 \\
+ & (0.238) & (0.123) & \\
+\addlinespace
+\multicolumn{4}{l}{\textit{Panel B: program-year controls, university \(\times\) year and field \(\times\) year FE}} \\
+First stage: \(n_{pt}\) on \(Z_{pt}\) &  0.731\sym{***} &  0.843\sym{***} & 0.016 \\
+ & (0.036) & (0.029) & \\
+Kleibergen--Paap F &    419 &    829 & \\
+2SLS: graduation, enrolled program, 8y & -0.229 &  0.211 & 0.251 \\
+ & (0.178) & (0.340) & \\
+2SLS: graduation, any university, 8y &  0.346\sym{**} &  0.270\sym{***} & 0.697 \\
+ & (0.170) & (0.099) & \\
+2SLS: graduation, any higher education, 8y &  0.353\sym{**} &  0.255\sym{***} & 0.619 \\
+ & (0.170) & (0.098) & \\
+\midrule
+Mean program VA (EB, income rank points) &  -7.7 &   5.5 & \\
+Mean of program graduation (\%) &  30.8 &  40.0 & \\
+Students (Panel A) &   145,812 &   177,039 & \\
+Programs (Panel A) &    597 &    596 & \\
+\bottomrule
+\end{tabular}

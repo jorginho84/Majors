@@ -10,7 +10,9 @@
 *            admission process year t.
 *   Enrollment (MINEDUC matricula, 2013-2022): undergraduate students
 *            (nivel_global pregrado), one row per student-program;
-*            total and first-year (anio_ing_carr_ori = year). Covers
+*            total and first-year (anio_ing_carr_ori = year); enr_all
+*            counts every level (undergraduate, graduate, postitulo),
+*            the denominator for spending per student in 49. Covers
 *            every program of the university, also those outside the
 *            centralized admission system, as the finances do.
 *   Seats  : Oferta Academica regular vacancies summed by university
@@ -46,19 +48,20 @@ forvalues y = 2013/2022 {
     rename *, lower
     keep cod_inst nivel_global anio_ing_carr_ori codigo_demre
     replace nivel_global = ustrlower(nivel_global)
-    keep if strpos(nivel_global, "pregrado") > 0
+    gen byte pre = strpos(nivel_global, "pregrado") > 0
     destring cod_inst anio_ing_carr_ori codigo_demre, replace force
     drop if missing(cod_inst)
     gen int  fy = `y'
-    gen byte first_year = anio_ing_carr_ori == `y'
+    gen byte first_year = anio_ing_carr_ori == `y' & pre
     preserve
-        keep if codigo_demre > 0 & !missing(codigo_demre)
+        keep if pre & codigo_demre > 0 & !missing(codigo_demre)
         contract codigo_demre cod_inst
         if !`first' append using `cwp'
         save `cwp', replace
     restore
-    gen byte one = 1
-    collapse (sum) enr_total = one enr_first = first_year, by(cod_inst fy)
+    gen byte one_all = 1
+    collapse (sum) enr_total = pre enr_all = one_all enr_first = first_year, by(cod_inst fy)
+    replace enr_total = . if enr_total == 0
     if !`first' append using `enr'
     save `enr', replace
     local first 0
@@ -114,6 +117,7 @@ foreach v in aranceles ing_total gasto_total rem_total rem_acad {
     gen double pc_`v' = `v' / enr_total
 }
 label variable enr_total       "Undergraduate enrollment (students x programs)"
+label variable enr_all         "Enrollment, all levels: undergraduate, graduate, postitulo (students x programs)"
 label variable enr_first       "First-year undergraduate enrollment"
 label variable seats           "Regular vacancies, centralized admission (sum)"
 label variable in_sua          "University with seats in the centralized admission"
